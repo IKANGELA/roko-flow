@@ -1,19 +1,17 @@
-from typing import Optional
+from sqlalchemy import Integer, String
+from sqlalchemy.orm import Mapped, mapped_column
 
-from pydantic import BaseModel
-
-
-class DostawcaCreate(BaseModel):
-    """Dane potrzebne do utworzenia nowego dostawcy (bez id — to nadaje repozytorium)."""
-
-    nazwa: str
-    telefon: Optional[str] = None
-    email: Optional[str] = None
-    adres: Optional[str] = None
-    uwagi: Optional[str] = None
+from app.core.database import Base
 
 
-class Dostawca(DostawcaCreate):
-    """Pełny rekord dostawcy, taki jaki już istnieje w systemie (ma nadane id)."""
+class DostawcaDB(Base):
+    """Definicja tabeli 'dostawcy' w bazie danych."""
 
-    id: int
+    __tablename__ = "dostawcy"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    nazwa: Mapped[str] = mapped_column(String, nullable=False)
+    telefon: Mapped[str | None] = mapped_column(String, nullable=True)
+    email: Mapped[str | None] = mapped_column(String, nullable=True)
+    adres: Mapped[str | None] = mapped_column(String, nullable=True)
+    uwagi: Mapped[str | None] = mapped_column(String, nullable=True)

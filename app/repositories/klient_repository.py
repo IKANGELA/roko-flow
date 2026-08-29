@@ -1,29 +1,26 @@
-from typing import Dict, List, Optional
+from typing import List, Optional
 
-from app.models.klient import Klient, KlientCreate
+from sqlalchemy.orm import Session
+
+from app.models.klient import KlientDB
+from app.schemas.klient import KlientCreate
 
 
 class KlientRepository:
-    """
-    Odpowiada wyłącznie za przechowywanie i odczyt danych klientów.
+    """Odpowiada wyłącznie za przechowywanie i odczyt danych klientów — teraz w bazie SQLite."""
 
-    Na razie dane trzymamy w pamięci (znikają po restarcie serwera).
-    Gdy dołożymy prawdziwą bazę danych, zmieni się TYLKO ta klasa —
-    serwis i router nie będą wiedzieć o tej zmianie.
-    """
+    def __init__(self, db: Session) -> None:
+        self._db = db
 
-    def __init__(self) -> None:
-        self._klienci: Dict[int, Klient] = {}
-        self._nastepne_id = 1
-
-    def dodaj(self, dane: KlientCreate) -> Klient:
-        klient = Klient(id=self._nastepne_id, **dane.model_dump())
-        self._klienci[klient.id] = klient
-        self._nastepne_id += 1
+    def dodaj(self, dane: KlientCreate) -> KlientDB:
+        klient = KlientDB(**dane.model_dump())
+        self._db.add(klient)
+        self._db.commit()
+        self._db.refresh(klient)
         return klient
 
-    def wszyscy(self) -> List[Klient]:
-        return list(self._klienci.values())
+    def wszyscy(self) -> List[KlientDB]:
+        return self._db.query(KlientDB).all()
 
-    def znajdz(self, klient_id: int) -> Optional[Klient]:
-        return self._klienci.get(klient_id)
+    def znajdz(self, klient_id: int) -> Optional[KlientDB]:
+        return self._db.query(KlientDB).filter(KlientDB.id == klient_id).first()

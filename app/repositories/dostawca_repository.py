@@ -1,23 +1,26 @@
-from typing import Dict, List, Optional
+from typing import List, Optional
 
-from app.models.dostawca import Dostawca, DostawcaCreate
+from sqlalchemy.orm import Session
+
+from app.models.dostawca import DostawcaDB
+from app.schemas.dostawca import DostawcaCreate
 
 
 class DostawcaRepository:
-    """Przechowuje dostawców w pamięci (na razie bez bazy danych — patrz KlientRepository)."""
+    """Odpowiada wyłącznie za przechowywanie i odczyt danych dostawców — teraz w bazie SQLite."""
 
-    def __init__(self) -> None:
-        self._dostawcy: Dict[int, Dostawca] = {}
-        self._nastepne_id = 1
+    def __init__(self, db: Session) -> None:
+        self._db = db
 
-    def dodaj(self, dane: DostawcaCreate) -> Dostawca:
-        dostawca = Dostawca(id=self._nastepne_id, **dane.model_dump())
-        self._dostawcy[dostawca.id] = dostawca
-        self._nastepne_id += 1
+    def dodaj(self, dane: DostawcaCreate) -> DostawcaDB:
+        dostawca = DostawcaDB(**dane.model_dump())
+        self._db.add(dostawca)
+        self._db.commit()
+        self._db.refresh(dostawca)
         return dostawca
 
-    def wszyscy(self) -> List[Dostawca]:
-        return list(self._dostawcy.values())
+    def wszyscy(self) -> List[DostawcaDB]:
+        return self._db.query(DostawcaDB).all()
 
-    def znajdz(self, dostawca_id: int) -> Optional[Dostawca]:
-        return self._dostawcy.get(dostawca_id)
+    def znajdz(self, dostawca_id: int) -> Optional[DostawcaDB]:
+        return self._db.query(DostawcaDB).filter(DostawcaDB.id == dostawca_id).first()
