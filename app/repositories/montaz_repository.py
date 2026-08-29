@@ -39,3 +39,11 @@ class MontazRepository:
 
     def istnieje_dla_kosztorysu(self, kosztorys_id: int) -> bool:
         return self._db.query(MontazDB).filter(MontazDB.kosztorys_id == kosztorys_id).first() is not None
+
+    def usun(self, montaz_id: int) -> bool:
+        montaz = self.znajdz(montaz_id)
+        if montaz is None:
+            return False
+        self._db.delete(montaz)
+        self._db.commit()
+        return True
