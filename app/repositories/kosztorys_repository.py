@@ -32,10 +32,22 @@ class KosztorysRepository:
             for pozycja in pozycje
         ]
 
+    def _kolejny_numer(self) -> str:
+        """Generuje kolejny unikatowy numer kosztorysu w formacie K_01, K_02, ..."""
+        istniejace_numery = [numer for (numer,) in self._db.query(KosztorysDB.numer).all()]
+        maks = 0
+        for numer in istniejace_numery:
+            if numer and numer.startswith("K_"):
+                try:
+                    maks = max(maks, int(numer[2:]))
+                except ValueError:
+                    continue
+        return f"K_{maks + 1:02d}"
+
     def dodaj(self, dane: KosztorysCreate) -> KosztorysDB:
         kosztorys = KosztorysDB(
             klient_id=dane.klient_id,
-            numer=dane.numer,
+            numer=self._kolejny_numer(),
             wersja=dane.wersja,
             nazwa_inwestycji=dane.nazwa_inwestycji,
             adres_montazu=dane.adres_montazu,
@@ -56,8 +68,8 @@ class KosztorysRepository:
         if kosztorys is None:
             return None
 
+        # numer NIE jest tu nadpisywany — jest nadawany raz, przy utworzeniu, i pozostaje stały.
         kosztorys.klient_id = dane.klient_id
-        kosztorys.numer = dane.numer
         kosztorys.wersja = dane.wersja
         kosztorys.nazwa_inwestycji = dane.nazwa_inwestycji
         kosztorys.adres_montazu = dane.adres_montazu
