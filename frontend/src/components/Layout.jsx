@@ -1,4 +1,5 @@
 import { NavLink, Outlet } from 'react-router-dom'
+import './Layout.css'
 
 const POZYCJE_MENU = [
   { sciezka: '/klienci', etykieta: 'Klienci' },
@@ -10,26 +11,21 @@ const POZYCJE_MENU = [
 
 function Layout() {
   return (
-    <div style={{ display: 'flex', minHeight: '100vh' }}>
-      <nav style={{ width: 200, borderRight: '1px solid #ddd', padding: 16 }}>
-        <h2 style={{ marginTop: 0 }}>ROKO Flow</h2>
-        <ul style={{ listStyle: 'none', padding: 0 }}>
+    <div className="uklad">
+      <nav className="sidebar">
+        <p className="sidebar-logo">ROKO Flow</p>
+        <p className="sidebar-tagline">Centrum Designu</p>
+        <ul className="sidebar-menu">
           {POZYCJE_MENU.map((pozycja) => (
-            <li key={pozycja.sciezka} style={{ marginBottom: 8 }}>
-              <NavLink
-                to={pozycja.sciezka}
-                style={({ isActive }) => ({
-                  fontWeight: isActive ? 'bold' : 'normal',
-                  textDecoration: 'none',
-                })}
-              >
+            <li key={pozycja.sciezka}>
+              <NavLink to={pozycja.sciezka} className={({ isActive }) => (isActive ? 'active' : '')}>
                 {pozycja.etykieta}
               </NavLink>
             </li>
           ))}
         </ul>
       </nav>
-      <main style={{ flex: 1, padding: 24 }}>
+      <main className="tresc">
         <Outlet />
       </main>
     </div>
