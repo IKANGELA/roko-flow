@@ -30,14 +30,15 @@ function ZamowieniaList({ zamowienia, onWybierz, zaznaczone, onPrzelacz }) {
             </td>
             <td>{zamowienie.numer_zamowienia || '—'}</td>
             <td>
-              {zamowienie.kosztorys.numer}
-              {zamowienie.kosztorys.nazwa_inwestycji ? ` (${zamowienie.kosztorys.nazwa_inwestycji})` : ''}
+              {zamowienie.kosztorys
+                ? `${zamowienie.kosztorys.numer}${zamowienie.kosztorys.nazwa_inwestycji ? ` (${zamowienie.kosztorys.nazwa_inwestycji})` : ''}`
+                : '—'}
             </td>
-            <td>{zamowienie.dostawca.nazwa}</td>
+            <td>{zamowienie.dostawca ? zamowienie.dostawca.nazwa : '—'}</td>
             <td>{zamowienie.status}</td>
-            <td>{zamowienie.wartosc_brutto.toFixed(2)} zł</td>
+            <td>{zamowienie.wartosc_brutto === null ? '—' : `${zamowienie.wartosc_brutto.toFixed(2)} zł`}</td>
             <td>{zamowienie.zaliczka_klienta.toFixed(2)} zł</td>
-            <td>{zamowienie.do_doplaty.toFixed(2)} zł</td>
+            <td>{zamowienie.do_doplaty === null ? '—' : `${zamowienie.do_doplaty.toFixed(2)} zł`}</td>
             <td>{zamowienie.data_dostawy || '—'}</td>
           </tr>
         ))}
