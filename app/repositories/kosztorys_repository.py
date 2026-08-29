@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import List, Optional
 
 from sqlalchemy.orm import Session, joinedload
@@ -52,6 +53,8 @@ class KosztorysRepository:
             nazwa_inwestycji=dane.nazwa_inwestycji,
             adres_montazu=dane.adres_montazu,
             termin=dane.termin,
+            uwagi=dane.uwagi,
+            wybrany_do_realizacji=dane.wybrany_do_realizacji,
             vat_procent=dane.vat_procent,
             dodatkowe_koszty=dane.dodatkowe_koszty,
             rabat=dane.rabat,
@@ -74,10 +77,13 @@ class KosztorysRepository:
         kosztorys.nazwa_inwestycji = dane.nazwa_inwestycji
         kosztorys.adres_montazu = dane.adres_montazu
         kosztorys.termin = dane.termin
+        kosztorys.uwagi = dane.uwagi
+        kosztorys.wybrany_do_realizacji = dane.wybrany_do_realizacji
         kosztorys.vat_procent = dane.vat_procent
         kosztorys.dodatkowe_koszty = dane.dodatkowe_koszty
         kosztorys.rabat = dane.rabat
         kosztorys.ustalona_zaliczka = dane.ustalona_zaliczka
+        kosztorys.ostatnia_aktualizacja = datetime.utcnow()
 
         # Podmiana całej listy pozycji. cascade="all, delete-orphan" (patrz app/models/kosztorys.py)
         # sprawia, że stare pozycje i ich składniki są automatycznie usuwane z bazy.

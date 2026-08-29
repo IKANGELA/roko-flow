@@ -8,6 +8,8 @@ const PUSTY_FORMULARZ = {
   nazwa_inwestycji: '',
   adres_montazu: '',
   termin: '',
+  uwagi: '',
+  wybrany_do_realizacji: false,
   vat_procent: 8,
   dodatkowe_koszty: 0,
   rabat: 0,
@@ -23,6 +25,8 @@ function danePoczatkowe(kosztorys) {
     nazwa_inwestycji: kosztorys.nazwa_inwestycji || '',
     adres_montazu: kosztorys.adres_montazu || '',
     termin: kosztorys.termin || '',
+    uwagi: kosztorys.uwagi || '',
+    wybrany_do_realizacji: kosztorys.wybrany_do_realizacji,
     vat_procent: kosztorys.vat_procent,
     dodatkowe_koszty: kosztorys.dodatkowe_koszty,
     rabat: kosztorys.rabat,
@@ -79,6 +83,8 @@ function KosztorysForm({ kosztorys, onZapisano }) {
       nazwa_inwestycji: dane.nazwa_inwestycji || null,
       adres_montazu: dane.adres_montazu || null,
       termin: dane.termin || null,
+      uwagi: dane.uwagi || null,
+      wybrany_do_realizacji: dane.wybrany_do_realizacji,
       vat_procent: Number(dane.vat_procent),
       dodatkowe_koszty: Number(dane.dodatkowe_koszty) || 0,
       rabat: Number(dane.rabat) || 0,
@@ -139,6 +145,22 @@ function KosztorysForm({ kosztorys, onZapisano }) {
       </div>
       <div>
         <input name="termin" placeholder="Termin (np. 2 tygodnie)" value={dane.termin} onChange={zmienPole} />
+      </div>
+      <div>
+        <textarea name="uwagi" placeholder="Uwagi" value={dane.uwagi} onChange={zmienPole} rows={2} />
+      </div>
+      <div>
+        <label>
+          <input
+            type="checkbox"
+            name="wybrany_do_realizacji"
+            checked={dane.wybrany_do_realizacji}
+            onChange={(event) =>
+              setDane((poprzednie) => ({ ...poprzednie, wybrany_do_realizacji: event.target.checked }))
+            }
+          />{' '}
+          Wybrany do realizacji
+        </label>
       </div>
 
       <div>
