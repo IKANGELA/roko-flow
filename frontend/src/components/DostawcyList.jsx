@@ -1,4 +1,4 @@
-function DostawcyList({ dostawcy, onUsun }) {
+function DostawcyList({ dostawcy, zaznaczone, onPrzelacz }) {
   if (dostawcy.length === 0) {
     return <p>Brak dostawców.</p>
   }
@@ -7,11 +7,15 @@ function DostawcyList({ dostawcy, onUsun }) {
     <ul>
       {dostawcy.map((dostawca) => (
         <li key={dostawca.id}>
-          <strong>{dostawca.nazwa}</strong>
-          {dostawca.specyfikacja && ` — ${dostawca.specyfikacja}`}{' '}
-          <button type="button" onClick={() => onUsun(dostawca)}>
-            Usuń
-          </button>
+          <label>
+            <input
+              type="checkbox"
+              checked={zaznaczone.has(dostawca.id)}
+              onChange={() => onPrzelacz(dostawca.id)}
+            />{' '}
+            <strong>{dostawca.nazwa}</strong>
+            {dostawca.specyfikacja && ` — ${dostawca.specyfikacja}`}
+          </label>
         </li>
       ))}
     </ul>

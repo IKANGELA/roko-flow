@@ -1,10 +1,14 @@
 import { useEffect, useState } from 'react'
 import DostawcyList from '../components/DostawcyList'
 import DostawcaForm from '../components/DostawcaForm'
+import PasekZaznaczenia from '../components/PasekZaznaczenia'
 import { pobierzDostawcow, usunDostawce } from '../api'
+import { useZaznaczenie } from '../useZaznaczenie'
+import { usunZaznaczoneElementy } from '../usunZaznaczone'
 
 function DostawcyPage() {
   const [dostawcy, setDostawcy] = useState([])
+  const { zaznaczone, przelacz, wyczysc } = useZaznaczenie()
 
   useEffect(() => {
     pobierzDostawcow().then(setDostawcy)
@@ -14,15 +18,15 @@ function DostawcyPage() {
     setDostawcy((poprzedni) => [...poprzedni, nowyDostawca])
   }
 
-  async function usunZListy(dostawca) {
-    if (!window.confirm(`Usunąć dostawcę „${dostawca.nazwa}"?`)) {
+  async function usunZaznaczonych() {
+    if (!window.confirm(`Usunąć ${zaznaczone.size} dostawców?`)) {
       return
     }
-    try {
-      await usunDostawce(dostawca.id)
-      setDostawcy((poprzedni) => poprzedni.filter((d) => d.id !== dostawca.id))
-    } catch (e) {
-      window.alert(e.message)
+    const { usunieteId, bledy } = await usunZaznaczoneElementy(zaznaczone, usunDostawce, dostawcy, (d) => d.nazwa)
+    setDostawcy((poprzedni) => poprzedni.filter((d) => !usunieteId.includes(d.id)))
+    wyczysc()
+    if (bledy.length > 0) {
+      window.alert(`Nie udało się usunąć niektórych dostawców:\n${bledy.join('\n')}`)
     }
   }
 
@@ -30,7 +34,8 @@ function DostawcyPage() {
     <div>
       <h1>Dostawcy</h1>
       <DostawcaForm onUtworzono={dodajDostawceDoListy} />
-      <DostawcyList dostawcy={dostawcy} onUsun={usunZListy} />
+      <DostawcyList dostawcy={dostawcy} zaznaczone={zaznaczone} onPrzelacz={przelacz} />
+      <PasekZaznaczenia liczbaZaznaczonych={zaznaczone.size} onUsun={usunZaznaczonych} />
     </div>
   )
 }

@@ -1,4 +1,4 @@
-function KosztorysyList({ kosztorysy, onWybierz, onAkceptuj, onUsun }) {
+function KosztorysyList({ kosztorysy, onWybierz, onAkceptuj, zaznaczone, onPrzelacz }) {
   if (kosztorysy.length === 0) {
     return <p>Brak kosztorysów.</p>
   }
@@ -7,6 +7,7 @@ function KosztorysyList({ kosztorysy, onWybierz, onAkceptuj, onUsun }) {
     <table>
       <thead>
         <tr>
+          <th></th>
           <th>Numer</th>
           <th>Klient</th>
           <th>Inwestycja</th>
@@ -21,6 +22,13 @@ function KosztorysyList({ kosztorysy, onWybierz, onAkceptuj, onUsun }) {
       <tbody>
         {kosztorysy.map((kosztorys) => (
           <tr key={kosztorys.id} onClick={() => onWybierz(kosztorys)} style={{ cursor: 'pointer' }}>
+            <td onClick={(event) => event.stopPropagation()}>
+              <input
+                type="checkbox"
+                checked={zaznaczone.has(kosztorys.id)}
+                onChange={() => onPrzelacz(kosztorys.id)}
+              />
+            </td>
             <td>{kosztorys.numer}</td>
             <td>{kosztorys.klient.imie_i_nazwisko}</td>
             <td>{kosztorys.nazwa_inwestycji || '—'}</td>
@@ -40,16 +48,7 @@ function KosztorysyList({ kosztorysy, onWybierz, onAkceptuj, onUsun }) {
                 >
                   Akceptuj
                 </button>
-              )}{' '}
-              <button
-                type="button"
-                onClick={(event) => {
-                  event.stopPropagation()
-                  onUsun(kosztorys)
-                }}
-              >
-                Usuń
-              </button>
+              )}
             </td>
           </tr>
         ))}
