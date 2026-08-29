@@ -28,6 +28,15 @@ class KosztorysService:
         kosztorys_db = self._repository.dodaj(dane)
         return self._do_schematu(kosztorys_db)
 
+    def aktualizuj_kosztorys(self, kosztorys_id: int, dane: KosztorysCreate) -> Optional[Kosztorys]:
+        if self._klient_repository.znajdz(dane.klient_id) is None:
+            raise ValueError(f"Klient o id={dane.klient_id} nie istnieje")
+
+        kosztorys_db = self._repository.aktualizuj(kosztorys_id, dane)
+        if kosztorys_db is None:
+            return None
+        return self._do_schematu(kosztorys_db)
+
     def lista_kosztorysow(self) -> List[Kosztorys]:
         return [self._do_schematu(k) for k in self._repository.wszystkie()]
 

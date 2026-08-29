@@ -24,6 +24,21 @@ def utworz_kosztorys(
         raise HTTPException(status_code=400, detail=str(e))
 
 
+@router.put("/{kosztorys_id}", response_model=Kosztorys)
+def aktualizuj_kosztorys(
+    kosztorys_id: int,
+    dane: KosztorysCreate,
+    service: KosztorysService = Depends(get_kosztorys_service),
+) -> Kosztorys:
+    try:
+        kosztorys = service.aktualizuj_kosztorys(kosztorys_id, dane)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    if kosztorys is None:
+        raise HTTPException(status_code=404, detail="Kosztorys nie znaleziony")
+    return kosztorys
+
+
 @router.get("/", response_model=list[Kosztorys])
 def lista_kosztorysow(service: KosztorysService = Depends(get_kosztorys_service)) -> list[Kosztorys]:
     return service.lista_kosztorysow()
