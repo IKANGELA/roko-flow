@@ -24,8 +24,8 @@ class DostawcaPodsumowanie(BaseModel):
 
 
 class ZamowienieCreate(BaseModel):
-    kosztorys_id: int
-    dostawca_id: int
+    kosztorys_id: Optional[int] = None
+    dostawca_id: Optional[int] = None
 
     status: str = "Nowe"
     numer_zamowienia: Optional[str] = None
@@ -40,7 +40,7 @@ class ZamowienieCreate(BaseModel):
     zaliczka_producent: float = 0
     doplata_producent: float = 0
 
-    wartosc_netto: float
+    wartosc_netto: Optional[float] = None
     vat_procent: float = 8
 
     zaliczka_klienta: float = 0
@@ -52,11 +52,11 @@ class ZamowienieCreate(BaseModel):
 
 class Zamowienie(ZamowienieCreate):
     id: int
-    kosztorys: KosztorysPodsumowanie
-    dostawca: DostawcaPodsumowanie
+    kosztorys: Optional[KosztorysPodsumowanie] = None
+    dostawca: Optional[DostawcaPodsumowanie] = None
 
-    # Wyliczane przez serwis, nie ma takich kolumn w bazie:
-    wartosc_brutto: float
-    do_doplaty: float
+    # Wyliczane przez serwis, nie ma takich kolumn w bazie — None, dopóki nie znamy wartości netto.
+    wartosc_brutto: Optional[float] = None
+    do_doplaty: Optional[float] = None
 
     model_config = ConfigDict(from_attributes=True)

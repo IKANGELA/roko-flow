@@ -12,13 +12,18 @@ class ZamowienieDB(Base):
 
     Jeden kosztorys może mieć kilka zamówień (po jednym na dostawcę/markę) —
     na razie tworzone i wyceniane ręcznie, patrz architecture_decisions.
+
+    kosztorys_id jest opcjonalny — zamówienie nie zawsze wynika z kosztorysu
+    (np. zlecenie serwisowe albo doraźny zakup), rodzaj takiego "wolnego"
+    zamówienia opisuje się po prostu w polu status/uwagi.
     """
 
     __tablename__ = "zamowienia"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
-    kosztorys_id: Mapped[int] = mapped_column(ForeignKey("kosztorysy.id"), nullable=False)
-    dostawca_id: Mapped[int] = mapped_column(ForeignKey("dostawcy.id"), nullable=False)
+    kosztorys_id: Mapped[int | None] = mapped_column(ForeignKey("kosztorysy.id"), nullable=True)
+    # Dostawca bywa nieznany w chwili akceptacji kosztorysu — uzupełniany później, stąd nullable.
+    dostawca_id: Mapped[int | None] = mapped_column(ForeignKey("dostawcy.id"), nullable=True)
 
     status: Mapped[str] = mapped_column(String, default="Nowe")
     numer_zamowienia: Mapped[str | None] = mapped_column(String, nullable=True)
@@ -33,7 +38,8 @@ class ZamowienieDB(Base):
     zaliczka_producent: Mapped[float] = mapped_column(Float, default=0)
     doplata_producent: Mapped[float] = mapped_column(Float, default=0)
 
-    wartosc_netto: Mapped[float] = mapped_column(Float, nullable=False)
+    # Wartość netto bywa nieznana do czasu wyceny u dostawcy — również nullable.
+    wartosc_netto: Mapped[float | None] = mapped_column(Float, nullable=True)
     vat_procent: Mapped[float] = mapped_column(Float, default=8)
 
     zaliczka_klienta: Mapped[float] = mapped_column(Float, default=0)

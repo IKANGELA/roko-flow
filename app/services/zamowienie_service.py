@@ -26,9 +26,11 @@ class ZamowienieService:
         self._dostawca_repository = dostawca_repository
 
     def _sprawdz_powiazania(self, dane: ZamowienieCreate) -> None:
-        if self._kosztorys_repository.znajdz(dane.kosztorys_id) is None:
+        # kosztorys_id i dostawca_id są opcjonalne (zamówienie "wolne", np. serwis,
+        # albo dostawca jeszcze nieznany) — sprawdzamy istnienie tylko gdy podano.
+        if dane.kosztorys_id is not None and self._kosztorys_repository.znajdz(dane.kosztorys_id) is None:
             raise ValueError(f"Kosztorys o id={dane.kosztorys_id} nie istnieje")
-        if self._dostawca_repository.znajdz(dane.dostawca_id) is None:
+        if dane.dostawca_id is not None and self._dostawca_repository.znajdz(dane.dostawca_id) is None:
             raise ValueError(f"Dostawca o id={dane.dostawca_id} nie istnieje")
 
     def utworz_zamowienie(self, dane: ZamowienieCreate) -> Zamowienie:
@@ -56,16 +58,29 @@ class ZamowienieService:
         return self._repository.usun(zamowienie_id)
 
     def _do_schematu(self, zamowienie: ZamowienieDB) -> Zamowienie:
-        wartosc_brutto = round(zamowienie.wartosc_netto * (1 + zamowienie.vat_procent / 100), 2)
-        do_doplaty = round(wartosc_brutto - zamowienie.zaliczka_klienta, 2)
-        kosztorys = self._kosztorys_repository.znajdz(zamowienie.kosztorys_id)
-        dostawca = self._dostawca_repository.znajdz(zamowienie.dostawca_id)
+        if zamowienie.wartosc_netto is None:
+            wartosc_brutto = None
+            do_doplaty = None
+        else:
+            wartosc_brutto = round(zamowienie.wartosc_netto * (1 + zamowienie.vat_procent / 100), 2)
+            do_doplaty = round(wartosc_brutto - zamowienie.zaliczka_klienta, 2)
+
+        kosztorys = (
+            self._kosztorys_repository.znajdz(zamowienie.kosztorys_id)
+            if zamowienie.kosztorys_id is not None
+            else None
+        )
+        dostawca = (
+            self._dostawca_repository.znajdz(zamowienie.dostawca_id)
+            if zamowienie.dostawca_id is not None
+            else None
+        )
         return Zamowienie(
             id=zamowienie.id,
             kosztorys_id=zamowienie.kosztorys_id,
-            kosztorys=KosztorysPodsumowanie.model_validate(kosztorys),
+            kosztorys=KosztorysPodsumowanie.model_validate(kosztorys) if kosztorys is not None else None,
             dostawca_id=zamowienie.dostawca_id,
-            dostawca=DostawcaPodsumowanie.model_validate(dostawca),
+            dostawca=DostawcaPodsumowanie.model_validate(dostawca) if dostawca is not None else None,
             status=zamowienie.status,
             numer_zamowienia=zamowienie.numer_zamowienia,
             data_zamowienia=zamowienie.data_zamowienia,

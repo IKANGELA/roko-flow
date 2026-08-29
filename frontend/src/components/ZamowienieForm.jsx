@@ -25,8 +25,8 @@ const PUSTY_FORMULARZ = {
 function danePoczatkowe(zamowienie, wstepnyKosztorysId) {
   if (zamowienie) {
     return {
-      kosztorys_id: zamowienie.kosztorys_id,
-      dostawca_id: zamowienie.dostawca_id,
+      kosztorys_id: zamowienie.kosztorys_id ?? '',
+      dostawca_id: zamowienie.dostawca_id ?? '',
       status: zamowienie.status,
       numer_zamowienia: zamowienie.numer_zamowienia || '',
       data_zamowienia: zamowienie.data_zamowienia || '',
@@ -37,7 +37,7 @@ function danePoczatkowe(zamowienie, wstepnyKosztorysId) {
       braki_w_dostawie: zamowienie.braki_w_dostawie || '',
       zaliczka_producent: zamowienie.zaliczka_producent,
       doplata_producent: zamowienie.doplata_producent,
-      wartosc_netto: zamowienie.wartosc_netto,
+      wartosc_netto: zamowienie.wartosc_netto ?? '',
       vat_procent: zamowienie.vat_procent,
       zaliczka_klienta: zamowienie.zaliczka_klienta,
       data_zaliczki: zamowienie.data_zaliczki || '',
@@ -90,17 +90,13 @@ function ZamowienieForm({ zamowienie, wstepnyKosztorysId, onZapisano }) {
 
   async function wyslij(event) {
     event.preventDefault()
-    if (!dane.kosztorys_id || !dane.dostawca_id) {
-      setBlad('Wybierz kosztorys i dostawcę.')
-      return
-    }
 
     setZapisywanie(true)
     setBlad(null)
 
     const daneDoWyslania = {
-      kosztorys_id: Number(dane.kosztorys_id),
-      dostawca_id: Number(dane.dostawca_id),
+      kosztorys_id: dane.kosztorys_id === '' ? null : Number(dane.kosztorys_id),
+      dostawca_id: dane.dostawca_id === '' ? null : Number(dane.dostawca_id),
       status: dane.status,
       numer_zamowienia: dane.numer_zamowienia || null,
       data_zamowienia: dane.data_zamowienia || null,
@@ -111,7 +107,7 @@ function ZamowienieForm({ zamowienie, wstepnyKosztorysId, onZapisano }) {
       braki_w_dostawie: dane.braki_w_dostawie || null,
       zaliczka_producent: Number(dane.zaliczka_producent) || 0,
       doplata_producent: Number(dane.doplata_producent) || 0,
-      wartosc_netto: Number(dane.wartosc_netto),
+      wartosc_netto: dane.wartosc_netto === '' ? null : Number(dane.wartosc_netto),
       vat_procent: Number(dane.vat_procent),
       zaliczka_klienta: Number(dane.zaliczka_klienta) || 0,
       data_zaliczki: dane.data_zaliczki || null,
@@ -138,11 +134,9 @@ function ZamowienieForm({ zamowienie, wstepnyKosztorysId, onZapisano }) {
     <form onSubmit={wyslij}>
       <div>
         <label>
-          Kosztorys:{' '}
-          <select name="kosztorys_id" value={dane.kosztorys_id} onChange={zmienKosztorys} required>
-            <option value="" disabled>
-              -- wybierz kosztorys --
-            </option>
+          Kosztorys (opcjonalnie — np. serwis lub inne zamówienie nie wymaga kosztorysu):{' '}
+          <select name="kosztorys_id" value={dane.kosztorys_id} onChange={zmienKosztorys}>
+            <option value="">-- bez kosztorysu --</option>
             {kosztorysy.map((k) => (
               <option key={k.id} value={k.id}>
                 {k.numer} — {k.klient.imie_i_nazwisko}
@@ -155,11 +149,9 @@ function ZamowienieForm({ zamowienie, wstepnyKosztorysId, onZapisano }) {
 
       <div>
         <label>
-          Dostawca:{' '}
-          <select name="dostawca_id" value={dane.dostawca_id} onChange={zmienPole} required>
-            <option value="" disabled>
-              -- wybierz dostawcę --
-            </option>
+          Dostawca (można uzupełnić później):{' '}
+          <select name="dostawca_id" value={dane.dostawca_id} onChange={zmienPole}>
+            <option value="">-- jeszcze nieznany --</option>
             {dostawcy.map((d) => (
               <option key={d.id} value={d.id}>
                 {d.nazwa}
@@ -229,8 +221,8 @@ function ZamowienieForm({ zamowienie, wstepnyKosztorysId, onZapisano }) {
 
       <div>
         <label>
-          Wartość netto:{' '}
-          <input type="number" step="0.01" name="wartosc_netto" value={dane.wartosc_netto} onChange={zmienPole} required />
+          Wartość netto (można uzupełnić później):{' '}
+          <input type="number" step="0.01" name="wartosc_netto" value={dane.wartosc_netto} onChange={zmienPole} />
         </label>
       </div>
       <div>
@@ -244,7 +236,9 @@ function ZamowienieForm({ zamowienie, wstepnyKosztorysId, onZapisano }) {
         </label>
       </div>
       <div>
-        <strong>Wartość brutto (wyliczana): {wartoscBrutto.toFixed(2)} zł</strong>
+        <strong>
+          Wartość brutto (wyliczana): {dane.wartosc_netto === '' ? '—' : `${wartoscBrutto.toFixed(2)} zł`}
+        </strong>
       </div>
       <div>
         <label>
