@@ -1,13 +1,17 @@
 import { useEffect, useState } from 'react'
 import KosztorysyList from '../components/KosztorysyList'
 import KosztorysForm from '../components/KosztorysForm'
+import PasekZaznaczenia from '../components/PasekZaznaczenia'
 import { aktualizujKosztorys, pobierzKosztorysy, usunKosztorys } from '../api'
 import { kosztorysDoPayloadu } from '../kosztorysUtils'
+import { useZaznaczenie } from '../useZaznaczenie'
+import { usunZaznaczoneElementy } from '../usunZaznaczone'
 
 function KosztorysyPage() {
   const [kosztorysy, setKosztorysy] = useState([])
   const [widok, setWidok] = useState('lista') // 'lista' | 'nowy' | 'edytuj'
   const [wybranyKosztorys, setWybranyKosztorys] = useState(null)
+  const { zaznaczone, przelacz, wyczysc } = useZaznaczenie()
 
   useEffect(() => {
     pobierzKosztorysy().then(setKosztorysy)
@@ -39,15 +43,15 @@ function KosztorysyPage() {
     setKosztorysy((poprzednie) => poprzednie.map((k) => (k.id === zaktualizowany.id ? zaktualizowany : k)))
   }
 
-  async function usunZListy(kosztorys) {
-    if (!window.confirm(`Usunąć kosztorys „${kosztorys.numer}"?`)) {
+  async function usunZaznaczone() {
+    if (!window.confirm(`Usunąć ${zaznaczone.size} kosztorysów?`)) {
       return
     }
-    try {
-      await usunKosztorys(kosztorys.id)
-      setKosztorysy((poprzednie) => poprzednie.filter((k) => k.id !== kosztorys.id))
-    } catch (e) {
-      window.alert(e.message)
+    const { usunieteId, bledy } = await usunZaznaczoneElementy(zaznaczone, usunKosztorys, kosztorysy, (k) => k.numer)
+    setKosztorysy((poprzednie) => poprzednie.filter((k) => !usunieteId.includes(k.id)))
+    wyczysc()
+    if (bledy.length > 0) {
+      window.alert(`Nie udało się usunąć niektórych kosztorysów:\n${bledy.join('\n')}`)
     }
   }
 
@@ -80,8 +84,10 @@ function KosztorysyPage() {
         kosztorysy={kosztorysy}
         onWybierz={otworzDoEdycji}
         onAkceptuj={zaakceptujKosztorys}
-        onUsun={usunZListy}
+        zaznaczone={zaznaczone}
+        onPrzelacz={przelacz}
       />
+      <PasekZaznaczenia liczbaZaznaczonych={zaznaczone.size} onUsun={usunZaznaczone} />
     </div>
   )
 }
