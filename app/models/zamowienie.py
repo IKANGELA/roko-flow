@@ -34,7 +34,7 @@ class ZamowienieDB(Base):
     doplata_producent: Mapped[float] = mapped_column(Float, default=0)
 
     wartosc_netto: Mapped[float] = mapped_column(Float, nullable=False)
-    wartosc_brutto: Mapped[float] = mapped_column(Float, nullable=False)
+    vat_procent: Mapped[float] = mapped_column(Float, default=8)
 
     zaliczka_klienta: Mapped[float] = mapped_column(Float, default=0)
     data_zaliczki: Mapped[date | None] = mapped_column(Date, nullable=True)
