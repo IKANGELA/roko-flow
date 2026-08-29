@@ -1,20 +1,18 @@
-from typing import Optional
+from sqlalchemy import Integer, String
+from sqlalchemy.orm import Mapped, mapped_column
 
-from pydantic import BaseModel
-
-
-class KlientCreate(BaseModel):
-    """Dane potrzebne do utworzenia nowego klienta (bez id — to nadaje repozytorium)."""
-
-    imie_i_nazwisko: str
-    telefon: str
-    email: Optional[str] = None
-    adres: Optional[str] = None
-    nip: Optional[str] = None
-    uwagi: Optional[str] = None
+from app.core.database import Base
 
 
-class Klient(KlientCreate):
-    """Pełny rekord klienta, taki jaki już istnieje w systemie (ma nadane id)."""
+class KlientDB(Base):
+    """Definicja tabeli 'klienci' w bazie danych."""
 
-    id: int
+    __tablename__ = "klienci"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    imie_i_nazwisko: Mapped[str] = mapped_column(String, nullable=False)
+    telefon: Mapped[str] = mapped_column(String, nullable=False)
+    email: Mapped[str | None] = mapped_column(String, nullable=True)
+    adres: Mapped[str | None] = mapped_column(String, nullable=True)
+    nip: Mapped[str | None] = mapped_column(String, nullable=True)
+    uwagi: Mapped[str | None] = mapped_column(String, nullable=True)
