@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import KosztorysyList from '../components/KosztorysyList'
 import KosztorysForm from '../components/KosztorysForm'
 import PasekZaznaczenia from '../components/PasekZaznaczenia'
-import { aktualizujKosztorys, pobierzKosztorysy, usunKosztorys } from '../api'
+import { aktualizujKosztorys, pobierzKosztorysy, pobierzZamowienia, usunKosztorys, usunZamowienie } from '../api'
 import { kosztorysDoPayloadu } from '../kosztorysUtils'
 import { useZaznaczenie } from '../useZaznaczenie'
 import { usunZaznaczoneElementy } from '../usunZaznaczone'
@@ -47,6 +47,28 @@ function KosztorysyPage() {
     navigate('/zamowienia', { state: { kosztorysId: kosztorys.id } })
   }
 
+  async function wycofajAkceptacjeKosztorysu(kosztorys) {
+    if (
+      !window.confirm(
+        `Cofnąć akceptację kosztorysu „${kosztorys.numer}"? Usunie to również powiązane z nim zamówienie(a).`,
+      )
+    ) {
+      return
+    }
+
+    // Usuwamy wszystkie zamówienia powiązane z tym kosztorysem — nie mamy osobnego
+    // endpointu "po kosztorysie", więc pobieramy wszystkie i filtrujemy po stronie frontendu.
+    const wszystkieZamowienia = await pobierzZamowienia()
+    const powiazane = wszystkieZamowienia.filter((z) => z.kosztorys_id === kosztorys.id)
+    for (const zamowienie of powiazane) {
+      await usunZamowienie(zamowienie.id)
+    }
+
+    const payload = kosztorysDoPayloadu(kosztorys, { wybrany_do_realizacji: false })
+    const zaktualizowany = await aktualizujKosztorys(kosztorys.id, payload)
+    setKosztorysy((poprzednie) => poprzednie.map((k) => (k.id === zaktualizowany.id ? zaktualizowany : k)))
+  }
+
   async function usunZaznaczone() {
     if (!window.confirm(`Usunąć ${zaznaczone.size} kosztorysów?`)) {
       return
@@ -88,6 +110,7 @@ function KosztorysyPage() {
         kosztorysy={kosztorysy}
         onWybierz={otworzDoEdycji}
         onAkceptuj={zaakceptujKosztorys}
+        onWycofajAkceptacje={wycofajAkceptacjeKosztorysu}
         zaznaczone={zaznaczone}
         onPrzelacz={przelacz}
       />
