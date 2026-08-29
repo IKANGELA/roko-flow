@@ -4,7 +4,12 @@ from app.models.zamowienie import ZamowienieDB
 from app.repositories.dostawca_repository import DostawcaRepository
 from app.repositories.kosztorys_repository import KosztorysRepository
 from app.repositories.zamowienie_repository import ZamowienieRepository
-from app.schemas.zamowienie import Zamowienie, ZamowienieCreate
+from app.schemas.zamowienie import (
+    DostawcaPodsumowanie,
+    KosztorysPodsumowanie,
+    Zamowienie,
+    ZamowienieCreate,
+)
 
 
 class ZamowienieService:
@@ -50,13 +55,17 @@ class ZamowienieService:
     def usun_zamowienie(self, zamowienie_id: int) -> bool:
         return self._repository.usun(zamowienie_id)
 
-    @staticmethod
-    def _do_schematu(zamowienie: ZamowienieDB) -> Zamowienie:
-        do_doplaty = round(zamowienie.wartosc_brutto - zamowienie.zaliczka_klienta, 2)
+    def _do_schematu(self, zamowienie: ZamowienieDB) -> Zamowienie:
+        wartosc_brutto = round(zamowienie.wartosc_netto * (1 + zamowienie.vat_procent / 100), 2)
+        do_doplaty = round(wartosc_brutto - zamowienie.zaliczka_klienta, 2)
+        kosztorys = self._kosztorys_repository.znajdz(zamowienie.kosztorys_id)
+        dostawca = self._dostawca_repository.znajdz(zamowienie.dostawca_id)
         return Zamowienie(
             id=zamowienie.id,
             kosztorys_id=zamowienie.kosztorys_id,
+            kosztorys=KosztorysPodsumowanie.model_validate(kosztorys),
             dostawca_id=zamowienie.dostawca_id,
+            dostawca=DostawcaPodsumowanie.model_validate(dostawca),
             status=zamowienie.status,
             numer_zamowienia=zamowienie.numer_zamowienia,
             data_zamowienia=zamowienie.data_zamowienia,
@@ -68,7 +77,8 @@ class ZamowienieService:
             zaliczka_producent=zamowienie.zaliczka_producent,
             doplata_producent=zamowienie.doplata_producent,
             wartosc_netto=zamowienie.wartosc_netto,
-            wartosc_brutto=zamowienie.wartosc_brutto,
+            vat_procent=zamowienie.vat_procent,
+            wartosc_brutto=wartosc_brutto,
             zaliczka_klienta=zamowienie.zaliczka_klienta,
             data_zaliczki=zamowienie.data_zaliczki,
             doplacono=zamowienie.doplacono,

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import KosztorysyList from '../components/KosztorysyList'
 import KosztorysForm from '../components/KosztorysForm'
 import PasekZaznaczenia from '../components/PasekZaznaczenia'
@@ -8,6 +9,7 @@ import { useZaznaczenie } from '../useZaznaczenie'
 import { usunZaznaczoneElementy } from '../usunZaznaczone'
 
 function KosztorysyPage() {
+  const navigate = useNavigate()
   const [kosztorysy, setKosztorysy] = useState([])
   const [widok, setWidok] = useState('lista') // 'lista' | 'nowy' | 'edytuj'
   const [wybranyKosztorys, setWybranyKosztorys] = useState(null)
@@ -39,8 +41,10 @@ function KosztorysyPage() {
 
   async function zaakceptujKosztorys(kosztorys) {
     const payload = kosztorysDoPayloadu(kosztorys, { wybrany_do_realizacji: true })
-    const zaktualizowany = await aktualizujKosztorys(kosztorys.id, payload)
-    setKosztorysy((poprzednie) => poprzednie.map((k) => (k.id === zaktualizowany.id ? zaktualizowany : k)))
+    await aktualizujKosztorys(kosztorys.id, payload)
+    // Zaakceptowany kosztorys od razu przechodzi do tworzenia zamówienia — z tym kosztorysem
+    // już wybranym, żeby nie trzeba było go szukać ręcznie na liście.
+    navigate('/zamowienia', { state: { kosztorysId: kosztorys.id } })
   }
 
   async function usunZaznaczone() {

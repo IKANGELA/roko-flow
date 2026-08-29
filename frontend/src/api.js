@@ -63,6 +63,35 @@ export async function utworzDostawce(dane) {
   return odpowiedz.json()
 }
 
+export async function pobierzZamowienia() {
+  const odpowiedz = await fetch(`${API_URL}/zamowienia/`)
+  return odpowiedz.json()
+}
+
+export async function utworzZamowienie(dane) {
+  const odpowiedz = await fetch(`${API_URL}/zamowienia/`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(dane),
+  })
+  if (!odpowiedz.ok) {
+    throw new Error('Nie udało się utworzyć zamówienia')
+  }
+  return odpowiedz.json()
+}
+
+export async function aktualizujZamowienie(id, dane) {
+  const odpowiedz = await fetch(`${API_URL}/zamowienia/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(dane),
+  })
+  if (!odpowiedz.ok) {
+    throw new Error('Nie udało się zaktualizować zamówienia')
+  }
+  return odpowiedz.json()
+}
+
 // Wspólna obsługa usuwania — jeśli backend odrzuci usunięcie (np. bo istnieją powiązane
 // rekordy), pokazujemy dokładnie ten komunikat, który zwrócił, zamiast ogólnego "błąd".
 async function usunPodAdresem(url) {

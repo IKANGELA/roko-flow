@@ -4,6 +4,25 @@ from typing import Optional
 from pydantic import BaseModel, ConfigDict
 
 
+class KosztorysPodsumowanie(BaseModel):
+    """Okrojone dane kosztorysu, dołączane do zamówienia, żeby nie trzeba było ich dociągać osobno."""
+
+    id: int
+    numer: str
+    nazwa_inwestycji: Optional[str] = None
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class DostawcaPodsumowanie(BaseModel):
+    """Okrojone dane dostawcy, dołączane do zamówienia."""
+
+    id: int
+    nazwa: str
+
+    model_config = ConfigDict(from_attributes=True)
+
+
 class ZamowienieCreate(BaseModel):
     kosztorys_id: int
     dostawca_id: int
@@ -22,7 +41,7 @@ class ZamowienieCreate(BaseModel):
     doplata_producent: float = 0
 
     wartosc_netto: float
-    wartosc_brutto: float
+    vat_procent: float = 8
 
     zaliczka_klienta: float = 0
     data_zaliczki: Optional[date] = None
@@ -33,8 +52,11 @@ class ZamowienieCreate(BaseModel):
 
 class Zamowienie(ZamowienieCreate):
     id: int
+    kosztorys: KosztorysPodsumowanie
+    dostawca: DostawcaPodsumowanie
 
-    # Wyliczane przez serwis: wartosc_brutto - zaliczka_klienta.
+    # Wyliczane przez serwis, nie ma takich kolumn w bazie:
+    wartosc_brutto: float
     do_doplaty: float
 
     model_config = ConfigDict(from_attributes=True)
