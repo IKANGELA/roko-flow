@@ -4,9 +4,9 @@ function DostawcyList({ dostawcy, zaznaczone, onPrzelacz }) {
   }
 
   return (
-    <ul>
+    <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
       {dostawcy.map((dostawca) => (
-        <li key={dostawca.id}>
+        <li key={dostawca.id} style={{ textAlign: 'left' }}>
           <label>
             <input
               type="checkbox"

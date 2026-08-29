@@ -4,9 +4,9 @@ function KlienciList({ klienci, zaznaczone, onPrzelacz }) {
   }
 
   return (
-    <ul>
+    <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
       {klienci.map((klient) => (
-        <li key={klient.id}>
+        <li key={klient.id} style={{ textAlign: 'left' }}>
           <label>
             <input type="checkbox" checked={zaznaczone.has(klient.id)} onChange={() => onPrzelacz(klient.id)} />{' '}
             {klient.imie_i_nazwisko} — {klient.telefon}
