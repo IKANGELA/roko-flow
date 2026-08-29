@@ -5,33 +5,59 @@ import { pobierzKosztorysy } from '../api'
 
 function KosztorysyPage() {
   const [kosztorysy, setKosztorysy] = useState([])
-  const [pokazFormularz, setPokazFormularz] = useState(false)
+  const [widok, setWidok] = useState('lista') // 'lista' | 'nowy' | 'edytuj'
+  const [wybranyKosztorys, setWybranyKosztorys] = useState(null)
 
   useEffect(() => {
     pobierzKosztorysy().then(setKosztorysy)
   }, [])
 
-  function dodajKosztorysDoListy(nowyKosztorys) {
-    setKosztorysy((poprzednie) => [...poprzednie, nowyKosztorys])
-    setPokazFormularz(false)
+  function wrocDoListy() {
+    setWidok('lista')
+    setWybranyKosztorys(null)
+  }
+
+  function zapisanoKosztorys(zapisany) {
+    setKosztorysy((poprzednie) => {
+      const juzIstnieje = poprzednie.some((k) => k.id === zapisany.id)
+      return juzIstnieje
+        ? poprzednie.map((k) => (k.id === zapisany.id ? zapisany : k))
+        : [...poprzednie, zapisany]
+    })
+    wrocDoListy()
+  }
+
+  function otworzDoEdycji(kosztorys) {
+    setWybranyKosztorys(kosztorys)
+    setWidok('edytuj')
+  }
+
+  if (widok === 'nowy' || widok === 'edytuj') {
+    return (
+      <div>
+        <button type="button" onClick={wrocDoListy}>
+          ← Powrót do listy kosztorysów
+        </button>
+        <h1>{widok === 'edytuj' ? `Edycja kosztorysu ${wybranyKosztorys.numer}` : 'Nowy kosztorys'}</h1>
+        <KosztorysForm
+          kosztorys={widok === 'edytuj' ? wybranyKosztorys : null}
+          onZapisano={zapisanoKosztorys}
+        />
+      </div>
+    )
   }
 
   return (
     <div>
       <h1>Kosztorysy</h1>
-
-      <button type="button" onClick={() => setPokazFormularz((poprzedni) => !poprzedni)}>
-        {pokazFormularz ? 'Anuluj' : 'Dodaj nowy kosztorys'}
+      <button type="button" onClick={() => setWidok('nowy')}>
+        + Dodaj kosztorys
       </button>
-
-      {pokazFormularz && (
-        <div style={{ border: '1px solid #ccc', padding: 16, marginTop: 8, marginBottom: 16 }}>
-          <KosztorysForm onUtworzono={dodajKosztorysDoListy} />
-        </div>
-      )}
-
       <h2>Lista kosztorysów</h2>
-      <KosztorysyList kosztorysy={kosztorysy} />
+      <p>
+        <em>Kliknij wiersz, żeby otworzyć kosztorys do edycji.</em>
+      </p>
+      <KosztorysyList kosztorysy={kosztorysy} onWybierz={otworzDoEdycji} />
     </div>
   )
 }

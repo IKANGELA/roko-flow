@@ -33,3 +33,15 @@ export async function utworzKosztorys(dane) {
   }
   return odpowiedz.json()
 }
+
+export async function aktualizujKosztorys(id, dane) {
+  const odpowiedz = await fetch(`${API_URL}/kosztorysy/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(dane),
+  })
+  if (!odpowiedz.ok) {
+    throw new Error('Nie udało się zaktualizować kosztorysu')
+  }
+  return odpowiedz.json()
+}
