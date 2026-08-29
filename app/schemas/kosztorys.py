@@ -1,7 +1,17 @@
-from datetime import date
+from datetime import date, datetime
 from typing import List, Optional
 
 from pydantic import BaseModel, ConfigDict
+
+
+class KlientPodsumowanie(BaseModel):
+    """Okrojone dane klienta, dołączane do kosztorysu, żeby nie trzeba było ich dociągać osobno."""
+
+    id: int
+    imie_i_nazwisko: str
+    telefon: str
+
+    model_config = ConfigDict(from_attributes=True)
 
 
 class SkladnikCreate(BaseModel):
@@ -56,6 +66,8 @@ class KosztorysCreate(BaseModel):
     nazwa_inwestycji: Optional[str] = None
     adres_montazu: Optional[str] = None
     termin: Optional[str] = None
+    uwagi: Optional[str] = None
+    wybrany_do_realizacji: bool = False
     vat_procent: float = 8
     dodatkowe_koszty: float = 0
     rabat: float = 0
@@ -66,12 +78,16 @@ class KosztorysCreate(BaseModel):
 class Kosztorys(BaseModel):
     id: int
     klient_id: int
+    klient: KlientPodsumowanie
     numer: str
     wersja: int
     nazwa_inwestycji: Optional[str] = None
     adres_montazu: Optional[str] = None
     termin: Optional[str] = None
     data: date
+    uwagi: Optional[str] = None
+    wybrany_do_realizacji: bool
+    ostatnia_aktualizacja: datetime
     vat_procent: float
     dodatkowe_koszty: float
     rabat: float

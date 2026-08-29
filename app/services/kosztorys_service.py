@@ -3,7 +3,7 @@ from typing import List, Optional
 from app.models.kosztorys import KosztorysDB, PozycjaKosztorysuDB
 from app.repositories.klient_repository import KlientRepository
 from app.repositories.kosztorys_repository import KosztorysRepository
-from app.schemas.kosztorys import Kosztorys, KosztorysCreate, Pozycja, Skladnik
+from app.schemas.kosztorys import KlientPodsumowanie, Kosztorys, KosztorysCreate, Pozycja, Skladnik
 
 DOMYSLNY_PROCENT_ZALICZKI = 0.4
 
@@ -76,15 +76,21 @@ class KosztorysService:
 
         do_doplaty = round(suma_brutto - zaliczka, 2)
 
+        klient = self._klient_repository.znajdz(kosztorys.klient_id)
+
         return Kosztorys(
             id=kosztorys.id,
             klient_id=kosztorys.klient_id,
+            klient=KlientPodsumowanie.model_validate(klient),
             numer=kosztorys.numer,
             wersja=kosztorys.wersja,
             nazwa_inwestycji=kosztorys.nazwa_inwestycji,
             adres_montazu=kosztorys.adres_montazu,
             termin=kosztorys.termin,
             data=kosztorys.data,
+            uwagi=kosztorys.uwagi,
+            wybrany_do_realizacji=kosztorys.wybrany_do_realizacji,
+            ostatnia_aktualizacja=kosztorys.ostatnia_aktualizacja,
             vat_procent=kosztorys.vat_procent,
             dodatkowe_koszty=kosztorys.dodatkowe_koszty,
             rabat=kosztorys.rabat,

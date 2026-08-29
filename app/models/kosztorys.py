@@ -1,6 +1,6 @@
-from datetime import date
+from datetime import date, datetime
 
-from sqlalchemy import Date, Float, ForeignKey, Integer, String
+from sqlalchemy import Boolean, Date, DateTime, Float, ForeignKey, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core.database import Base
@@ -20,6 +20,9 @@ class KosztorysDB(Base):
     adres_montazu: Mapped[str | None] = mapped_column(String, nullable=True)
     termin: Mapped[str | None] = mapped_column(String, nullable=True)
     data: Mapped[date] = mapped_column(Date, default=date.today)
+    uwagi: Mapped[str | None] = mapped_column(String, nullable=True)
+    wybrany_do_realizacji: Mapped[bool] = mapped_column(Boolean, default=False)
+    ostatnia_aktualizacja: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
     vat_procent: Mapped[float] = mapped_column(Float, default=8)
     dodatkowe_koszty: Mapped[float] = mapped_column(Float, default=0)
