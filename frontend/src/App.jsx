@@ -1,26 +1,23 @@
-import { useEffect, useState } from 'react'
-import KlienciList from './components/KlienciList'
-import KlientForm from './components/KlientForm'
-import { pobierzKlientow } from './api'
+import { Navigate, Route, Routes } from 'react-router-dom'
+import Layout from './components/Layout'
+import KlienciPage from './pages/KlienciPage'
+import KosztorysyPage from './pages/KosztorysyPage'
+import ZamowieniaPage from './pages/ZamowieniaPage'
+import DostawcyPage from './pages/DostawcyPage'
+import MontazePage from './pages/MontazePage'
 
 function App() {
-  const [klienci, setKlienci] = useState([])
-
-  useEffect(() => {
-    pobierzKlientow().then(setKlienci)
-  }, [])
-
-  function dodajKlientaDoListy(nowyKlient) {
-    setKlienci((poprzedni) => [...poprzedni, nowyKlient])
-  }
-
   return (
-    <div>
-      <h1>ROKO Flow</h1>
-      <h2>Klienci</h2>
-      <KlienciList klienci={klienci} />
-      <KlientForm onUtworzono={dodajKlientaDoListy} />
-    </div>
+    <Routes>
+      <Route element={<Layout />}>
+        <Route index element={<Navigate to="/klienci" replace />} />
+        <Route path="/klienci" element={<KlienciPage />} />
+        <Route path="/kosztorysy" element={<KosztorysyPage />} />
+        <Route path="/zamowienia" element={<ZamowieniaPage />} />
+        <Route path="/dostawcy" element={<DostawcyPage />} />
+        <Route path="/montaze" element={<MontazePage />} />
+      </Route>
+    </Routes>
   )
 }
 
