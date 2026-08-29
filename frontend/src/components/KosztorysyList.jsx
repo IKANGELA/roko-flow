@@ -1,4 +1,4 @@
-function KosztorysyList({ kosztorysy, onWybierz, onAkceptuj, zaznaczone, onPrzelacz }) {
+function KosztorysyList({ kosztorysy, onWybierz, onAkceptuj, onWycofajAkceptacje, zaznaczone, onPrzelacz }) {
   if (kosztorysy.length === 0) {
     return <p>Brak kosztorysów.</p>
   }
@@ -38,7 +38,7 @@ function KosztorysyList({ kosztorysy, onWybierz, onAkceptuj, zaznaczone, onPrzel
             <td>{kosztorys.wybrany_do_realizacji ? 'Zaakceptowany' : 'Oczekuje'}</td>
             <td>{kosztorys.uwagi || '—'}</td>
             <td>
-              {!kosztorys.wybrany_do_realizacji && (
+              {!kosztorys.wybrany_do_realizacji ? (
                 <button
                   type="button"
                   onClick={(event) => {
@@ -47,6 +47,16 @@ function KosztorysyList({ kosztorysy, onWybierz, onAkceptuj, zaznaczone, onPrzel
                   }}
                 >
                   Akceptuj
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={(event) => {
+                    event.stopPropagation()
+                    onWycofajAkceptacje(kosztorys)
+                  }}
+                >
+                  Cofnij akceptację
                 </button>
               )}
             </td>
