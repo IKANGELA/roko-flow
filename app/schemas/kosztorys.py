@@ -52,7 +52,6 @@ class KosztorysCreate(BaseModel):
     """Dane potrzebne do utworzenia nowego kosztorysu, razem z pozycjami i ich składnikami."""
 
     klient_id: int
-    numer: str
     wersja: int = 1
     nazwa_inwestycji: Optional[str] = None
     adres_montazu: Optional[str] = None
