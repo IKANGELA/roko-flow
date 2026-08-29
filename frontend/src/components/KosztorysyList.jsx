@@ -1,4 +1,4 @@
-function KosztorysyList({ kosztorysy }) {
+function KosztorysyList({ kosztorysy, onWybierz }) {
   if (kosztorysy.length === 0) {
     return <p>Brak kosztorysów.</p>
   }
@@ -16,7 +16,7 @@ function KosztorysyList({ kosztorysy }) {
       </thead>
       <tbody>
         {kosztorysy.map((kosztorys) => (
-          <tr key={kosztorys.id}>
+          <tr key={kosztorys.id} onClick={() => onWybierz(kosztorys)} style={{ cursor: 'pointer' }}>
             <td>{kosztorys.numer}</td>
             <td>{kosztorys.nazwa_inwestycji || '—'}</td>
             <td>{kosztorys.suma_brutto.toFixed(2)} zł</td>

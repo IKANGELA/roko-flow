@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import KlientPicker from './KlientPicker'
-import { utworzKosztorys } from '../api'
+import PozycjeEditor from './PozycjeEditor'
+import { aktualizujKosztorys, utworzKosztorys } from '../api'
 
 const PUSTY_FORMULARZ = {
   klient_id: null,
@@ -13,8 +14,44 @@ const PUSTY_FORMULARZ = {
   ustalona_zaliczka: '',
 }
 
-function KosztorysForm({ onUtworzono }) {
-  const [dane, setDane] = useState(PUSTY_FORMULARZ)
+function danePoczatkowe(kosztorys) {
+  if (!kosztorys) {
+    return PUSTY_FORMULARZ
+  }
+  return {
+    klient_id: kosztorys.klient_id,
+    nazwa_inwestycji: kosztorys.nazwa_inwestycji || '',
+    adres_montazu: kosztorys.adres_montazu || '',
+    termin: kosztorys.termin || '',
+    vat_procent: kosztorys.vat_procent,
+    dodatkowe_koszty: kosztorys.dodatkowe_koszty,
+    rabat: kosztorys.rabat,
+    ustalona_zaliczka: kosztorys.ustalona_zaliczka ?? '',
+  }
+}
+
+function pozycjePoczatkowe(kosztorys) {
+  if (!kosztorys) {
+    return []
+  }
+  return kosztorys.pozycje.map((pozycja) => ({
+    nazwa: pozycja.nazwa,
+    opis: pozycja.opis || '',
+    kolor: pozycja.kolor || '',
+    oscieznica_rodzaj: pozycja.oscieznica_rodzaj || '',
+    informacje_dodatkowe: pozycja.informacje_dodatkowe || '',
+    szklo: pozycja.szklo || '',
+    wentylacja: pozycja.wentylacja || '',
+    uwagi: pozycja.uwagi || '',
+    skladniki: pozycja.skladniki.map((skladnik) => ({ opis: skladnik.opis, kwota: String(skladnik.kwota) })),
+  }))
+}
+
+function KosztorysForm({ kosztorys, onZapisano }) {
+  const jestEdycja = Boolean(kosztorys)
+
+  const [dane, setDane] = useState(() => danePoczatkowe(kosztorys))
+  const [pozycje, setPozycje] = useState(() => pozycjePoczatkowe(kosztorys))
   const [zapisywanie, setZapisywanie] = useState(false)
   const [blad, setBlad] = useState(null)
 
@@ -37,7 +74,7 @@ function KosztorysForm({ onUtworzono }) {
     setZapisywanie(true)
     setBlad(null)
 
-    const nowyKosztorys = {
+    const daneDoWyslania = {
       klient_id: dane.klient_id,
       nazwa_inwestycji: dane.nazwa_inwestycji || null,
       adres_montazu: dane.adres_montazu || null,
@@ -46,15 +83,33 @@ function KosztorysForm({ onUtworzono }) {
       dodatkowe_koszty: Number(dane.dodatkowe_koszty) || 0,
       rabat: Number(dane.rabat) || 0,
       ustalona_zaliczka: dane.ustalona_zaliczka === '' ? null : Number(dane.ustalona_zaliczka),
-      pozycje: [],
+      pozycje: pozycje.map((pozycja) => ({
+        nazwa: pozycja.nazwa,
+        opis: pozycja.opis || null,
+        kolor: pozycja.kolor || null,
+        oscieznica_rodzaj: pozycja.oscieznica_rodzaj || null,
+        informacje_dodatkowe: pozycja.informacje_dodatkowe || null,
+        szklo: pozycja.szklo || null,
+        wentylacja: pozycja.wentylacja || null,
+        uwagi: pozycja.uwagi || null,
+        skladniki: pozycja.skladniki.map((skladnik) => ({
+          opis: skladnik.opis,
+          kwota: Number(skladnik.kwota) || 0,
+        })),
+      })),
     }
 
     try {
-      const utworzony = await utworzKosztorys(nowyKosztorys)
-      onUtworzono(utworzony)
-      setDane(PUSTY_FORMULARZ)
+      const zapisany = jestEdycja
+        ? await aktualizujKosztorys(kosztorys.id, daneDoWyslania)
+        : await utworzKosztorys(daneDoWyslania)
+      onZapisano(zapisany)
+      if (!jestEdycja) {
+        setDane(PUSTY_FORMULARZ)
+        setPozycje([])
+      }
     } catch (e) {
-      setBlad('Nie udało się zapisać kosztorysu.')
+      setBlad(jestEdycja ? 'Nie udało się zaktualizować kosztorysu.' : 'Nie udało się zapisać kosztorysu.')
     } finally {
       setZapisywanie(false)
     }
@@ -62,7 +117,7 @@ function KosztorysForm({ onUtworzono }) {
 
   return (
     <form onSubmit={wyslij}>
-      <h2>Nowy kosztorys</h2>
+      <h3>Dane klienta i inwestycji</h3>
 
       <KlientPicker klientId={dane.klient_id} onZmiana={zmienKlienta} />
 
@@ -124,13 +179,15 @@ function KosztorysForm({ onUtworzono }) {
         </label>
       </div>
 
-      <p>
-        <em>Pozycje kosztorysu dodamy w kolejnym etapie — na razie kosztorys tworzy się bez pozycji.</em>
-      </p>
+      <hr style={{ margin: '24px 0' }} />
 
-      <button type="submit" disabled={zapisywanie}>
-        {zapisywanie ? 'Zapisywanie...' : 'Utwórz kosztorys'}
-      </button>
+      <PozycjeEditor pozycje={pozycje} onZmiana={setPozycje} />
+
+      <div style={{ marginTop: 24 }}>
+        <button type="submit" disabled={zapisywanie}>
+          {zapisywanie ? 'Zapisywanie...' : jestEdycja ? 'Zapisz zmiany' : 'Utwórz kosztorys'}
+        </button>
+      </div>
 
       {blad && <p style={{ color: 'red' }}>{blad}</p>}
     </form>
