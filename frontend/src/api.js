@@ -45,3 +45,46 @@ export async function aktualizujKosztorys(id, dane) {
   }
   return odpowiedz.json()
 }
+
+export async function pobierzDostawcow() {
+  const odpowiedz = await fetch(`${API_URL}/dostawcy/`)
+  return odpowiedz.json()
+}
+
+export async function utworzDostawce(dane) {
+  const odpowiedz = await fetch(`${API_URL}/dostawcy/`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(dane),
+  })
+  if (!odpowiedz.ok) {
+    throw new Error('Nie udało się utworzyć dostawcy')
+  }
+  return odpowiedz.json()
+}
+
+// Wspólna obsługa usuwania — jeśli backend odrzuci usunięcie (np. bo istnieją powiązane
+// rekordy), pokazujemy dokładnie ten komunikat, który zwrócił, zamiast ogólnego "błąd".
+async function usunPodAdresem(url) {
+  const odpowiedz = await fetch(url, { method: 'DELETE' })
+  if (!odpowiedz.ok) {
+    const dane = await odpowiedz.json().catch(() => null)
+    throw new Error(dane?.detail || 'Nie udało się usunąć.')
+  }
+}
+
+export function usunKlienta(id) {
+  return usunPodAdresem(`${API_URL}/klienci/${id}`)
+}
+
+export function usunDostawce(id) {
+  return usunPodAdresem(`${API_URL}/dostawcy/${id}`)
+}
+
+export function usunKosztorys(id) {
+  return usunPodAdresem(`${API_URL}/kosztorysy/${id}`)
+}
+
+export function usunZamowienie(id) {
+  return usunPodAdresem(`${API_URL}/zamowienia/${id}`)
+}

@@ -1,4 +1,4 @@
-function KlienciList({ klienci }) {
+function KlienciList({ klienci, onUsun }) {
   if (klienci.length === 0) {
     return <p>Brak klientów.</p>
   }
@@ -8,7 +8,10 @@ function KlienciList({ klienci }) {
       {klienci.map((klient) => (
         <li key={klient.id}>
           {klient.imie_i_nazwisko} — {klient.telefon}
-          {klient.email && ` — ${klient.email}`}
+          {klient.email && ` — ${klient.email}`}{' '}
+          <button type="button" onClick={() => onUsun(klient)}>
+            Usuń
+          </button>
         </li>
       ))}
     </ul>

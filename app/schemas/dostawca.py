@@ -7,6 +7,7 @@ class DostawcaCreate(BaseModel):
     """Dane potrzebne do utworzenia nowego dostawcy (bez id — to nadaje baza danych)."""
 
     nazwa: str
+    specyfikacja: Optional[str] = None
     telefon: Optional[str] = None
     email: Optional[str] = None
     adres: Optional[str] = None

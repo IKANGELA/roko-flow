@@ -36,3 +36,17 @@ class ZamowienieRepository:
 
     def znajdz(self, zamowienie_id: int) -> Optional[ZamowienieDB]:
         return self._db.query(ZamowienieDB).filter(ZamowienieDB.id == zamowienie_id).first()
+
+    def usun(self, zamowienie_id: int) -> bool:
+        zamowienie = self.znajdz(zamowienie_id)
+        if zamowienie is None:
+            return False
+        self._db.delete(zamowienie)
+        self._db.commit()
+        return True
+
+    def istnieje_dla_kosztorysu(self, kosztorys_id: int) -> bool:
+        return self._db.query(ZamowienieDB).filter(ZamowienieDB.kosztorys_id == kosztorys_id).first() is not None
+
+    def istnieje_dla_dostawcy(self, dostawca_id: int) -> bool:
+        return self._db.query(ZamowienieDB).filter(ZamowienieDB.dostawca_id == dostawca_id).first() is not None

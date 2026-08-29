@@ -24,3 +24,11 @@ class DostawcaRepository:
 
     def znajdz(self, dostawca_id: int) -> Optional[DostawcaDB]:
         return self._db.query(DostawcaDB).filter(DostawcaDB.id == dostawca_id).first()
+
+    def usun(self, dostawca_id: int) -> bool:
+        dostawca = self.znajdz(dostawca_id)
+        if dostawca is None:
+            return False
+        self._db.delete(dostawca)
+        self._db.commit()
+        return True

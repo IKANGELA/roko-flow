@@ -55,3 +55,12 @@ def pobierz_zamowienie(
     if zamowienie is None:
         raise HTTPException(status_code=404, detail="Zamówienie nie znalezione")
     return zamowienie
+
+
+@router.delete("/{zamowienie_id}", status_code=204)
+def usun_zamowienie(
+    zamowienie_id: int, service: ZamowienieService = Depends(get_zamowienie_service)
+) -> None:
+    usuniete = service.usun_zamowienie(zamowienie_id)
+    if not usuniete:
+        raise HTTPException(status_code=404, detail="Zamówienie nie znalezione")

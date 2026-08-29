@@ -11,6 +11,7 @@ class DostawcaDB(Base):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     nazwa: Mapped[str] = mapped_column(String, nullable=False)
+    specyfikacja: Mapped[str | None] = mapped_column(String, nullable=True)
     telefon: Mapped[str | None] = mapped_column(String, nullable=True)
     email: Mapped[str | None] = mapped_column(String, nullable=True)
     adres: Mapped[str | None] = mapped_column(String, nullable=True)
