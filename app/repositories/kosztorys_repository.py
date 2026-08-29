@@ -107,3 +107,15 @@ class KosztorysRepository:
             .filter(KosztorysDB.id == kosztorys_id)
             .first()
         )
+
+    def usun(self, kosztorys_id: int) -> bool:
+        # .znajdz() bez joinedload wystarczy — samo usunięcie i tak kaskadowo skasuje pozycje/składniki.
+        kosztorys = self._db.query(KosztorysDB).filter(KosztorysDB.id == kosztorys_id).first()
+        if kosztorys is None:
+            return False
+        self._db.delete(kosztorys)
+        self._db.commit()
+        return True
+
+    def istnieje_dla_klienta(self, klient_id: int) -> bool:
+        return self._db.query(KosztorysDB).filter(KosztorysDB.klient_id == klient_id).first() is not None

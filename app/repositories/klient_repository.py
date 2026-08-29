@@ -24,3 +24,11 @@ class KlientRepository:
 
     def znajdz(self, klient_id: int) -> Optional[KlientDB]:
         return self._db.query(KlientDB).filter(KlientDB.id == klient_id).first()
+
+    def usun(self, klient_id: int) -> bool:
+        klient = self.znajdz(klient_id)
+        if klient is None:
+            return False
+        self._db.delete(klient)
+        self._db.commit()
+        return True

@@ -3,6 +3,8 @@ from typing import List, Optional
 from app.models.kosztorys import KosztorysDB, PozycjaKosztorysuDB
 from app.repositories.klient_repository import KlientRepository
 from app.repositories.kosztorys_repository import KosztorysRepository
+from app.repositories.montaz_repository import MontazRepository
+from app.repositories.zamowienie_repository import ZamowienieRepository
 from app.schemas.kosztorys import KlientPodsumowanie, Kosztorys, KosztorysCreate, Pozycja, Skladnik
 
 DOMYSLNY_PROCENT_ZALICZKI = 0.4
@@ -17,9 +19,17 @@ class KosztorysService:
     -> (+ VAT) -> suma brutto -> zaliczka (40% albo ustalona ręcznie) -> do dopłaty.
     """
 
-    def __init__(self, repository: KosztorysRepository, klient_repository: KlientRepository) -> None:
+    def __init__(
+        self,
+        repository: KosztorysRepository,
+        klient_repository: KlientRepository,
+        zamowienie_repository: ZamowienieRepository,
+        montaz_repository: MontazRepository,
+    ) -> None:
         self._repository = repository
         self._klient_repository = klient_repository
+        self._zamowienie_repository = zamowienie_repository
+        self._montaz_repository = montaz_repository
 
     def utworz_kosztorys(self, dane: KosztorysCreate) -> Kosztorys:
         if self._klient_repository.znajdz(dane.klient_id) is None:
@@ -45,6 +55,13 @@ class KosztorysService:
         if kosztorys_db is None:
             return None
         return self._do_schematu(kosztorys_db)
+
+    def usun_kosztorys(self, kosztorys_id: int) -> bool:
+        if self._zamowienie_repository.istnieje_dla_kosztorysu(kosztorys_id):
+            raise ValueError("Nie można usunąć kosztorysu — istnieją dla niego zamówienia")
+        if self._montaz_repository.istnieje_dla_kosztorysu(kosztorys_id):
+            raise ValueError("Nie można usunąć kosztorysu — istnieją dla niego montaże")
+        return self._repository.usun(kosztorys_id)
 
     def _pozycja_do_schematu(self, pozycja: PozycjaKosztorysuDB) -> Pozycja:
         suma_netto = sum(skladnik.kwota for skladnik in pozycja.skladniki)

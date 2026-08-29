@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 
 from app.core.database import get_db
 from app.repositories.dostawca_repository import DostawcaRepository
+from app.repositories.zamowienie_repository import ZamowienieRepository
 from app.schemas.dostawca import Dostawca, DostawcaCreate
 from app.services.dostawca_service import DostawcaService
 
@@ -10,8 +11,7 @@ router = APIRouter(prefix="/dostawcy", tags=["Dostawcy"])
 
 
 def get_dostawca_service(db: Session = Depends(get_db)) -> DostawcaService:
-    repository = DostawcaRepository(db)
-    return DostawcaService(repository)
+    return DostawcaService(DostawcaRepository(db), ZamowienieRepository(db))
 
 
 @router.post("/", response_model=Dostawca)
@@ -30,3 +30,13 @@ def pobierz_dostawce(dostawca_id: int, service: DostawcaService = Depends(get_do
     if dostawca is None:
         raise HTTPException(status_code=404, detail="Dostawca nie znaleziony")
     return dostawca
+
+
+@router.delete("/{dostawca_id}", status_code=204)
+def usun_dostawce(dostawca_id: int, service: DostawcaService = Depends(get_dostawca_service)) -> None:
+    try:
+        usuniety = service.usun_dostawce(dostawca_id)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    if not usuniety:
+        raise HTTPException(status_code=404, detail="Dostawca nie znaleziony")

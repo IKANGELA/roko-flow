@@ -47,6 +47,9 @@ class ZamowienieService:
             return None
         return self._do_schematu(zamowienie_db)
 
+    def usun_zamowienie(self, zamowienie_id: int) -> bool:
+        return self._repository.usun(zamowienie_id)
+
     @staticmethod
     def _do_schematu(zamowienie: ZamowienieDB) -> Zamowienie:
         do_doplaty = round(zamowienie.wartosc_brutto - zamowienie.zaliczka_klienta, 2)

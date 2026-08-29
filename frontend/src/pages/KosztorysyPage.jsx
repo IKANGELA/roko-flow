@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
 import KosztorysyList from '../components/KosztorysyList'
 import KosztorysForm from '../components/KosztorysForm'
-import { pobierzKosztorysy } from '../api'
+import { aktualizujKosztorys, pobierzKosztorysy, usunKosztorys } from '../api'
+import { kosztorysDoPayloadu } from '../kosztorysUtils'
 
 function KosztorysyPage() {
   const [kosztorysy, setKosztorysy] = useState([])
@@ -32,6 +33,24 @@ function KosztorysyPage() {
     setWidok('edytuj')
   }
 
+  async function zaakceptujKosztorys(kosztorys) {
+    const payload = kosztorysDoPayloadu(kosztorys, { wybrany_do_realizacji: true })
+    const zaktualizowany = await aktualizujKosztorys(kosztorys.id, payload)
+    setKosztorysy((poprzednie) => poprzednie.map((k) => (k.id === zaktualizowany.id ? zaktualizowany : k)))
+  }
+
+  async function usunZListy(kosztorys) {
+    if (!window.confirm(`Usunąć kosztorys „${kosztorys.numer}"?`)) {
+      return
+    }
+    try {
+      await usunKosztorys(kosztorys.id)
+      setKosztorysy((poprzednie) => poprzednie.filter((k) => k.id !== kosztorys.id))
+    } catch (e) {
+      window.alert(e.message)
+    }
+  }
+
   if (widok === 'nowy' || widok === 'edytuj') {
     return (
       <div>
@@ -57,7 +76,12 @@ function KosztorysyPage() {
       <p>
         <em>Kliknij wiersz, żeby otworzyć kosztorys do edycji.</em>
       </p>
-      <KosztorysyList kosztorysy={kosztorysy} onWybierz={otworzDoEdycji} />
+      <KosztorysyList
+        kosztorysy={kosztorysy}
+        onWybierz={otworzDoEdycji}
+        onAkceptuj={zaakceptujKosztorys}
+        onUsun={usunZListy}
+      />
     </div>
   )
 }

@@ -36,3 +36,6 @@ class MontazRepository:
 
     def znajdz(self, montaz_id: int) -> Optional[MontazDB]:
         return self._db.query(MontazDB).filter(MontazDB.id == montaz_id).first()
+
+    def istnieje_dla_kosztorysu(self, kosztorys_id: int) -> bool:
+        return self._db.query(MontazDB).filter(MontazDB.kosztorys_id == kosztorys_id).first() is not None
