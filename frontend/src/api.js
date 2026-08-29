@@ -92,6 +92,35 @@ export async function aktualizujZamowienie(id, dane) {
   return odpowiedz.json()
 }
 
+export async function pobierzMontaze() {
+  const odpowiedz = await fetch(`${API_URL}/montaze/`)
+  return odpowiedz.json()
+}
+
+export async function utworzMontaz(dane) {
+  const odpowiedz = await fetch(`${API_URL}/montaze/`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(dane),
+  })
+  if (!odpowiedz.ok) {
+    throw new Error('Nie udało się utworzyć montażu')
+  }
+  return odpowiedz.json()
+}
+
+export async function aktualizujMontaz(id, dane) {
+  const odpowiedz = await fetch(`${API_URL}/montaze/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(dane),
+  })
+  if (!odpowiedz.ok) {
+    throw new Error('Nie udało się zaktualizować montażu')
+  }
+  return odpowiedz.json()
+}
+
 // Wspólna obsługa usuwania — jeśli backend odrzuci usunięcie (np. bo istnieją powiązane
 // rekordy), pokazujemy dokładnie ten komunikat, który zwrócił, zamiast ogólnego "błąd".
 async function usunPodAdresem(url) {
@@ -116,4 +145,8 @@ export function usunKosztorys(id) {
 
 export function usunZamowienie(id) {
   return usunPodAdresem(`${API_URL}/zamowienia/${id}`)
+}
+
+export function usunMontaz(id) {
+  return usunPodAdresem(`${API_URL}/montaze/${id}`)
 }
