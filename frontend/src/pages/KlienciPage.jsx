@@ -17,8 +17,9 @@ function KlienciPage() {
   return (
     <div>
       <h1>Klienci</h1>
-      <KlienciList klienci={klienci} />
       <KlientForm onUtworzono={dodajKlientaDoListy} />
+      <h2>Lista klientów</h2>
+      <KlienciList klienci={klienci} />
     </div>
   )
 }
