@@ -1,11 +1,19 @@
 from typing import List, Optional
 
 from app.models.kosztorys import KosztorysDB, PozycjaKosztorysuDB
+from app.repositories.dostawca_repository import DostawcaRepository
 from app.repositories.klient_repository import KlientRepository
 from app.repositories.kosztorys_repository import KosztorysRepository
 from app.repositories.montaz_repository import MontazRepository
 from app.repositories.zamowienie_repository import ZamowienieRepository
-from app.schemas.kosztorys import KlientPodsumowanie, Kosztorys, KosztorysCreate, Pozycja, Skladnik
+from app.schemas.kosztorys import (
+    DostawcaPodsumowanie,
+    KlientPodsumowanie,
+    Kosztorys,
+    KosztorysCreate,
+    Pozycja,
+    Skladnik,
+)
 
 DOMYSLNY_PROCENT_ZALICZKI = 0.4
 
@@ -25,11 +33,13 @@ class KosztorysService:
         klient_repository: KlientRepository,
         zamowienie_repository: ZamowienieRepository,
         montaz_repository: MontazRepository,
+        dostawca_repository: DostawcaRepository,
     ) -> None:
         self._repository = repository
         self._klient_repository = klient_repository
         self._zamowienie_repository = zamowienie_repository
         self._montaz_repository = montaz_repository
+        self._dostawca_repository = dostawca_repository
 
     def utworz_kosztorys(self, dane: KosztorysCreate) -> Kosztorys:
         if self._klient_repository.znajdz(dane.klient_id) is None:
@@ -65,9 +75,14 @@ class KosztorysService:
 
     def _pozycja_do_schematu(self, pozycja: PozycjaKosztorysuDB) -> Pozycja:
         suma_netto = sum(skladnik.kwota for skladnik in pozycja.skladniki)
+        dostawca = (
+            self._dostawca_repository.znajdz(pozycja.dostawca_id) if pozycja.dostawca_id is not None else None
+        )
         return Pozycja(
             id=pozycja.id,
             nazwa=pozycja.nazwa,
+            dostawca_id=pozycja.dostawca_id,
+            dostawca=DostawcaPodsumowanie.model_validate(dostawca) if dostawca is not None else None,
             opis=pozycja.opis,
             kolor=pozycja.kolor,
             oscieznica_rodzaj=pozycja.oscieznica_rodzaj,

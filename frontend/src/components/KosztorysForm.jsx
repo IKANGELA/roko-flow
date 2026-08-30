@@ -1,7 +1,7 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import KlientPicker from './KlientPicker'
 import PozycjeEditor from './PozycjeEditor'
-import { aktualizujKosztorys, utworzKosztorys } from '../api'
+import { aktualizujKosztorys, pobierzDostawcow, utworzKosztorys } from '../api'
 import { pozycjeDoPayloadu } from '../kosztorysUtils'
 
 const PUSTY_FORMULARZ = {
@@ -41,6 +41,7 @@ function pozycjePoczatkowe(kosztorys) {
   }
   return kosztorys.pozycje.map((pozycja) => ({
     nazwa: pozycja.nazwa,
+    dostawca_id: pozycja.dostawca_id ?? '',
     opis: pozycja.opis || '',
     kolor: pozycja.kolor || '',
     oscieznica_rodzaj: pozycja.oscieznica_rodzaj || '',
@@ -63,6 +64,11 @@ function KosztorysForm({ kosztorys, onZapisano }) {
   // i od tej pory kolejne zapisy (także ten końcowy, przyciskiem na dole) są już edycją.
   const [kosztorysId, setKosztorysId] = useState(kosztorys?.id ?? null)
   const [statusZapisu, setStatusZapisu] = useState(null) // null | 'zapisywanie' | 'zapisano' | 'blad'
+  const [dostawcy, setDostawcy] = useState([])
+
+  useEffect(() => {
+    pobierzDostawcow().then(setDostawcy)
+  }, [])
 
   function zmienPole(event) {
     const { name, value } = event.target
@@ -177,7 +183,12 @@ function KosztorysForm({ kosztorys, onZapisano }) {
         {statusZapisu === 'zapisywanie' && <p>Zapisywanie kosztorysu...</p>}
         {statusZapisu === 'zapisano' && <p>Zapisano ✓</p>}
         {statusZapisu === 'blad' && <p style={{ color: 'red' }}>Nie udało się zapisać.</p>}
-        <PozycjeEditor pozycje={pozycje} onZmiana={setPozycje} onZapiszKosztorys={zapiszWTle} />
+        <PozycjeEditor
+          pozycje={pozycje}
+          onZmiana={setPozycje}
+          onZapiszKosztorys={zapiszWTle}
+          dostawcy={dostawcy}
+        />
       </fieldset>
 
       <fieldset>

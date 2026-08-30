@@ -2,6 +2,7 @@ import { Fragment, useState } from 'react'
 
 const PUSTA_POZYCJA = () => ({
   nazwa: '',
+  dostawca_id: '',
   opis: '',
   kolor: '',
   oscieznica_rodzaj: '',
@@ -18,7 +19,7 @@ export function sumaNettoPozycji(pozycja) {
   return pozycja.skladniki.reduce((suma, skladnik) => suma + (Number(skladnik.kwota) || 0), 0)
 }
 
-function PozycjeEditor({ pozycje, onZmiana, onZapiszKosztorys }) {
+function PozycjeEditor({ pozycje, onZmiana, onZapiszKosztorys, dostawcy = [] }) {
   const [rozwinieta, setRozwinieta] = useState(null)
 
   function dodajPozycje() {
@@ -63,20 +64,22 @@ function PozycjeEditor({ pozycje, onZmiana, onZapiszKosztorys }) {
     <div>
       <table className="tabela-pozycji" style={{ tableLayout: 'fixed' }}>
         <colgroup>
-          <col style={{ width: '13%' }} />
-          <col style={{ width: '13%' }} />
+          <col style={{ width: '12%' }} />
           <col style={{ width: '9%' }} />
           <col style={{ width: '10%' }} />
-          <col style={{ width: '12%' }} />
           <col style={{ width: '8%' }} />
-          <col style={{ width: '8%' }} />
-          <col style={{ width: '12%' }} />
-          <col style={{ width: '8%' }} />
+          <col style={{ width: '9%' }} />
+          <col style={{ width: '10%' }} />
           <col style={{ width: '7%' }} />
+          <col style={{ width: '7%' }} />
+          <col style={{ width: '10%' }} />
+          <col style={{ width: '8%' }} />
+          <col style={{ width: '10%' }} />
         </colgroup>
         <thead>
           <tr>
             <th>Nazwa</th>
+            <th>Producent/Marka</th>
             <th>Opis</th>
             <th>Kolor</th>
             <th>Ościeżnica rodzaj</th>
@@ -91,7 +94,7 @@ function PozycjeEditor({ pozycje, onZmiana, onZapiszKosztorys }) {
         <tbody>
           {pozycje.length === 0 && (
             <tr>
-              <td colSpan={10}>Brak pozycji — dodaj pierwszą przyciskiem poniżej.</td>
+              <td colSpan={11}>Brak pozycji — dodaj pierwszą przyciskiem poniżej.</td>
             </tr>
           )}
 
@@ -104,6 +107,19 @@ function PozycjeEditor({ pozycje, onZmiana, onZapiszKosztorys }) {
                     onChange={(event) => zmienPozycje(indeksPozycji, 'nazwa', event.target.value)}
                     required
                   />
+                </td>
+                <td>
+                  <select
+                    value={pozycja.dostawca_id}
+                    onChange={(event) => zmienPozycje(indeksPozycji, 'dostawca_id', event.target.value)}
+                  >
+                    <option value="">-- brak --</option>
+                    {dostawcy.map((dostawca) => (
+                      <option key={dostawca.id} value={dostawca.id}>
+                        {dostawca.nazwa}
+                      </option>
+                    ))}
+                  </select>
                 </td>
                 <td>
                   <input
@@ -170,7 +186,7 @@ function PozycjeEditor({ pozycje, onZmiana, onZapiszKosztorys }) {
 
               {rozwinieta === indeksPozycji && (
                 <tr>
-                  <td colSpan={10} style={{ background: 'var(--bg)' }}>
+                  <td colSpan={11} style={{ background: 'var(--bg)' }}>
                     <table>
                       <thead>
                         <tr>

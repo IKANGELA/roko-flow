@@ -14,6 +14,15 @@ class KlientPodsumowanie(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
+class DostawcaPodsumowanie(BaseModel):
+    """Okrojone dane dostawcy, dołączane do pozycji kosztorysu."""
+
+    id: int
+    nazwa: str
+
+    model_config = ConfigDict(from_attributes=True)
+
+
 class SkladnikCreate(BaseModel):
     """Jeden składnik kosztu pozycji, np. 'Montaż drzwi' + kwota."""
 
@@ -30,6 +39,7 @@ class PozycjaCreate(BaseModel):
     """Jedna pozycja kosztorysu wraz z listą jej składników kosztu."""
 
     nazwa: str
+    dostawca_id: Optional[int] = None
     opis: Optional[str] = None
     kolor: Optional[str] = None
     oscieznica_rodzaj: Optional[str] = None
@@ -43,6 +53,8 @@ class PozycjaCreate(BaseModel):
 class Pozycja(BaseModel):
     id: int
     nazwa: str
+    dostawca_id: Optional[int] = None
+    dostawca: Optional[DostawcaPodsumowanie] = None
     opis: Optional[str] = None
     kolor: Optional[str] = None
     oscieznica_rodzaj: Optional[str] = None
