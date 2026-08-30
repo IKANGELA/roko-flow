@@ -42,8 +42,13 @@ function ZamowieniaPage() {
     setWidok('edytuj')
   }
 
-  // Szybka zmiana statusu zamówienia u dostawcy wprost z listy, bez otwierania całego
+  // Szybka zmiana statusu (ogólnego albo u dostawcy) wprost z listy, bez otwierania całego
   // formularza edycji — PUT robi pełną podmianę, więc bazujemy na już wczytanym obiekcie.
+  async function zmienStatus(zamowienie, nowyStatus) {
+    const zaktualizowane = await aktualizujZamowienie(zamowienie.id, zamowienieDoPayloadu(zamowienie, { status: nowyStatus }))
+    setZamowienia((poprzednie) => poprzednie.map((z) => (z.id === zaktualizowane.id ? zaktualizowane : z)))
+  }
+
   async function zmienStatusDostawcy(zamowienie, nowyStatus) {
     const zaktualizowane = await aktualizujZamowienie(
       zamowienie.id,
@@ -100,6 +105,7 @@ function ZamowieniaPage() {
         onWybierz={otworzDoEdycji}
         zaznaczone={zaznaczone}
         onPrzelacz={przelacz}
+        onZmienStatus={zmienStatus}
         onZmienStatusDostawcy={zmienStatusDostawcy}
       />
       <PasekZaznaczenia liczbaZaznaczonych={zaznaczone.size} onUsun={usunZaznaczone} />

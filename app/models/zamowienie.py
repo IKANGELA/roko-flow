@@ -25,7 +25,10 @@ class ZamowienieDB(Base):
     # Dostawca bywa nieznany w chwili akceptacji kosztorysu — uzupełniany później, stąd nullable.
     dostawca_id: Mapped[int | None] = mapped_column(ForeignKey("dostawcy.id"), nullable=True)
 
-    status: Mapped[str] = mapped_column(String, default="Nowe")
+    # Ogólny etap sprawy — stała lista (patrz app/schemas/zamowienie.py::STATUSY_ZAMOWIENIA),
+    # nie dowolny tekst. "Do dokończenia" to stan pomiędzy montażem a pełnym zamknięciem —
+    # zostały drobne braki (np. domontowanie zamka, klameczki), a nie cała reszta zlecenia.
+    status: Mapped[str] = mapped_column(String, default="Zamówić")
     # Osobny status "czy to zamówienie zostało faktycznie złożone u dostawcy" — to inna
     # ścieżka niż ogólny status zamówienia, bo jeden kosztorys może mieć kilka zamówień
     # u różnych dostawców, każde na innym etapie składania. Zaznaczane ręcznie na liście.

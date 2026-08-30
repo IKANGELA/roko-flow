@@ -8,11 +8,12 @@ import {
   utworzZamowienie,
 } from '../api'
 import { kosztorysDoPayloadu, pozycjeDoPayloadu } from '../kosztorysUtils'
+import { STATUSY_ZAMOWIENIA } from '../zamowienieUtils'
 
 const PUSTY_FORMULARZ = {
   kosztorys_id: '',
   dostawca_id: '',
-  status: 'Nowe',
+  status: 'Zamówić',
   status_zamowienia_dostawcy: 'Do zamówienia',
   adres_nabywcy: '',
   adres_montazu: '',
@@ -251,7 +252,13 @@ function ZamowienieForm({ zamowienie, wstepnyKosztorysId, onZapisano }) {
           </label>
           <label>
             Status
-            <input name="status" value={dane.status} onChange={zmienPole} />
+            <select name="status" value={dane.status} onChange={zmienPole}>
+              {STATUSY_ZAMOWIENIA.map((wartosc) => (
+                <option key={wartosc} value={wartosc}>
+                  {wartosc}
+                </option>
+              ))}
+            </select>
           </label>
           <label>
             Zamówione u dostawcy

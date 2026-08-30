@@ -1,4 +1,6 @@
-function ZamowieniaList({ zamowienia, onWybierz, zaznaczone, onPrzelacz, onZmienStatusDostawcy }) {
+import { STATUSY_ZAMOWIENIA } from '../zamowienieUtils'
+
+function ZamowieniaList({ zamowienia, onWybierz, zaznaczone, onPrzelacz, onZmienStatus, onZmienStatusDostawcy }) {
   if (zamowienia.length === 0) {
     return <p>Brak zamówień.</p>
   }
@@ -36,7 +38,15 @@ function ZamowieniaList({ zamowienia, onWybierz, zaznaczone, onPrzelacz, onZmien
                 ? `${zamowienie.kosztorys.numer}${zamowienie.kosztorys.nazwa_inwestycji ? ` (${zamowienie.kosztorys.nazwa_inwestycji})` : ''}`
                 : '—'}
             </td>
-            <td>{zamowienie.status}</td>
+            <td onClick={(event) => event.stopPropagation()}>
+              <select value={zamowienie.status} onChange={(event) => onZmienStatus(zamowienie, event.target.value)}>
+                {STATUSY_ZAMOWIENIA.map((wartosc) => (
+                  <option key={wartosc} value={wartosc}>
+                    {wartosc}
+                  </option>
+                ))}
+              </select>
+            </td>
             <td onClick={(event) => event.stopPropagation()}>
               <select
                 value={zamowienie.status_zamowienia_dostawcy}
