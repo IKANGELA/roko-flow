@@ -26,6 +26,10 @@ class ZamowienieDB(Base):
     dostawca_id: Mapped[int | None] = mapped_column(ForeignKey("dostawcy.id"), nullable=True)
 
     status: Mapped[str] = mapped_column(String, default="Nowe")
+    # Osobny status "czy to zamówienie zostało faktycznie złożone u dostawcy" — to inna
+    # ścieżka niż ogólny status zamówienia, bo jeden kosztorys może mieć kilka zamówień
+    # u różnych dostawców, każde na innym etapie składania. Zaznaczane ręcznie na liście.
+    status_zamowienia_dostawcy: Mapped[str] = mapped_column(String, default="Do zamówienia")
     # Niezależne od kosztorysu — przydatne zwłaszcza przy "wolnych" zamówieniach bez kosztorysu.
     adres_nabywcy: Mapped[str | None] = mapped_column(String, nullable=True)
     adres_montazu: Mapped[str | None] = mapped_column(String, nullable=True)

@@ -1,4 +1,4 @@
-function ZamowieniaList({ zamowienia, onWybierz, zaznaczone, onPrzelacz }) {
+function ZamowieniaList({ zamowienia, onWybierz, zaznaczone, onPrzelacz, onZmienStatusDostawcy }) {
   if (zamowienia.length === 0) {
     return <p>Brak zamówień.</p>
   }
@@ -13,6 +13,7 @@ function ZamowieniaList({ zamowienia, onWybierz, zaznaczone, onPrzelacz }) {
           <th>Kosztorys</th>
           <th>Dostawca</th>
           <th>Status</th>
+          <th>Zamówione u dostawcy</th>
           <th>Wartość brutto</th>
           <th>Zaliczka klienta</th>
           <th>Do dopłaty</th>
@@ -38,6 +39,16 @@ function ZamowieniaList({ zamowienia, onWybierz, zaznaczone, onPrzelacz }) {
             </td>
             <td>{zamowienie.dostawca ? zamowienie.dostawca.nazwa : '—'}</td>
             <td>{zamowienie.status}</td>
+            <td onClick={(event) => event.stopPropagation()}>
+              <select
+                value={zamowienie.status_zamowienia_dostawcy}
+                onChange={(event) => onZmienStatusDostawcy(zamowienie, event.target.value)}
+              >
+                <option value="Do zamówienia">Do zamówienia</option>
+                <option value="Zamówione częściowo">Zamówione częściowo</option>
+                <option value="Zamówione kompletnie">Zamówione kompletnie</option>
+              </select>
+            </td>
             <td>{zamowienie.wartosc_brutto === null ? '—' : `${zamowienie.wartosc_brutto.toFixed(2)} zł`}</td>
             <td>{zamowienie.zaliczka_klienta.toFixed(2)} zł</td>
             <td>{zamowienie.do_doplaty === null ? '—' : `${zamowienie.do_doplaty.toFixed(2)} zł`}</td>

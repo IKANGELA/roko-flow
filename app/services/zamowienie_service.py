@@ -92,6 +92,7 @@ class ZamowienieService:
             dostawca_id=zamowienie.dostawca_id,
             dostawca=DostawcaPodsumowanie.model_validate(dostawca) if dostawca is not None else None,
             status=zamowienie.status,
+            status_zamowienia_dostawcy=zamowienie.status_zamowienia_dostawcy,
             adres_nabywcy=zamowienie.adres_nabywcy,
             adres_montazu=zamowienie.adres_montazu,
             numer_zamowienia=zamowienie.numer_zamowienia,
