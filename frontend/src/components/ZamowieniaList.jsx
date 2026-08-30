@@ -10,15 +10,15 @@ function ZamowieniaList({ zamowienia, onWybierz, zaznaczone, onPrzelacz, onZmien
       <thead>
         <tr>
           <th></th>
+          <th>Klient</th>
           <th>Numer</th>
           <th>Data zamówienia</th>
-          <th>Klient</th>
-          <th>Kosztorys</th>
-          <th>Status</th>
+          <th>Adres montażu</th>
           <th>Wartość brutto</th>
-          <th>Zaliczka klienta</th>
+          <th>Zaliczka od klienta</th>
           <th>Do dopłaty</th>
           <th>Data dostawy</th>
+          <th>Status</th>
         </tr>
       </thead>
       <tbody>
@@ -31,16 +31,16 @@ function ZamowieniaList({ zamowienia, onWybierz, zaznaczone, onPrzelacz, onZmien
                 onChange={() => onPrzelacz(zamowienie.id)}
               />
             </td>
-            <td>{zamowienie.numer_zamowienia || '—'}</td>
-            <td>{zamowienie.data_zamowienia || '—'}</td>
             <td>
               {zamowienie.klient?.imie_i_nazwisko || zamowienie.kosztorys?.klient?.imie_i_nazwisko || '—'}
             </td>
-            <td>
-              {zamowienie.kosztorys
-                ? `${zamowienie.kosztorys.numer}${zamowienie.kosztorys.nazwa_inwestycji ? ` (${zamowienie.kosztorys.nazwa_inwestycji})` : ''}`
-                : '—'}
-            </td>
+            <td>{zamowienie.numer_zamowienia || '—'}</td>
+            <td>{zamowienie.data_zamowienia || '—'}</td>
+            <td>{zamowienie.adres_montazu || '—'}</td>
+            <td>{zamowienie.wartosc_brutto === null ? '—' : `${zamowienie.wartosc_brutto.toFixed(2)} zł`}</td>
+            <td>{zamowienie.zaliczka_klienta.toFixed(2)} zł</td>
+            <td>{zamowienie.do_doplaty === null ? '—' : `${zamowienie.do_doplaty.toFixed(2)} zł`}</td>
+            <td>{zamowienie.data_dostawy || '—'}</td>
             <td onClick={(event) => event.stopPropagation()}>
               <select value={zamowienie.status} onChange={(event) => onZmienStatus(zamowienie, event.target.value)}>
                 {STATUSY_ZAMOWIENIA.map((wartosc) => (
@@ -50,10 +50,6 @@ function ZamowieniaList({ zamowienia, onWybierz, zaznaczone, onPrzelacz, onZmien
                 ))}
               </select>
             </td>
-            <td>{zamowienie.wartosc_brutto === null ? '—' : `${zamowienie.wartosc_brutto.toFixed(2)} zł`}</td>
-            <td>{zamowienie.zaliczka_klienta.toFixed(2)} zł</td>
-            <td>{zamowienie.do_doplaty === null ? '—' : `${zamowienie.do_doplaty.toFixed(2)} zł`}</td>
-            <td>{zamowienie.data_dostawy || '—'}</td>
           </tr>
         ))}
       </tbody>
