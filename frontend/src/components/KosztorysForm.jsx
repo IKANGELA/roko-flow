@@ -152,30 +152,25 @@ function KosztorysForm({ kosztorys, onZapisano }) {
 
         <KlientPicker klientId={dane.klient_id} onZmiana={zmienKlienta} />
 
-        <div>
-          <input
-            name="nazwa_inwestycji"
-            placeholder="Nazwa inwestycji"
-            value={dane.nazwa_inwestycji}
-            onChange={zmienPole}
-          />
-        </div>
-        <div>
-          <input
-            name="adres_montazu"
-            placeholder="Adres montażu"
-            value={dane.adres_montazu}
-            onChange={zmienPole}
-          />
-        </div>
-        <div>
-          <input name="termin" placeholder="Termin (np. 2 tygodnie)" value={dane.termin} onChange={zmienPole} />
-        </div>
-        <div>
-          <textarea name="uwagi" placeholder="Uwagi" value={dane.uwagi} onChange={zmienPole} rows={2} />
-        </div>
-        <div>
+        <div className="siatka-pol">
           <label>
+            Nazwa inwestycji
+            <input name="nazwa_inwestycji" value={dane.nazwa_inwestycji} onChange={zmienPole} />
+          </label>
+          <label>
+            Adres montażu
+            <input name="adres_montazu" value={dane.adres_montazu} onChange={zmienPole} />
+          </label>
+          <label>
+            Termin
+            <input name="termin" placeholder="np. 2 tygodnie" value={dane.termin} onChange={zmienPole} />
+          </label>
+
+          <label className="pole-szerokie">
+            Uwagi
+            <textarea name="uwagi" value={dane.uwagi} onChange={zmienPole} rows={2} />
+          </label>
+          <label className="pole-checkbox">
             <input
               type="checkbox"
               name="wybrany_do_realizacji"
@@ -183,7 +178,7 @@ function KosztorysForm({ kosztorys, onZapisano }) {
               onChange={(event) =>
                 setDane((poprzednie) => ({ ...poprzednie, wybrany_do_realizacji: event.target.checked }))
               }
-            />{' '}
+            />
             Wybrany do realizacji
           </label>
         </div>
