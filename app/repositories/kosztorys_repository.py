@@ -3,7 +3,7 @@ from typing import List, Optional
 
 from sqlalchemy.orm import Session, joinedload
 
-from app.models.kosztorys import KosztorysDB, PozycjaKosztorysuDB, SkladnikPozycjiDB
+from app.models.kosztorys import KosztorysDB, PozycjaKosztorysuDB
 from app.schemas.kosztorys import KosztorysCreate, PozycjaCreate
 
 
@@ -19,17 +19,21 @@ class KosztorysRepository:
             PozycjaKosztorysuDB(
                 nazwa=pozycja.nazwa,
                 dostawca_id=pozycja.dostawca_id,
+                montaz_kwota=pozycja.montaz_kwota,
                 opis=pozycja.opis,
+                opis_kwota=pozycja.opis_kwota,
                 kolor=pozycja.kolor,
+                kolor_kwota=pozycja.kolor_kwota,
                 oscieznica_rodzaj=pozycja.oscieznica_rodzaj,
+                oscieznica_rodzaj_kwota=pozycja.oscieznica_rodzaj_kwota,
                 informacje_dodatkowe=pozycja.informacje_dodatkowe,
+                informacje_dodatkowe_kwota=pozycja.informacje_dodatkowe_kwota,
                 szklo=pozycja.szklo,
+                szklo_kwota=pozycja.szklo_kwota,
                 wentylacja=pozycja.wentylacja,
+                wentylacja_kwota=pozycja.wentylacja_kwota,
                 uwagi=pozycja.uwagi,
-                skladniki=[
-                    SkladnikPozycjiDB(opis=skladnik.opis, kwota=skladnik.kwota)
-                    for skladnik in pozycja.skladniki
-                ],
+                uwagi_kwota=pozycja.uwagi_kwota,
             )
             for pozycja in pozycje
         ]
@@ -97,16 +101,12 @@ class KosztorysRepository:
         return kosztorys
 
     def wszystkie(self) -> List[KosztorysDB]:
-        return (
-            self._db.query(KosztorysDB)
-            .options(joinedload(KosztorysDB.pozycje).joinedload(PozycjaKosztorysuDB.skladniki))
-            .all()
-        )
+        return self._db.query(KosztorysDB).options(joinedload(KosztorysDB.pozycje)).all()
 
     def znajdz(self, kosztorys_id: int) -> Optional[KosztorysDB]:
         return (
             self._db.query(KosztorysDB)
-            .options(joinedload(KosztorysDB.pozycje).joinedload(PozycjaKosztorysuDB.skladniki))
+            .options(joinedload(KosztorysDB.pozycje))
             .filter(KosztorysDB.id == kosztorys_id)
             .first()
         )
