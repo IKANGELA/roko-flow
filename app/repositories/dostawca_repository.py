@@ -25,6 +25,16 @@ class DostawcaRepository:
     def znajdz(self, dostawca_id: int) -> Optional[DostawcaDB]:
         return self._db.query(DostawcaDB).filter(DostawcaDB.id == dostawca_id).first()
 
+    def aktualizuj(self, dostawca_id: int, dane: DostawcaCreate) -> Optional[DostawcaDB]:
+        dostawca = self.znajdz(dostawca_id)
+        if dostawca is None:
+            return None
+        for pole, wartosc in dane.model_dump().items():
+            setattr(dostawca, pole, wartosc)
+        self._db.commit()
+        self._db.refresh(dostawca)
+        return dostawca
+
     def usun(self, dostawca_id: int) -> bool:
         dostawca = self.znajdz(dostawca_id)
         if dostawca is None:

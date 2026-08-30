@@ -22,6 +22,9 @@ class DostawcaService:
     def pobierz_dostawce(self, dostawca_id: int) -> Optional[DostawcaDB]:
         return self._repository.znajdz(dostawca_id)
 
+    def aktualizuj_dostawce(self, dostawca_id: int, dane: DostawcaCreate) -> Optional[DostawcaDB]:
+        return self._repository.aktualizuj(dostawca_id, dane)
+
     def usun_dostawce(self, dostawca_id: int) -> bool:
         if self._zamowienie_repository.istnieje_dla_dostawcy(dostawca_id):
             raise ValueError("Nie można usunąć dostawcy — istnieją dla niego zamówienia")

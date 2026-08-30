@@ -63,6 +63,18 @@ export async function utworzDostawce(dane) {
   return odpowiedz.json()
 }
 
+export async function aktualizujDostawce(id, dane) {
+  const odpowiedz = await fetch(`${API_URL}/dostawcy/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(dane),
+  })
+  if (!odpowiedz.ok) {
+    throw new Error('Nie udało się zaktualizować dostawcy')
+  }
+  return odpowiedz.json()
+}
+
 export async function pobierzZamowienia() {
   const odpowiedz = await fetch(`${API_URL}/zamowienia/`)
   return odpowiedz.json()
