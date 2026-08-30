@@ -1,6 +1,6 @@
 import { STATUSY_ZAMOWIENIA } from '../zamowienieUtils'
 
-function ZamowieniaList({ zamowienia, onWybierz, zaznaczone, onPrzelacz, onZmienStatus, onZmienStatusDostawcy }) {
+function ZamowieniaList({ zamowienia, onWybierz, zaznaczone, onPrzelacz, onZmienStatus }) {
   if (zamowienia.length === 0) {
     return <p>Brak zamówień.</p>
   }
@@ -15,7 +15,6 @@ function ZamowieniaList({ zamowienia, onWybierz, zaznaczone, onPrzelacz, onZmien
           <th>Klient</th>
           <th>Kosztorys</th>
           <th>Status</th>
-          <th>Zamówione u dostawcy</th>
           <th>Wartość brutto</th>
           <th>Zaliczka klienta</th>
           <th>Do dopłaty</th>
@@ -49,16 +48,6 @@ function ZamowieniaList({ zamowienia, onWybierz, zaznaczone, onPrzelacz, onZmien
                     {wartosc}
                   </option>
                 ))}
-              </select>
-            </td>
-            <td onClick={(event) => event.stopPropagation()}>
-              <select
-                value={zamowienie.status_zamowienia_dostawcy}
-                onChange={(event) => onZmienStatusDostawcy(zamowienie, event.target.value)}
-              >
-                <option value="Do zamówienia">Do zamówienia</option>
-                <option value="Zamówione częściowo">Zamówione częściowo</option>
-                <option value="Zamówione kompletnie">Zamówione kompletnie</option>
               </select>
             </td>
             <td>{zamowienie.wartosc_brutto === null ? '—' : `${zamowienie.wartosc_brutto.toFixed(2)} zł`}</td>
