@@ -1,3 +1,16 @@
+// Ogólny etap sprawy — od kosztorysu, przez zamówienie u dostawcy i montaż, do zamknięcia
+// (albo serwisu/reklamacji, które mogą się zdarzyć już po montażu). Musi być zgodne
+// z STATUSY_ZAMOWIENIA w app/schemas/zamowienie.py.
+export const STATUSY_ZAMOWIENIA = [
+  'Kosztorys',
+  'Zamówić',
+  'Montaż',
+  'Do dokończenia',
+  'Zakończone',
+  'Serwis',
+  'Reklamacja',
+]
+
 // Buduje payload dla PUT /zamowienia/{id} na podstawie już istniejącego, w pełni wypełnionego
 // zamówienia (np. pobranego z listy) — używane, gdy zmieniamy jedno pole (np. status u dostawcy)
 // bezpośrednio z listy, bez otwierania całego formularza edycji. PUT robi pełną podmianę,

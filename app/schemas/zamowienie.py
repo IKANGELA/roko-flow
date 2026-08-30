@@ -32,11 +32,24 @@ class DostawcaPodsumowanie(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
+# Ogólny etap sprawy — od kosztorysu, przez zamówienie u dostawcy i montaż, do zamknięcia
+# (albo serwisu/reklamacji, które mogą się zdarzyć już po montażu).
+STATUSY_ZAMOWIENIA = [
+    "Kosztorys",
+    "Zamówić",
+    "Montaż",
+    "Do dokończenia",
+    "Zakończone",
+    "Serwis",
+    "Reklamacja",
+]
+
+
 class ZamowienieCreate(BaseModel):
     kosztorys_id: Optional[int] = None
     dostawca_id: Optional[int] = None
 
-    status: str = "Nowe"
+    status: str = "Zamówić"
     status_zamowienia_dostawcy: str = "Do zamówienia"
     adres_nabywcy: Optional[str] = None
     adres_montazu: Optional[str] = None
