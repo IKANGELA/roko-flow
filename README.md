@@ -1,58 +1,42 @@
 # ROKO Flow
 
-Aplikacja do zarządzania procesem sprzedaży i montażu stolarki budowlanej (drzwi, okna, klamki, rolety, bramy garażowe) — od kosztorysu, przez zamówienie u dostawcy, aż po montaż u klienta.
+Projekt powstał z konkretnej potrzeby. Firma stolarska ROKO prowadziła cały proces sprzedaży (kosztorysy, zamówienia, montaże) w Arkuszach Google, z osobnymi zakładkami połączonymi ręcznie klikanymi linkami. Działało, ale z czasem trudno było to ogarnąć: kosztorys trzeba było kopiować do zamówienia, dane klienta wpisywać po kilka razy, a każda zmiana groziła zepsuciem jakiejś formuły.
 
-Projekt zastępuje dotychczasowy proces prowadzony ręcznie w Arkuszach Google (BAZA_KOSZTORYSÓW → Z26 → Montaże), digitalizując go w postaci pełnej aplikacji webowej z bazą danych.
+Zamiast kolejnej wersji arkusza postanowiłam zbudować to jako prawdziwą aplikację webową. Przy okazji jest to dla mnie projekt do nauki: pierwszy raz budowałam coś tej wielkości od zera, z podziałem na warstwy backendu i osobnym frontendem.
 
-## Funkcje
+## Co robi
 
-- **Klienci** — kartoteka klientów z wyszukiwarką i edycją.
-- **Kosztorysy** — wycena inwestycji z dynamicznymi pozycjami (drzwi, okna, klamki...), każda pozycja z własnymi składnikami kosztu (towar, montaż, podfrezowanie itd.) i przypisanym dostawcą/marką. Automatyczne wyliczanie VAT, rabatu, zaliczki i kwoty do dopłaty.
-- **Dostawcy** — prosta lista producentów/dostawców ze specyfikacją asortymentu.
-- **Zamówienia** — generowane z zaakceptowanego kosztorysu, z możliwością utworzenia zamówienia niezależnego (np. serwisowego). Dane uzupełniane progresywnie w miarę ustaleń z dostawcą.
-- **Montaże** — harmonogram realizacji, powiązany z kosztorysem/inwestycją.
-- Zaznaczanie i usuwanie zbiorcze na każdej liście, z zabezpieczeniem przed usunięciem rekordów posiadających powiązania (np. klienta z istniejącymi kosztorysami).
+Ścieżka jest taka sama jak w arkuszu, tylko już bez ręcznego przepisywania. Zakładasz klienta, robisz mu kosztorys (z pozycjami typu drzwi, okna, klamki, każda pozycja ma swoje składniki kosztu, np. osobno towar, osobno montaż, osobno podfrezowanie), po akceptacji kosztorys zamienia się w zamówienie do konkretnego dostawcy, a na końcu jest montaż. Dostawcy przypisuje się do konkretnej pozycji, nie do całego zamówienia, bo w praktyce drzwi mogą być od jednego producenta, a klamki od zupełnie innego.
 
-## Stos technologiczny
+Kosztorys sam liczy VAT, rabat, zaliczkę i to, ile zostało do dopłaty. Te wyliczenia robiłam kilka razy od nowa, bo dopiero w trakcie rozmów z osobą, która na co dzień pracuje na tych arkuszach, wychodziły kolejne szczegóły (np. że rabat liczy się od netto, a nie od brutto).
 
-**Backend:** Python, FastAPI, SQLAlchemy (ORM), SQLite, Pydantic
-**Frontend:** React, Vite, React Router
+## Z czego to zrobione
 
-## Architektura
+Backend: Python, FastAPI, SQLAlchemy, SQLite.
+Frontend: React (Vite), bez dodatkowych bibliotek UI, style pisane ręcznie.
 
-Backend zbudowany w warstwach, z rozdzieleniem odpowiedzialności:
+Backend jest rozbity na warstwy (routery, serwisy, repozytoria, modele) głównie po to, żebym mogła się nauczyć, po co w ogóle taki podział istnieje. Na przykład dane klientów najpierw trzymałam w pamięci procesu, a potem podmieniłam to na prawdziwą bazę danych i reszta kodu (logika biznesowa, endpointy) w ogóle się nie zmieniła. To był dobry moment, żeby zobaczyć, po co jest wzorzec repozytorium, a nie tylko przeczytać o nim.
 
-```
-app/
-├── routers/       # obsługa żądań HTTP
-├── services/      # logika biznesowa (wyliczenia, walidacje)
-├── repositories/  # dostęp do bazy danych (wzorzec Repository)
-├── models/        # definicje tabel SQLAlchemy
-└── schemas/       # kontrakty API (Pydantic)
-```
+## Stan projektu
 
-Zastosowane wzorce projektowe: **Repository** (odseparowanie logiki od sposobu przechowywania danych), **Service Layer** (reguły biznesowe oddzielone od warstwy HTTP), **Dependency Injection** (wstrzykiwanie zależności przez `Depends()` w FastAPI).
+Wszystkie pięć modułów (klienci, dostawcy, kosztorysy, zamówienia, montaże) działa od dodawania po usuwanie. Czego jeszcze nie ma: generowania dokumentów PDF (umowa, protokół odbioru itd., w arkuszu to osobne wydruki) i prawdziwego wdrożenia gdzieś poza moim komputerem.
 
-Frontend jako SPA (Single Page Application) komunikujące się z backendem przez REST API, z widokami list/formularzy współdzielącymi wspólne wzorce (zaznaczanie zbiorcze, edycja pełnoekranowa, siatki pól z podpisami).
+## Uruchomienie
 
-## Uruchomienie lokalne
-
-**Backend:**
 ```bash
 python -m venv venv
-source venv/Scripts/activate  # Windows (Git Bash)
+source venv/Scripts/activate
 pip install -r requirements.txt
 uvicorn app.main:app --reload --port 8000
 ```
 
-**Frontend:**
 ```bash
 cd frontend
 npm install
 npm run dev
 ```
 
-Frontend: http://localhost:5173 · API i interaktywna dokumentacja: http://localhost:8000/docs
+Frontend pod http://localhost:5173, dokumentacja API pod http://localhost:8000/docs.
 
 ## Zrzuty ekranu
 
