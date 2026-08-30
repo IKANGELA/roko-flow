@@ -21,7 +21,7 @@ const PUSTA_POZYCJA = () => ({
 // Kolumny opisowe, które mają pod treścią własne pole na cenę — nazwa pola tekstowego
 // i odpowiadającego mu pola z kwotą, zgodnie z układem z arkusza.
 const KOLUMNY_Z_CENA = [
-  { pole: 'opis', poleKwoty: 'opis_kwota', naglowek: 'Opis' },
+  { pole: 'opis', poleKwoty: 'opis_kwota', naglowek: 'Model/wzór' },
   { pole: 'kolor', poleKwoty: 'kolor_kwota', naglowek: 'Kolor' },
   { pole: 'oscieznica_rodzaj', poleKwoty: 'oscieznica_rodzaj_kwota', naglowek: 'Ościeżnica rodzaj' },
   { pole: 'informacje_dodatkowe', poleKwoty: 'informacje_dodatkowe_kwota', naglowek: 'Informacje dodatkowe' },
