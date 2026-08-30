@@ -11,7 +11,6 @@ function ZamowieniaList({ zamowienia, onWybierz, zaznaczone, onPrzelacz, onZmien
           <th>Numer</th>
           <th>Klient</th>
           <th>Kosztorys</th>
-          <th>Dostawca</th>
           <th>Status</th>
           <th>Zamówione u dostawcy</th>
           <th>Wartość brutto</th>
@@ -37,7 +36,6 @@ function ZamowieniaList({ zamowienia, onWybierz, zaznaczone, onPrzelacz, onZmien
                 ? `${zamowienie.kosztorys.numer}${zamowienie.kosztorys.nazwa_inwestycji ? ` (${zamowienie.kosztorys.nazwa_inwestycji})` : ''}`
                 : '—'}
             </td>
-            <td>{zamowienie.dostawca ? zamowienie.dostawca.nazwa : '—'}</td>
             <td>{zamowienie.status}</td>
             <td onClick={(event) => event.stopPropagation()}>
               <select
