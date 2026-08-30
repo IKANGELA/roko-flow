@@ -134,6 +134,7 @@ class KosztorysService:
             wersja=kosztorys.wersja,
             nazwa_inwestycji=kosztorys.nazwa_inwestycji,
             adres_nabywcy=kosztorys.adres_nabywcy,
+            nip_nabywcy=kosztorys.nip_nabywcy,
             adres_montazu=kosztorys.adres_montazu,
             termin=kosztorys.termin,
             data=kosztorys.data,

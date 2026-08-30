@@ -99,6 +99,7 @@ class KosztorysCreate(BaseModel):
     wersja: int = 1
     nazwa_inwestycji: Optional[str] = None
     adres_nabywcy: Optional[str] = None
+    nip_nabywcy: Optional[str] = None
     adres_montazu: Optional[str] = None
     termin: Optional[str] = None
     uwagi: Optional[str] = None
@@ -118,6 +119,7 @@ class Kosztorys(BaseModel):
     wersja: int
     nazwa_inwestycji: Optional[str] = None
     adres_nabywcy: Optional[str] = None
+    nip_nabywcy: Optional[str] = None
     adres_montazu: Optional[str] = None
     termin: Optional[str] = None
     data: date
