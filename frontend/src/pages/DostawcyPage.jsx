@@ -18,6 +18,10 @@ function DostawcyPage() {
     setDostawcy((poprzedni) => [...poprzedni, nowyDostawca])
   }
 
+  function zaktualizowanoDostawce(zaktualizowany) {
+    setDostawcy((poprzedni) => poprzedni.map((d) => (d.id === zaktualizowany.id ? zaktualizowany : d)))
+  }
+
   async function usunZaznaczonych() {
     if (!window.confirm(`Usunąć ${zaznaczone.size} dostawców?`)) {
       return
@@ -34,7 +38,12 @@ function DostawcyPage() {
     <div>
       <h1>Dostawcy</h1>
       <DostawcaForm onUtworzono={dodajDostawceDoListy} />
-      <DostawcyList dostawcy={dostawcy} zaznaczone={zaznaczone} onPrzelacz={przelacz} />
+      <DostawcyList
+        dostawcy={dostawcy}
+        zaznaczone={zaznaczone}
+        onPrzelacz={przelacz}
+        onZaktualizowano={zaktualizowanoDostawce}
+      />
       <PasekZaznaczenia liczbaZaznaczonych={zaznaczone.size} onUsun={usunZaznaczonych} />
     </div>
   )

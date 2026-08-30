@@ -32,6 +32,16 @@ def pobierz_dostawce(dostawca_id: int, service: DostawcaService = Depends(get_do
     return dostawca
 
 
+@router.put("/{dostawca_id}", response_model=Dostawca)
+def aktualizuj_dostawce(
+    dostawca_id: int, dane: DostawcaCreate, service: DostawcaService = Depends(get_dostawca_service)
+) -> Dostawca:
+    dostawca = service.aktualizuj_dostawce(dostawca_id, dane)
+    if dostawca is None:
+        raise HTTPException(status_code=404, detail="Dostawca nie znaleziony")
+    return dostawca
+
+
 @router.delete("/{dostawca_id}", status_code=204)
 def usun_dostawce(dostawca_id: int, service: DostawcaService = Depends(get_dostawca_service)) -> None:
     try:
