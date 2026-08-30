@@ -290,6 +290,19 @@ form button[type='submit']:hover {
   text-align: center;
 }
 
+/* Przycisk "Zapisz" przy pozycji, gdy są niezapisane zmiany — wyraźne podświetlenie,
+   żeby było widać, że coś się zmieniło i trzeba to zapisać. */
+.przyciski-akcji button.do-zapisania {
+  background: var(--danger);
+  border-color: var(--danger);
+  color: #fff;
+}
+
+.przyciski-akcji button.do-zapisania:hover {
+  background: #94371f;
+  border-color: #94371f;
+}
+
 /* Tabela pozycji kosztorysu — osobne "kafelki" pól z drobnym odstępem między sobą,
    zamiast pól stykających się krawędziami. */
 .tabela-pozycji {

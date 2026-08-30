@@ -37,7 +37,7 @@ export function sumaNettoPozycji(pozycja) {
   return POLA_KWOT.reduce((suma, pole) => suma + (Number(pozycja[pole]) || 0), 0)
 }
 
-function PozycjeEditor({ pozycje, onZmiana, onZapiszKosztorys, dostawcy = [] }) {
+function PozycjeEditor({ pozycje, onZmiana, onZapiszKosztorys, dostawcy = [], niezapisaneZmiany = false }) {
   function dodajPozycje() {
     onZmiana([...pozycje, PUSTA_POZYCJA()])
   }
@@ -144,7 +144,11 @@ function PozycjeEditor({ pozycje, onZmiana, onZapiszKosztorys, dostawcy = [] }) 
                   <button type="button" onClick={() => usunPozycje(indeksPozycji)}>
                     Usuń
                   </button>
-                  <button type="button" onClick={onZapiszKosztorys}>
+                  <button
+                    type="button"
+                    className={niezapisaneZmiany ? 'do-zapisania' : ''}
+                    onClick={onZapiszKosztorys}
+                  >
                     Zapisz
                   </button>
                 </div>
