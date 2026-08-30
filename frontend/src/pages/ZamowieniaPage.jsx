@@ -3,9 +3,10 @@ import { useLocation } from 'react-router-dom'
 import ZamowieniaList from '../components/ZamowieniaList'
 import ZamowienieForm from '../components/ZamowienieForm'
 import PasekZaznaczenia from '../components/PasekZaznaczenia'
-import { pobierzZamowienia, usunZamowienie } from '../api'
+import { aktualizujZamowienie, pobierzZamowienia, usunZamowienie } from '../api'
 import { useZaznaczenie } from '../useZaznaczenie'
 import { usunZaznaczoneElementy } from '../usunZaznaczone'
+import { zamowienieDoPayloadu } from '../zamowienieUtils'
 
 function ZamowieniaPage() {
   const location = useLocation()
@@ -39,6 +40,16 @@ function ZamowieniaPage() {
   function otworzDoEdycji(zamowienie) {
     setWybraneZamowienie(zamowienie)
     setWidok('edytuj')
+  }
+
+  // Szybka zmiana statusu zamówienia u dostawcy wprost z listy, bez otwierania całego
+  // formularza edycji — PUT robi pełną podmianę, więc bazujemy na już wczytanym obiekcie.
+  async function zmienStatusDostawcy(zamowienie, nowyStatus) {
+    const zaktualizowane = await aktualizujZamowienie(
+      zamowienie.id,
+      zamowienieDoPayloadu(zamowienie, { status_zamowienia_dostawcy: nowyStatus }),
+    )
+    setZamowienia((poprzednie) => poprzednie.map((z) => (z.id === zaktualizowane.id ? zaktualizowane : z)))
   }
 
   async function usunZaznaczone() {
@@ -89,6 +100,7 @@ function ZamowieniaPage() {
         onWybierz={otworzDoEdycji}
         zaznaczone={zaznaczone}
         onPrzelacz={przelacz}
+        onZmienStatusDostawcy={zmienStatusDostawcy}
       />
       <PasekZaznaczenia liczbaZaznaczonych={zaznaczone.size} onUsun={usunZaznaczone} />
     </div>

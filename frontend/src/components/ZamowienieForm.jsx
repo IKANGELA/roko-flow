@@ -13,6 +13,7 @@ const PUSTY_FORMULARZ = {
   kosztorys_id: '',
   dostawca_id: '',
   status: 'Nowe',
+  status_zamowienia_dostawcy: 'Do zamówienia',
   adres_nabywcy: '',
   adres_montazu: '',
   numer_zamowienia: '',
@@ -38,6 +39,7 @@ function danePoczatkowe(zamowienie, wstepnyKosztorysId) {
       kosztorys_id: zamowienie.kosztorys_id ?? '',
       dostawca_id: zamowienie.dostawca_id ?? '',
       status: zamowienie.status,
+      status_zamowienia_dostawcy: zamowienie.status_zamowienia_dostawcy || 'Do zamówienia',
       adres_nabywcy: zamowienie.adres_nabywcy || '',
       adres_montazu: zamowienie.adres_montazu || '',
       numer_zamowienia: zamowienie.numer_zamowienia || '',
@@ -182,6 +184,7 @@ function ZamowienieForm({ zamowienie, wstepnyKosztorysId, onZapisano }) {
       kosztorys_id: dane.kosztorys_id === '' ? null : Number(dane.kosztorys_id),
       dostawca_id: dane.dostawca_id === '' ? null : Number(dane.dostawca_id),
       status: dane.status,
+      status_zamowienia_dostawcy: dane.status_zamowienia_dostawcy,
       adres_nabywcy: dane.adres_nabywcy || null,
       adres_montazu: dane.adres_montazu || null,
       numer_zamowienia: dane.numer_zamowienia || null,
@@ -249,6 +252,14 @@ function ZamowienieForm({ zamowienie, wstepnyKosztorysId, onZapisano }) {
           <label>
             Status
             <input name="status" value={dane.status} onChange={zmienPole} />
+          </label>
+          <label>
+            Zamówione u dostawcy
+            <select name="status_zamowienia_dostawcy" value={dane.status_zamowienia_dostawcy} onChange={zmienPole}>
+              <option value="Do zamówienia">Do zamówienia</option>
+              <option value="Zamówione częściowo">Zamówione częściowo</option>
+              <option value="Zamówione kompletnie">Zamówione kompletnie</option>
+            </select>
           </label>
           <label>
             Adres nabywcy (do faktury)
