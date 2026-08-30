@@ -58,7 +58,7 @@ function ZamowieniaPage() {
       zaznaczone,
       usunZamowienie,
       zamowienia,
-      (z) => z.numer_zamowienia || `zamówienie #${z.id}`,
+      (z) => z.kosztorys?.numer || z.numer_zamowienia || `zamówienie #${z.id}`,
     )
     setZamowienia((poprzednie) => poprzednie.filter((z) => !usunieteId.includes(z.id)))
     wyczysc()
