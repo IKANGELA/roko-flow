@@ -37,7 +37,7 @@ function KosztorysyList({ kosztorysy, onWybierz, onAkceptuj, onWycofajAkceptacje
             <td>{kosztorys.suma_brutto.toFixed(2)} zł</td>
             <td>{kosztorys.wybrany_do_realizacji ? 'Zaakceptowany' : 'Oczekuje'}</td>
             <td>{kosztorys.uwagi || '—'}</td>
-            <td>
+            <td style={{ textAlign: 'right' }}>
               {!kosztorys.wybrany_do_realizacji ? (
                 <button
                   type="button"
