@@ -61,7 +61,19 @@ function PozycjeEditor({ pozycje, onZmiana, onZapiszKosztorys }) {
 
   return (
     <div>
-      <table>
+      <table className="tabela-pozycji" style={{ tableLayout: 'fixed' }}>
+        <colgroup>
+          <col style={{ width: '13%' }} />
+          <col style={{ width: '13%' }} />
+          <col style={{ width: '9%' }} />
+          <col style={{ width: '10%' }} />
+          <col style={{ width: '12%' }} />
+          <col style={{ width: '8%' }} />
+          <col style={{ width: '8%' }} />
+          <col style={{ width: '12%' }} />
+          <col style={{ width: '8%' }} />
+          <col style={{ width: '7%' }} />
+        </colgroup>
         <thead>
           <tr>
             <th>Nazwa</th>
@@ -138,19 +150,21 @@ function PozycjeEditor({ pozycje, onZmiana, onZapiszKosztorys }) {
                 <td>
                   <strong>{sumaNettoPozycji(pozycja).toFixed(2)} zł</strong>
                 </td>
-                <td style={{ whiteSpace: 'nowrap' }}>
-                  <button
-                    type="button"
-                    onClick={() => setRozwinieta(rozwinieta === indeksPozycji ? null : indeksPozycji)}
-                  >
-                    Składniki ({pozycja.skladniki.length})
-                  </button>{' '}
-                  <button type="button" onClick={() => usunPozycje(indeksPozycji)}>
-                    Usuń
-                  </button>{' '}
-                  <button type="button" onClick={onZapiszKosztorys}>
-                    Zapisz
-                  </button>
+                <td>
+                  <div className="przyciski-akcji">
+                    <button
+                      type="button"
+                      onClick={() => setRozwinieta(rozwinieta === indeksPozycji ? null : indeksPozycji)}
+                    >
+                      Skł. ({pozycja.skladniki.length})
+                    </button>
+                    <button type="button" onClick={() => usunPozycje(indeksPozycji)}>
+                      Usuń
+                    </button>
+                    <button type="button" onClick={onZapiszKosztorys}>
+                      Zapisz
+                    </button>
+                  </div>
                 </td>
               </tr>
 
@@ -188,12 +202,14 @@ function PozycjeEditor({ pozycje, onZmiana, onZapiszKosztorys }) {
                               />
                             </td>
                             <td>
-                              <button
-                                type="button"
-                                onClick={() => usunSkladnik(indeksPozycji, indeksSkladnika)}
-                              >
-                                Usuń
-                              </button>
+                              <div className="przyciski-akcji">
+                                <button
+                                  type="button"
+                                  onClick={() => usunSkladnik(indeksPozycji, indeksSkladnika)}
+                                >
+                                  Usuń
+                                </button>
+                              </div>
                             </td>
                           </tr>
                         ))}
