@@ -5,6 +5,7 @@ export function kosztorysDoPayloadu(kosztorys, nadpisania = {}) {
   return {
     klient_id: kosztorys.klient_id,
     nazwa_inwestycji: kosztorys.nazwa_inwestycji,
+    adres_nabywcy: kosztorys.adres_nabywcy,
     adres_montazu: kosztorys.adres_montazu,
     termin: kosztorys.termin,
     uwagi: kosztorys.uwagi,
@@ -15,6 +16,7 @@ export function kosztorysDoPayloadu(kosztorys, nadpisania = {}) {
     ustalona_zaliczka: kosztorys.ustalona_zaliczka,
     pozycje: kosztorys.pozycje.map((pozycja) => ({
       nazwa: pozycja.nazwa,
+      dostawca_id: pozycja.dostawca_id,
       opis: pozycja.opis,
       kolor: pozycja.kolor,
       oscieznica_rodzaj: pozycja.oscieznica_rodzaj,

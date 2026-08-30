@@ -117,6 +117,7 @@ class KosztorysService:
             numer=kosztorys.numer,
             wersja=kosztorys.wersja,
             nazwa_inwestycji=kosztorys.nazwa_inwestycji,
+            adres_nabywcy=kosztorys.adres_nabywcy,
             adres_montazu=kosztorys.adres_montazu,
             termin=kosztorys.termin,
             data=kosztorys.data,

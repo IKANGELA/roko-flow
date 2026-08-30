@@ -37,6 +37,8 @@ class ZamowienieCreate(BaseModel):
     dostawca_id: Optional[int] = None
 
     status: str = "Nowe"
+    adres_nabywcy: Optional[str] = None
+    adres_montazu: Optional[str] = None
     numer_zamowienia: Optional[str] = None
     data_zamowienia: Optional[date] = None
     termin_realizacji_tygodnie: Optional[int] = None

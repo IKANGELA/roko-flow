@@ -52,6 +52,7 @@ class KosztorysRepository:
             numer=self._kolejny_numer(),
             wersja=dane.wersja,
             nazwa_inwestycji=dane.nazwa_inwestycji,
+            adres_nabywcy=dane.adres_nabywcy,
             adres_montazu=dane.adres_montazu,
             termin=dane.termin,
             uwagi=dane.uwagi,
@@ -76,6 +77,7 @@ class KosztorysRepository:
         kosztorys.klient_id = dane.klient_id
         kosztorys.wersja = dane.wersja
         kosztorys.nazwa_inwestycji = dane.nazwa_inwestycji
+        kosztorys.adres_nabywcy = dane.adres_nabywcy
         kosztorys.adres_montazu = dane.adres_montazu
         kosztorys.termin = dane.termin
         kosztorys.uwagi = dane.uwagi

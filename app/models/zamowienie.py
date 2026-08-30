@@ -26,6 +26,9 @@ class ZamowienieDB(Base):
     dostawca_id: Mapped[int | None] = mapped_column(ForeignKey("dostawcy.id"), nullable=True)
 
     status: Mapped[str] = mapped_column(String, default="Nowe")
+    # Niezależne od kosztorysu — przydatne zwłaszcza przy "wolnych" zamówieniach bez kosztorysu.
+    adres_nabywcy: Mapped[str | None] = mapped_column(String, nullable=True)
+    adres_montazu: Mapped[str | None] = mapped_column(String, nullable=True)
     numer_zamowienia: Mapped[str | None] = mapped_column(String, nullable=True)
     data_zamowienia: Mapped[date | None] = mapped_column(Date, nullable=True)
     termin_realizacji_tygodnie: Mapped[int | None] = mapped_column(Integer, nullable=True)
