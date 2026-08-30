@@ -7,6 +7,7 @@ import { pozycjeDoPayloadu } from '../kosztorysUtils'
 const PUSTY_FORMULARZ = {
   klient_id: null,
   nazwa_inwestycji: '',
+  adres_nabywcy: '',
   adres_montazu: '',
   termin: '',
   uwagi: '',
@@ -24,6 +25,7 @@ function danePoczatkowe(kosztorys) {
   return {
     klient_id: kosztorys.klient_id,
     nazwa_inwestycji: kosztorys.nazwa_inwestycji || '',
+    adres_nabywcy: kosztorys.adres_nabywcy || '',
     adres_montazu: kosztorys.adres_montazu || '',
     termin: kosztorys.termin || '',
     uwagi: kosztorys.uwagi || '',
@@ -83,6 +85,7 @@ function KosztorysForm({ kosztorys, onZapisano }) {
     return {
       klient_id: dane.klient_id,
       nazwa_inwestycji: dane.nazwa_inwestycji || null,
+      adres_nabywcy: dane.adres_nabywcy || null,
       adres_montazu: dane.adres_montazu || null,
       termin: dane.termin || null,
       uwagi: dane.uwagi || null,
@@ -150,6 +153,10 @@ function KosztorysForm({ kosztorys, onZapisano }) {
           <label>
             Nazwa inwestycji
             <input name="nazwa_inwestycji" value={dane.nazwa_inwestycji} onChange={zmienPole} />
+          </label>
+          <label>
+            Adres nabywcy (do faktury)
+            <input name="adres_nabywcy" value={dane.adres_nabywcy} onChange={zmienPole} />
           </label>
           <label>
             Adres montażu

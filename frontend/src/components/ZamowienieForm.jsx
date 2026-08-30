@@ -13,6 +13,8 @@ const PUSTY_FORMULARZ = {
   kosztorys_id: '',
   dostawca_id: '',
   status: 'Nowe',
+  adres_nabywcy: '',
+  adres_montazu: '',
   numer_zamowienia: '',
   data_zamowienia: '',
   termin_realizacji_tygodnie: '',
@@ -36,6 +38,8 @@ function danePoczatkowe(zamowienie, wstepnyKosztorysId) {
       kosztorys_id: zamowienie.kosztorys_id ?? '',
       dostawca_id: zamowienie.dostawca_id ?? '',
       status: zamowienie.status,
+      adres_nabywcy: zamowienie.adres_nabywcy || '',
+      adres_montazu: zamowienie.adres_montazu || '',
       numer_zamowienia: zamowienie.numer_zamowienia || '',
       data_zamowienia: zamowienie.data_zamowienia || '',
       termin_realizacji_tygodnie: zamowienie.termin_realizacji_tygodnie ?? '',
@@ -121,12 +125,14 @@ function ZamowienieForm({ zamowienie, wstepnyKosztorysId, onZapisano }) {
 
   function zmienKosztorys(event) {
     const nowyId = event.target.value
-    // Podpowiadamy VAT z wybranego kosztorysu — nadal można go ręcznie zmienić.
+    // Podpowiadamy VAT i adresy z wybranego kosztorysu — nadal można je ręcznie zmienić.
     const wybrany = kosztorysy.find((k) => String(k.id) === nowyId)
     setDane((poprzednie) => ({
       ...poprzednie,
       kosztorys_id: nowyId,
       vat_procent: wybrany ? wybrany.vat_procent : poprzednie.vat_procent,
+      adres_nabywcy: wybrany ? wybrany.adres_nabywcy || '' : poprzednie.adres_nabywcy,
+      adres_montazu: wybrany ? wybrany.adres_montazu || '' : poprzednie.adres_montazu,
     }))
   }
 
@@ -169,6 +175,8 @@ function ZamowienieForm({ zamowienie, wstepnyKosztorysId, onZapisano }) {
       kosztorys_id: dane.kosztorys_id === '' ? null : Number(dane.kosztorys_id),
       dostawca_id: dane.dostawca_id === '' ? null : Number(dane.dostawca_id),
       status: dane.status,
+      adres_nabywcy: dane.adres_nabywcy || null,
+      adres_montazu: dane.adres_montazu || null,
       numer_zamowienia: dane.numer_zamowienia || null,
       data_zamowienia: dane.data_zamowienia || null,
       termin_realizacji_tygodnie: dane.termin_realizacji_tygodnie === '' ? null : Number(dane.termin_realizacji_tygodnie),
@@ -234,6 +242,14 @@ function ZamowienieForm({ zamowienie, wstepnyKosztorysId, onZapisano }) {
           <label>
             Status
             <input name="status" value={dane.status} onChange={zmienPole} />
+          </label>
+          <label>
+            Adres nabywcy (do faktury)
+            <input name="adres_nabywcy" value={dane.adres_nabywcy} onChange={zmienPole} />
+          </label>
+          <label>
+            Adres montażu
+            <input name="adres_montazu" value={dane.adres_montazu} onChange={zmienPole} />
           </label>
 
           <label>

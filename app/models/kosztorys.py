@@ -17,6 +17,8 @@ class KosztorysDB(Base):
     numer: Mapped[str] = mapped_column(String, nullable=False)
     wersja: Mapped[int] = mapped_column(Integer, default=1)
     nazwa_inwestycji: Mapped[str | None] = mapped_column(String, nullable=True)
+    # Adres nabywcy do faktury — bywa inny niż adres montażu (np. adres firmy, a montaż gdzie indziej).
+    adres_nabywcy: Mapped[str | None] = mapped_column(String, nullable=True)
     adres_montazu: Mapped[str | None] = mapped_column(String, nullable=True)
     termin: Mapped[str | None] = mapped_column(String, nullable=True)
     data: Mapped[date] = mapped_column(Date, default=date.today)
