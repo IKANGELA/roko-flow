@@ -276,6 +276,19 @@ form button[type='submit']:hover {
   padding: 8px 10px;
 }
 
+/* Komórka pozycji z treścią i ceną pod spodem (np. "Ościeżnica rodzaj" + jej kwota) —
+   dwa pola jedno pod drugim w tej samej kolumnie, zamiast osobnej listy składników. */
+.komorka-cena {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.komorka-cena input[type='number'] {
+  color: var(--muted);
+  font-size: 12px;
+}
+
 /* Tabele */
 
 table {

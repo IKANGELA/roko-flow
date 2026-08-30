@@ -23,31 +23,38 @@ class DostawcaPodsumowanie(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
-class SkladnikCreate(BaseModel):
-    """Jeden składnik kosztu pozycji, np. 'Montaż drzwi' + kwota."""
-
-    opis: str
-    kwota: float
-
-
-class Skladnik(SkladnikCreate):
-    id: int
-    model_config = ConfigDict(from_attributes=True)
-
-
 class PozycjaCreate(BaseModel):
-    """Jedna pozycja kosztorysu wraz z listą jej składników kosztu."""
+    """
+    Jedna pozycja kosztorysu. Każda opisowa kolumna (opis, kolor, ościeżnica,
+    informacje dodatkowe, szkło, wentylacja, uwagi) ma obok siebie opcjonalną kwotę —
+    cenę wpisuje się bezpośrednio pod tym, co jest wyceniane. Montaż to samo pole na kwotę.
+    """
 
     nazwa: str
     dostawca_id: Optional[int] = None
+
+    montaz_kwota: Optional[float] = None
+
     opis: Optional[str] = None
+    opis_kwota: Optional[float] = None
+
     kolor: Optional[str] = None
+    kolor_kwota: Optional[float] = None
+
     oscieznica_rodzaj: Optional[str] = None
+    oscieznica_rodzaj_kwota: Optional[float] = None
+
     informacje_dodatkowe: Optional[str] = None
+    informacje_dodatkowe_kwota: Optional[float] = None
+
     szklo: Optional[str] = None
+    szklo_kwota: Optional[float] = None
+
     wentylacja: Optional[str] = None
+    wentylacja_kwota: Optional[float] = None
+
     uwagi: Optional[str] = None
-    skladniki: List[SkladnikCreate] = []
+    uwagi_kwota: Optional[float] = None
 
 
 class Pozycja(BaseModel):
@@ -55,16 +62,31 @@ class Pozycja(BaseModel):
     nazwa: str
     dostawca_id: Optional[int] = None
     dostawca: Optional[DostawcaPodsumowanie] = None
-    opis: Optional[str] = None
-    kolor: Optional[str] = None
-    oscieznica_rodzaj: Optional[str] = None
-    informacje_dodatkowe: Optional[str] = None
-    szklo: Optional[str] = None
-    wentylacja: Optional[str] = None
-    uwagi: Optional[str] = None
-    skladniki: List[Skladnik] = []
 
-    # Wyliczane przez serwis jako suma kwot składników — nie ma takiej kolumny w bazie.
+    montaz_kwota: Optional[float] = None
+
+    opis: Optional[str] = None
+    opis_kwota: Optional[float] = None
+
+    kolor: Optional[str] = None
+    kolor_kwota: Optional[float] = None
+
+    oscieznica_rodzaj: Optional[str] = None
+    oscieznica_rodzaj_kwota: Optional[float] = None
+
+    informacje_dodatkowe: Optional[str] = None
+    informacje_dodatkowe_kwota: Optional[float] = None
+
+    szklo: Optional[str] = None
+    szklo_kwota: Optional[float] = None
+
+    wentylacja: Optional[str] = None
+    wentylacja_kwota: Optional[float] = None
+
+    uwagi: Optional[str] = None
+    uwagi_kwota: Optional[float] = None
+
+    # Wyliczane przez serwis jako suma powyższych kwot — nie ma takiej kolumny w bazie.
     suma_netto: float
 
     model_config = ConfigDict(from_attributes=True)

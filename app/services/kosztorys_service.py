@@ -12,7 +12,6 @@ from app.schemas.kosztorys import (
     Kosztorys,
     KosztorysCreate,
     Pozycja,
-    Skladnik,
 )
 
 DOMYSLNY_PROCENT_ZALICZKI = 0.4
@@ -74,7 +73,17 @@ class KosztorysService:
         return self._repository.usun(kosztorys_id)
 
     def _pozycja_do_schematu(self, pozycja: PozycjaKosztorysuDB) -> Pozycja:
-        suma_netto = sum(skladnik.kwota for skladnik in pozycja.skladniki)
+        kwoty = [
+            pozycja.montaz_kwota,
+            pozycja.opis_kwota,
+            pozycja.kolor_kwota,
+            pozycja.oscieznica_rodzaj_kwota,
+            pozycja.informacje_dodatkowe_kwota,
+            pozycja.szklo_kwota,
+            pozycja.wentylacja_kwota,
+            pozycja.uwagi_kwota,
+        ]
+        suma_netto = sum(kwota for kwota in kwoty if kwota is not None)
         dostawca = (
             self._dostawca_repository.znajdz(pozycja.dostawca_id) if pozycja.dostawca_id is not None else None
         )
@@ -83,14 +92,21 @@ class KosztorysService:
             nazwa=pozycja.nazwa,
             dostawca_id=pozycja.dostawca_id,
             dostawca=DostawcaPodsumowanie.model_validate(dostawca) if dostawca is not None else None,
+            montaz_kwota=pozycja.montaz_kwota,
             opis=pozycja.opis,
+            opis_kwota=pozycja.opis_kwota,
             kolor=pozycja.kolor,
+            kolor_kwota=pozycja.kolor_kwota,
             oscieznica_rodzaj=pozycja.oscieznica_rodzaj,
+            oscieznica_rodzaj_kwota=pozycja.oscieznica_rodzaj_kwota,
             informacje_dodatkowe=pozycja.informacje_dodatkowe,
+            informacje_dodatkowe_kwota=pozycja.informacje_dodatkowe_kwota,
             szklo=pozycja.szklo,
+            szklo_kwota=pozycja.szklo_kwota,
             wentylacja=pozycja.wentylacja,
+            wentylacja_kwota=pozycja.wentylacja_kwota,
             uwagi=pozycja.uwagi,
-            skladniki=[Skladnik.model_validate(s) for s in pozycja.skladniki],
+            uwagi_kwota=pozycja.uwagi_kwota,
             suma_netto=suma_netto,
         )
 

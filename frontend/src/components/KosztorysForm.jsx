@@ -44,14 +44,21 @@ function pozycjePoczatkowe(kosztorys) {
   return kosztorys.pozycje.map((pozycja) => ({
     nazwa: pozycja.nazwa,
     dostawca_id: pozycja.dostawca_id ?? '',
+    montaz_kwota: pozycja.montaz_kwota ?? '',
     opis: pozycja.opis || '',
+    opis_kwota: pozycja.opis_kwota ?? '',
     kolor: pozycja.kolor || '',
+    kolor_kwota: pozycja.kolor_kwota ?? '',
     oscieznica_rodzaj: pozycja.oscieznica_rodzaj || '',
+    oscieznica_rodzaj_kwota: pozycja.oscieznica_rodzaj_kwota ?? '',
     informacje_dodatkowe: pozycja.informacje_dodatkowe || '',
+    informacje_dodatkowe_kwota: pozycja.informacje_dodatkowe_kwota ?? '',
     szklo: pozycja.szklo || '',
+    szklo_kwota: pozycja.szklo_kwota ?? '',
     wentylacja: pozycja.wentylacja || '',
+    wentylacja_kwota: pozycja.wentylacja_kwota ?? '',
     uwagi: pozycja.uwagi || '',
-    skladniki: pozycja.skladniki.map((skladnik) => ({ opis: skladnik.opis, kwota: String(skladnik.kwota) })),
+    uwagi_kwota: pozycja.uwagi_kwota ?? '',
   }))
 }
 

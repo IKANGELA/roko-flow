@@ -39,7 +39,15 @@ class KosztorysDB(Base):
 
 
 class PozycjaKosztorysuDB(Base):
-    """Jedna pozycja w kosztorysie, np. 'Drzwi do salonu' albo 'Okno w kuchni'."""
+    """
+    Jedna pozycja w kosztorysie, np. 'Drzwi do salonu' albo 'Okno w kuchni'.
+
+    Każda z opisowych kolumn (opis, kolor, ościeżnica, informacje dodatkowe, szkło,
+    wentylacja, uwagi) ma obok siebie własne pole `_kwota` — jeśli dany element trzeba
+    wycenić (np. konkretny model drzwi w polu opis, albo dopłata za nietypową ościeżnicę),
+    cena wpisywana jest bezpośrednio pod jego treścią, a nie w osobnej, oderwanej liście.
+    Montaż nie ma własnej treści opisowej — to wyłącznie pole na cenę robocizny.
+    """
 
     __tablename__ = "pozycje_kosztorysu"
 
@@ -50,31 +58,28 @@ class PozycjaKosztorysuDB(Base):
     dostawca_id: Mapped[int | None] = mapped_column(ForeignKey("dostawcy.id"), nullable=True)
 
     nazwa: Mapped[str] = mapped_column(String, nullable=False)
+
+    montaz_kwota: Mapped[float | None] = mapped_column(Float, nullable=True)
+
     opis: Mapped[str | None] = mapped_column(String, nullable=True)
+    opis_kwota: Mapped[float | None] = mapped_column(Float, nullable=True)
+
     kolor: Mapped[str | None] = mapped_column(String, nullable=True)
+    kolor_kwota: Mapped[float | None] = mapped_column(Float, nullable=True)
+
     oscieznica_rodzaj: Mapped[str | None] = mapped_column(String, nullable=True)
+    oscieznica_rodzaj_kwota: Mapped[float | None] = mapped_column(Float, nullable=True)
+
     informacje_dodatkowe: Mapped[str | None] = mapped_column(String, nullable=True)
+    informacje_dodatkowe_kwota: Mapped[float | None] = mapped_column(Float, nullable=True)
+
     szklo: Mapped[str | None] = mapped_column(String, nullable=True)
+    szklo_kwota: Mapped[float | None] = mapped_column(Float, nullable=True)
+
     wentylacja: Mapped[str | None] = mapped_column(String, nullable=True)
+    wentylacja_kwota: Mapped[float | None] = mapped_column(Float, nullable=True)
+
     uwagi: Mapped[str | None] = mapped_column(String, nullable=True)
+    uwagi_kwota: Mapped[float | None] = mapped_column(Float, nullable=True)
 
     kosztorys: Mapped["KosztorysDB"] = relationship(back_populates="pozycje")
-    skladniki: Mapped[list["SkladnikPozycjiDB"]] = relationship(
-        back_populates="pozycja",
-        cascade="all, delete-orphan",
-        order_by="SkladnikPozycjiDB.id",
-    )
-
-
-class SkladnikPozycjiDB(Base):
-    """Jeden składnik kosztu pozycji, np. 'Montaż drzwi' — 200 zł, 'Podfrezowanie' — 50 zł."""
-
-    __tablename__ = "skladniki_pozycji"
-
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
-    pozycja_id: Mapped[int] = mapped_column(ForeignKey("pozycje_kosztorysu.id"), nullable=False)
-
-    opis: Mapped[str] = mapped_column(String, nullable=False)
-    kwota: Mapped[float] = mapped_column(Float, nullable=False)
-
-    pozycja: Mapped["PozycjaKosztorysuDB"] = relationship(back_populates="skladniki")
