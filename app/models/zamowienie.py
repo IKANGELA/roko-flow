@@ -40,6 +40,7 @@ class ZamowienieDB(Base):
     status_zamowienia_dostawcy: Mapped[str] = mapped_column(String, default="Do zamówienia")
     # Niezależne od kosztorysu — przydatne zwłaszcza przy "wolnych" zamówieniach bez kosztorysu.
     adres_nabywcy: Mapped[str | None] = mapped_column(String, nullable=True)
+    nip_nabywcy: Mapped[str | None] = mapped_column(String, nullable=True)
     adres_montazu: Mapped[str | None] = mapped_column(String, nullable=True)
     numer_zamowienia: Mapped[str | None] = mapped_column(String, nullable=True)
     data_zamowienia: Mapped[date | None] = mapped_column(Date, nullable=True)

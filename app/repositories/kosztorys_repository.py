@@ -57,6 +57,7 @@ class KosztorysRepository:
             wersja=dane.wersja,
             nazwa_inwestycji=dane.nazwa_inwestycji,
             adres_nabywcy=dane.adres_nabywcy,
+            nip_nabywcy=dane.nip_nabywcy,
             adres_montazu=dane.adres_montazu,
             termin=dane.termin,
             uwagi=dane.uwagi,
@@ -82,6 +83,7 @@ class KosztorysRepository:
         kosztorys.wersja = dane.wersja
         kosztorys.nazwa_inwestycji = dane.nazwa_inwestycji
         kosztorys.adres_nabywcy = dane.adres_nabywcy
+        kosztorys.nip_nabywcy = dane.nip_nabywcy
         kosztorys.adres_montazu = dane.adres_montazu
         kosztorys.termin = dane.termin
         kosztorys.uwagi = dane.uwagi

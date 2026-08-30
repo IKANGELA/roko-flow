@@ -23,6 +23,7 @@ export function zamowienieDoPayloadu(zamowienie, nadpisania = {}) {
     status: zamowienie.status,
     status_zamowienia_dostawcy: zamowienie.status_zamowienia_dostawcy,
     adres_nabywcy: zamowienie.adres_nabywcy,
+    nip_nabywcy: zamowienie.nip_nabywcy,
     adres_montazu: zamowienie.adres_montazu,
     numer_zamowienia: zamowienie.numer_zamowienia,
     data_zamowienia: zamowienie.data_zamowienia,

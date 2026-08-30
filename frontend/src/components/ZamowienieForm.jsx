@@ -18,6 +18,7 @@ const PUSTY_FORMULARZ = {
   status: 'Zamówić',
   status_zamowienia_dostawcy: 'Do zamówienia',
   adres_nabywcy: '',
+  nip_nabywcy: '',
   adres_montazu: '',
   numer_zamowienia: '',
   data_zamowienia: '',
@@ -45,6 +46,7 @@ function danePoczatkowe(zamowienie, wstepnyKosztorysId) {
       status: zamowienie.status,
       status_zamowienia_dostawcy: zamowienie.status_zamowienia_dostawcy || 'Do zamówienia',
       adres_nabywcy: zamowienie.adres_nabywcy || '',
+      nip_nabywcy: zamowienie.nip_nabywcy || '',
       adres_montazu: zamowienie.adres_montazu || '',
       numer_zamowienia: zamowienie.numer_zamowienia || '',
       data_zamowienia: zamowienie.data_zamowienia || '',
@@ -152,6 +154,7 @@ function ZamowienieForm({ zamowienie, wstepnyKosztorysId, onZapisano }) {
       ...poprzednie,
       klient_id: klient ? klient.id : null,
       adres_nabywcy: klient ? klient.adres || '' : poprzednie.adres_nabywcy,
+      nip_nabywcy: klient ? klient.nip || '' : poprzednie.nip_nabywcy,
     }))
   }
 
@@ -165,6 +168,7 @@ function ZamowienieForm({ zamowienie, wstepnyKosztorysId, onZapisano }) {
       klient_id: wybrany ? wybrany.klient_id : poprzednie.klient_id,
       vat_procent: wybrany ? wybrany.vat_procent : poprzednie.vat_procent,
       adres_nabywcy: wybrany ? wybrany.adres_nabywcy || '' : poprzednie.adres_nabywcy,
+      nip_nabywcy: wybrany ? wybrany.nip_nabywcy || '' : poprzednie.nip_nabywcy,
       adres_montazu: wybrany ? wybrany.adres_montazu || '' : poprzednie.adres_montazu,
     }))
   }
@@ -212,6 +216,7 @@ function ZamowienieForm({ zamowienie, wstepnyKosztorysId, onZapisano }) {
       status: dane.status,
       status_zamowienia_dostawcy: dane.status_zamowienia_dostawcy,
       adres_nabywcy: dane.adres_nabywcy || null,
+      nip_nabywcy: dane.nip_nabywcy || null,
       adres_montazu: dane.adres_montazu || null,
       numer_zamowienia: dane.numer_zamowienia || null,
       data_zamowienia: dane.data_zamowienia || null,
@@ -298,6 +303,10 @@ function ZamowienieForm({ zamowienie, wstepnyKosztorysId, onZapisano }) {
           <label>
             Adres nabywcy (do faktury)
             <input name="adres_nabywcy" value={dane.adres_nabywcy} onChange={zmienPole} />
+          </label>
+          <label>
+            NIP nabywcy
+            <input name="nip_nabywcy" value={dane.nip_nabywcy} onChange={zmienPole} />
           </label>
           <label>
             Adres montażu

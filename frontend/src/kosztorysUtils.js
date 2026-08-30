@@ -6,6 +6,7 @@ export function kosztorysDoPayloadu(kosztorys, nadpisania = {}) {
     klient_id: kosztorys.klient_id,
     nazwa_inwestycji: kosztorys.nazwa_inwestycji,
     adres_nabywcy: kosztorys.adres_nabywcy,
+    nip_nabywcy: kosztorys.nip_nabywcy,
     adres_montazu: kosztorys.adres_montazu,
     termin: kosztorys.termin,
     uwagi: kosztorys.uwagi,
