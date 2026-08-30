@@ -1,5 +1,13 @@
-import { useEffect, useState } from 'react'
-import { aktualizujZamowienie, pobierzDostawcow, pobierzKosztorysy, utworzZamowienie } from '../api'
+import { useEffect, useRef, useState } from 'react'
+import PozycjeEditor from './PozycjeEditor'
+import {
+  aktualizujKosztorys,
+  aktualizujZamowienie,
+  pobierzDostawcow,
+  pobierzKosztorysy,
+  utworzZamowienie,
+} from '../api'
+import { kosztorysDoPayloadu, pozycjeDoPayloadu } from '../kosztorysUtils'
 
 const PUSTY_FORMULARZ = {
   kosztorys_id: '',
@@ -60,10 +68,45 @@ function ZamowienieForm({ zamowienie, wstepnyKosztorysId, onZapisano }) {
   const [zapisywanie, setZapisywanie] = useState(false)
   const [blad, setBlad] = useState(null)
 
+  const [pozycje, setPozycje] = useState([])
+  const [statusZapisuPozycji, setStatusZapisuPozycji] = useState(null) // null | 'zapisywanie' | 'zapisano' | 'blad'
+  const zaladowanyKosztorysId = useRef(null)
+
   useEffect(() => {
     pobierzKosztorysy().then(setKosztorysy)
     pobierzDostawcow().then(setDostawcy)
   }, [])
+
+  // Wczytuje pozycje wybranego kosztorysu do edycji — tylko raz na dany kosztorys,
+  // żeby nie nadpisywać tego, co użytkownik właśnie edytuje.
+  useEffect(() => {
+    if (!dane.kosztorys_id) {
+      setPozycje([])
+      zaladowanyKosztorysId.current = null
+      return
+    }
+    if (zaladowanyKosztorysId.current === dane.kosztorys_id) {
+      return
+    }
+    const wybrany = kosztorysy.find((k) => String(k.id) === String(dane.kosztorys_id))
+    if (!wybrany) {
+      return
+    }
+    setPozycje(
+      wybrany.pozycje.map((pozycja) => ({
+        nazwa: pozycja.nazwa,
+        opis: pozycja.opis || '',
+        kolor: pozycja.kolor || '',
+        oscieznica_rodzaj: pozycja.oscieznica_rodzaj || '',
+        informacje_dodatkowe: pozycja.informacje_dodatkowe || '',
+        szklo: pozycja.szklo || '',
+        wentylacja: pozycja.wentylacja || '',
+        uwagi: pozycja.uwagi || '',
+        skladniki: pozycja.skladniki.map((skladnik) => ({ opis: skladnik.opis, kwota: String(skladnik.kwota) })),
+      })),
+    )
+    zaladowanyKosztorysId.current = dane.kosztorys_id
+  }, [dane.kosztorys_id, kosztorysy])
 
   function zmienPole(event) {
     const { name, value } = event.target
@@ -86,7 +129,34 @@ function ZamowienieForm({ zamowienie, wstepnyKosztorysId, onZapisano }) {
     }))
   }
 
+  // Kosztorysy pobrane z API mają już w sobie pełną listę pozycji — nie trzeba
+  // dociągać jej osobno, żeby pokazać podgląd tego, co jest wycenione.
+  const wybranyKosztorys = kosztorysy.find((k) => String(k.id) === String(dane.kosztorys_id))
+
+  // Pozycje należą do kosztorysu, nie do zamówienia — zapisujemy je więc bezpośrednio
+  // do kosztorysu (PUT), niezależnie od zapisu samego zamówienia. Dzięki temu np. dobór
+  // klamek ustalony już po złożeniu zamówienia można dopisać z tego samego ekranu.
+  async function zapiszPozycjeKosztorysu() {
+    if (!wybranyKosztorys) {
+      setBlad('Wybierz kosztorys, zanim zapiszesz pozycje.')
+      return
+    }
+    setBlad(null)
+    setStatusZapisuPozycji('zapisywanie')
+    try {
+      const payload = kosztorysDoPayloadu(wybranyKosztorys, { pozycje: pozycjeDoPayloadu(pozycje) })
+      const zaktualizowanyKosztorys = await aktualizujKosztorys(wybranyKosztorys.id, payload)
+      setKosztorysy((poprzednie) =>
+        poprzednie.map((k) => (k.id === zaktualizowanyKosztorys.id ? zaktualizowanyKosztorys : k)),
+      )
+      setStatusZapisuPozycji('zapisano')
+    } catch (e) {
+      setStatusZapisuPozycji('blad')
+    }
+  }
+
   const wartoscBrutto = dane.wartosc_netto === '' ? 0 : Number(dane.wartosc_netto) * (1 + Number(dane.vat_procent) / 100)
+  const doDoplaty = dane.wartosc_netto === '' ? null : wartoscBrutto - (Number(dane.zaliczka_klienta) || 0)
 
   async function wyslij(event) {
     event.preventDefault()
@@ -131,150 +201,173 @@ function ZamowienieForm({ zamowienie, wstepnyKosztorysId, onZapisano }) {
   }
 
   return (
-    <form onSubmit={wyslij}>
-      <div>
-        <label>
-          Kosztorys (opcjonalnie — np. serwis lub inne zamówienie nie wymaga kosztorysu):{' '}
-          <select name="kosztorys_id" value={dane.kosztorys_id} onChange={zmienKosztorys}>
-            <option value="">-- bez kosztorysu --</option>
-            {kosztorysy.map((k) => (
-              <option key={k.id} value={k.id}>
-                {k.numer} — {k.klient.imie_i_nazwisko}
-                {k.nazwa_inwestycji ? ` (${k.nazwa_inwestycji})` : ''}
-              </option>
-            ))}
-          </select>
-        </label>
-      </div>
+    <form className="pelny-formularz" onSubmit={wyslij}>
+      <fieldset>
+        <legend>Dane zamówienia</legend>
 
-      <div>
-        <label>
-          Dostawca (można uzupełnić później):{' '}
-          <select name="dostawca_id" value={dane.dostawca_id} onChange={zmienPole}>
-            <option value="">-- jeszcze nieznany --</option>
-            {dostawcy.map((d) => (
-              <option key={d.id} value={d.id}>
-                {d.nazwa}
-                {d.specyfikacja ? ` (${d.specyfikacja})` : ''}
-              </option>
-            ))}
-          </select>
-        </label>
-      </div>
+        <div className="siatka-pol">
+          <label>
+            Kosztorys (opcjonalnie)
+            <select name="kosztorys_id" value={dane.kosztorys_id} onChange={zmienKosztorys}>
+              <option value="">-- bez kosztorysu --</option>
+              {kosztorysy.map((k) => (
+                <option key={k.id} value={k.id}>
+                  {k.numer} — {k.klient.imie_i_nazwisko}
+                  {k.nazwa_inwestycji ? ` (${k.nazwa_inwestycji})` : ''}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label>
+            Dostawca (można uzupełnić później)
+            <select name="dostawca_id" value={dane.dostawca_id} onChange={zmienPole}>
+              <option value="">-- jeszcze nieznany --</option>
+              {dostawcy.map((d) => (
+                <option key={d.id} value={d.id}>
+                  {d.nazwa}
+                  {d.specyfikacja ? ` (${d.specyfikacja})` : ''}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label>
+            Status
+            <input name="status" value={dane.status} onChange={zmienPole} />
+          </label>
 
-      <div>
-        <label>
-          Status:{' '}
-          <input name="status" value={dane.status} onChange={zmienPole} />
-        </label>
-      </div>
-      <div>
-        <input
-          name="numer_zamowienia"
-          placeholder="Numer zamówienia (u dostawcy)"
-          value={dane.numer_zamowienia}
-          onChange={zmienPole}
-        />
-      </div>
-      <div>
-        <label>
-          Data zamówienia:{' '}
-          <input type="date" name="data_zamowienia" value={dane.data_zamowienia} onChange={zmienPole} />
-        </label>
-      </div>
-      <div>
-        <label>
-          Termin realizacji (tygodnie):{' '}
-          <input
-            type="number"
-            name="termin_realizacji_tygodnie"
-            value={dane.termin_realizacji_tygodnie}
-            onChange={zmienPole}
-          />
-        </label>
-      </div>
-      <div>
-        <textarea name="uwagi" placeholder="Uwagi" value={dane.uwagi} onChange={zmienPole} rows={2} />
-      </div>
+          <label>
+            Numer zamówienia (u dostawcy)
+            <input name="numer_zamowienia" value={dane.numer_zamowienia} onChange={zmienPole} />
+          </label>
+          <label>
+            Data zamówienia
+            <input type="date" name="data_zamowienia" value={dane.data_zamowienia} onChange={zmienPole} />
+          </label>
+          <label>
+            Termin realizacji (tygodnie)
+            <input
+              type="number"
+              name="termin_realizacji_tygodnie"
+              value={dane.termin_realizacji_tygodnie}
+              onChange={zmienPole}
+            />
+          </label>
 
-      <hr style={{ margin: '16px 0' }} />
+          <label>
+            Data dostawy
+            <input type="date" name="data_dostawy" value={dane.data_dostawy} onChange={zmienPole} />
+          </label>
+          <label>
+            Magazyn
+            <input name="magazyn" value={dane.magazyn} onChange={zmienPole} />
+          </label>
+          <label>
+            Braki w dostawie
+            <input name="braki_w_dostawie" value={dane.braki_w_dostawie} onChange={zmienPole} />
+          </label>
 
-      <div>
-        <label>
-          Data dostawy:{' '}
-          <input type="date" name="data_dostawy" value={dane.data_dostawy} onChange={zmienPole} />
-        </label>
-      </div>
-      <div>
-        <input name="magazyn" placeholder="Magazyn" value={dane.magazyn} onChange={zmienPole} />
-      </div>
-      <div>
-        <input
-          name="braki_w_dostawie"
-          placeholder="Braki w dostawie"
-          value={dane.braki_w_dostawie}
-          onChange={zmienPole}
-        />
-      </div>
+          <label className="pole-szerokie">
+            Uwagi
+            <textarea name="uwagi" value={dane.uwagi} onChange={zmienPole} rows={2} />
+          </label>
+        </div>
+      </fieldset>
 
-      <hr style={{ margin: '16px 0' }} />
+      <fieldset>
+        <legend>Pozycje kosztorysu</legend>
+        {!wybranyKosztorys && <p>Wybierz kosztorys powyżej, żeby zobaczyć i edytować jego pozycje.</p>}
+        {wybranyKosztorys && (
+          <>
+            {statusZapisuPozycji === 'zapisywanie' && <p>Zapisywanie pozycji...</p>}
+            {statusZapisuPozycji === 'zapisano' && <p>Zapisano ✓</p>}
+            {statusZapisuPozycji === 'blad' && <p style={{ color: 'red' }}>Nie udało się zapisać pozycji.</p>}
+            <p>
+              <em>
+                Zmiany w pozycjach (np. dobór klamek ustalony już po złożeniu zamówienia) zapisują się do
+                kosztorysu — kliknij „Zapisz” przy pozycji.
+              </em>
+            </p>
+            <PozycjeEditor pozycje={pozycje} onZmiana={setPozycje} onZapiszKosztorys={zapiszPozycjeKosztorysu} />
+          </>
+        )}
+      </fieldset>
 
-      <div>
-        <label>
-          Wartość netto (można uzupełnić później):{' '}
-          <input type="number" step="0.01" name="wartosc_netto" value={dane.wartosc_netto} onChange={zmienPole} />
-        </label>
-      </div>
-      <div>
-        <label>
-          VAT:{' '}
-          <select name="vat_procent" value={dane.vat_procent} onChange={zmienPole}>
-            <option value={8}>8%</option>
-            <option value={23}>23%</option>
-            <option value={0}>0%</option>
-          </select>
-        </label>
-      </div>
-      <div>
-        <strong>
-          Wartość brutto (wyliczana): {dane.wartosc_netto === '' ? '—' : `${wartoscBrutto.toFixed(2)} zł`}
-        </strong>
-      </div>
-      <div>
-        <label>
-          Zaliczka producenta:{' '}
-          <input type="number" step="0.01" name="zaliczka_producent" value={dane.zaliczka_producent} onChange={zmienPole} />
-        </label>
-      </div>
-      <div>
-        <label>
-          Dopłata producenta:{' '}
-          <input type="number" step="0.01" name="doplata_producent" value={dane.doplata_producent} onChange={zmienPole} />
-        </label>
-      </div>
-      <div>
-        <label>
-          Zaliczka klienta:{' '}
-          <input type="number" step="0.01" name="zaliczka_klienta" value={dane.zaliczka_klienta} onChange={zmienPole} />
-        </label>
-      </div>
-      <div>
-        <label>
-          Data zaliczki:{' '}
-          <input type="date" name="data_zaliczki" value={dane.data_zaliczki} onChange={zmienPole} />
-        </label>
-      </div>
-      <div>
-        <label>
-          <input type="checkbox" name="doplacono" checked={dane.doplacono} onChange={zmienCheckbox} /> Dopłacono
-        </label>
-      </div>
-      <div>
-        <label>
-          <input type="checkbox" name="dodaj_do_montazy" checked={dane.dodaj_do_montazy} onChange={zmienCheckbox} />{' '}
-          Dodaj do Montaży
-        </label>
-      </div>
+      <fieldset>
+        <legend>Podsumowanie finansowe</legend>
+
+        <div className="siatka-pol">
+          <label>
+            Wartość netto (można uzupełnić później)
+            <input type="number" step="0.01" name="wartosc_netto" value={dane.wartosc_netto} onChange={zmienPole} />
+          </label>
+          <label>
+            VAT
+            <select name="vat_procent" value={dane.vat_procent} onChange={zmienPole}>
+              <option value={8}>8%</option>
+              <option value={23}>23%</option>
+              <option value={0}>0%</option>
+            </select>
+          </label>
+          <label>
+            Wartość brutto (wyliczana)
+            <input value={dane.wartosc_netto === '' ? '—' : `${wartoscBrutto.toFixed(2)} zł`} disabled />
+          </label>
+
+          <label>
+            Zaliczka klienta
+            <input
+              type="number"
+              step="0.01"
+              name="zaliczka_klienta"
+              value={dane.zaliczka_klienta}
+              onChange={zmienPole}
+            />
+          </label>
+          <label>
+            Data zaliczki
+            <input type="date" name="data_zaliczki" value={dane.data_zaliczki} onChange={zmienPole} />
+          </label>
+          <label>
+            Do dopłaty (wyliczane)
+            <input value={doDoplaty === null ? '—' : `${doDoplaty.toFixed(2)} zł`} disabled />
+          </label>
+
+          <label>
+            Zaliczka producenta
+            <input
+              type="number"
+              step="0.01"
+              name="zaliczka_producent"
+              value={dane.zaliczka_producent}
+              onChange={zmienPole}
+            />
+          </label>
+          <label>
+            Dopłata producenta
+            <input
+              type="number"
+              step="0.01"
+              name="doplata_producent"
+              value={dane.doplata_producent}
+              onChange={zmienPole}
+            />
+          </label>
+          <label className="pole-checkbox">
+            <input type="checkbox" name="doplacono" checked={dane.doplacono} onChange={zmienCheckbox} />
+            Dopłacono
+          </label>
+
+          <label className="pole-checkbox">
+            <input
+              type="checkbox"
+              name="dodaj_do_montazy"
+              checked={dane.dodaj_do_montazy}
+              onChange={zmienCheckbox}
+            />
+            Dodaj do Montaży
+          </label>
+        </div>
+      </fieldset>
 
       <div style={{ marginTop: 16 }}>
         <button type="submit" disabled={zapisywanie}>

@@ -142,6 +142,12 @@ legend {
   min-width: 0;
 }
 
+.siatka-pol input:disabled {
+  background: var(--bg);
+  color: var(--muted);
+  font-weight: 600;
+}
+
 .siatka-pol .pole-szerokie {
   grid-column: span 2;
 }

@@ -2,6 +2,7 @@ import { useState } from 'react'
 import KlientPicker from './KlientPicker'
 import PozycjeEditor from './PozycjeEditor'
 import { aktualizujKosztorys, utworzKosztorys } from '../api'
+import { pozycjeDoPayloadu } from '../kosztorysUtils'
 
 const PUSTY_FORMULARZ = {
   klient_id: null,
@@ -84,20 +85,7 @@ function KosztorysForm({ kosztorys, onZapisano }) {
       dodatkowe_koszty: Number(dane.dodatkowe_koszty) || 0,
       rabat: Number(dane.rabat) || 0,
       ustalona_zaliczka: dane.ustalona_zaliczka === '' ? null : Number(dane.ustalona_zaliczka),
-      pozycje: pozycje.map((pozycja) => ({
-        nazwa: pozycja.nazwa,
-        opis: pozycja.opis || null,
-        kolor: pozycja.kolor || null,
-        oscieznica_rodzaj: pozycja.oscieznica_rodzaj || null,
-        informacje_dodatkowe: pozycja.informacje_dodatkowe || null,
-        szklo: pozycja.szklo || null,
-        wentylacja: pozycja.wentylacja || null,
-        uwagi: pozycja.uwagi || null,
-        skladniki: pozycja.skladniki.map((skladnik) => ({
-          opis: skladnik.opis,
-          kwota: Number(skladnik.kwota) || 0,
-        })),
-      })),
+      pozycje: pozycjeDoPayloadu(pozycje),
     }
   }
 

@@ -27,3 +27,22 @@ export function kosztorysDoPayloadu(kosztorys, nadpisania = {}) {
     ...nadpisania,
   }
 }
+
+// Zamienia pozycje z edytowalnego stanu formularza (PozycjeEditor — kwoty jako tekst)
+// na kształt, jakiego oczekuje backend (kwoty jako liczby, puste teksty jako null).
+export function pozycjeDoPayloadu(pozycje) {
+  return pozycje.map((pozycja) => ({
+    nazwa: pozycja.nazwa,
+    opis: pozycja.opis || null,
+    kolor: pozycja.kolor || null,
+    oscieznica_rodzaj: pozycja.oscieznica_rodzaj || null,
+    informacje_dodatkowe: pozycja.informacje_dodatkowe || null,
+    szklo: pozycja.szklo || null,
+    wentylacja: pozycja.wentylacja || null,
+    uwagi: pozycja.uwagi || null,
+    skladniki: pozycja.skladniki.map((skladnik) => ({
+      opis: skladnik.opis,
+      kwota: Number(skladnik.kwota) || 0,
+    })),
+  }))
+}
