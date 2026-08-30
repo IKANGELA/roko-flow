@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { pobierzKlientow } from '../api'
 import KlientForm from './KlientForm'
 
-function KlientPicker({ klientId, onZmiana }) {
+function KlientPicker({ klientId, onZmiana, wymagany = true }) {
   const [tryb, setTryb] = useState('wybierz')
   const [klienci, setKlienci] = useState([])
 
@@ -32,9 +32,13 @@ function KlientPicker({ klientId, onZmiana }) {
       </div>
 
       {tryb === 'wybierz' && (
-        <select value={klientId ?? ''} onChange={(event) => onZmiana(Number(event.target.value))} required>
-          <option value="" disabled>
-            -- wybierz klienta --
+        <select
+          value={klientId ?? ''}
+          onChange={(event) => onZmiana(event.target.value === '' ? null : Number(event.target.value))}
+          required={wymagany}
+        >
+          <option value="" disabled={wymagany}>
+            {wymagany ? '-- wybierz klienta --' : '-- bez klienta --'}
           </option>
           {klienci.map((klient) => (
             <option key={klient.id} value={klient.id}>

@@ -32,7 +32,9 @@ function ZamowieniaList({ zamowienia, onWybierz, zaznaczone, onPrzelacz, onZmien
               />
             </td>
             <td>{zamowienie.numer_zamowienia || '—'}</td>
-            <td>{zamowienie.kosztorys ? zamowienie.kosztorys.klient.imie_i_nazwisko : '—'}</td>
+            <td>
+              {zamowienie.klient?.imie_i_nazwisko || zamowienie.kosztorys?.klient?.imie_i_nazwisko || '—'}
+            </td>
             <td>
               {zamowienie.kosztorys
                 ? `${zamowienie.kosztorys.numer}${zamowienie.kosztorys.nazwa_inwestycji ? ` (${zamowienie.kosztorys.nazwa_inwestycji})` : ''}`

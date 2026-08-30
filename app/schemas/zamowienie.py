@@ -47,6 +47,8 @@ STATUSY_ZAMOWIENIA = [
 
 class ZamowienieCreate(BaseModel):
     kosztorys_id: Optional[int] = None
+    # Niezależne od kosztorysu — patrz komentarz przy tym polu w app/models/zamowienie.py.
+    klient_id: Optional[int] = None
     dostawca_id: Optional[int] = None
 
     status: str = "Zamówić"
@@ -78,6 +80,7 @@ class ZamowienieCreate(BaseModel):
 class Zamowienie(ZamowienieCreate):
     id: int
     kosztorys: Optional[KosztorysPodsumowanie] = None
+    klient: Optional[KlientPodsumowanie] = None
     dostawca: Optional[DostawcaPodsumowanie] = None
 
     # Wyliczane przez serwis, nie ma takich kolumn w bazie — None, dopóki nie znamy wartości netto.

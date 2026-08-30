@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import KlientPicker from './KlientPicker'
 import PozycjeEditor from './PozycjeEditor'
 import {
   aktualizujKosztorys,
@@ -12,6 +13,7 @@ import { STATUSY_ZAMOWIENIA } from '../zamowienieUtils'
 
 const PUSTY_FORMULARZ = {
   kosztorys_id: '',
+  klient_id: null,
   dostawca_id: '',
   status: 'Zamówić',
   status_zamowienia_dostawcy: 'Do zamówienia',
@@ -38,6 +40,7 @@ function danePoczatkowe(zamowienie, wstepnyKosztorysId) {
   if (zamowienie) {
     return {
       kosztorys_id: zamowienie.kosztorys_id ?? '',
+      klient_id: zamowienie.klient_id ?? null,
       dostawca_id: zamowienie.dostawca_id ?? '',
       status: zamowienie.status,
       status_zamowienia_dostawcy: zamowienie.status_zamowienia_dostawcy || 'Do zamówienia',
@@ -126,6 +129,10 @@ function ZamowienieForm({ zamowienie, wstepnyKosztorysId, onZapisano }) {
     setPozycje(wczytanePozycje)
     zapisanePozycjeRef.current = JSON.stringify(wczytanePozycje)
     zaladowanyKosztorysId.current = dane.kosztorys_id
+    // Bezpiecznik dla wejścia z wstepnyKosztorysId (np. po "Akceptuj" na kosztorysie) —
+    // wtedy kosztorys_id jest ustawiony od razu, zanim lista kosztorysów się wczyta,
+    // więc zmienKosztorys() (wywoływane tylko przy ręcznym wyborze) jeszcze nie zadziałało.
+    setDane((poprzednie) => (poprzednie.klient_id ? poprzednie : { ...poprzednie, klient_id: wybrany.klient_id }))
   }, [dane.kosztorys_id, kosztorysy])
 
   function zmienPole(event) {
@@ -138,13 +145,18 @@ function ZamowienieForm({ zamowienie, wstepnyKosztorysId, onZapisano }) {
     setDane((poprzednie) => ({ ...poprzednie, [name]: checked }))
   }
 
+  function zmienKlienta(klientId) {
+    setDane((poprzednie) => ({ ...poprzednie, klient_id: klientId }))
+  }
+
   function zmienKosztorys(event) {
     const nowyId = event.target.value
-    // Podpowiadamy VAT i adresy z wybranego kosztorysu — nadal można je ręcznie zmienić.
+    // Podpowiadamy klienta, VAT i adresy z wybranego kosztorysu — nadal można je ręcznie zmienić.
     const wybrany = kosztorysy.find((k) => String(k.id) === nowyId)
     setDane((poprzednie) => ({
       ...poprzednie,
       kosztorys_id: nowyId,
+      klient_id: wybrany ? wybrany.klient_id : poprzednie.klient_id,
       vat_procent: wybrany ? wybrany.vat_procent : poprzednie.vat_procent,
       adres_nabywcy: wybrany ? wybrany.adres_nabywcy || '' : poprzednie.adres_nabywcy,
       adres_montazu: wybrany ? wybrany.adres_montazu || '' : poprzednie.adres_montazu,
@@ -189,6 +201,7 @@ function ZamowienieForm({ zamowienie, wstepnyKosztorysId, onZapisano }) {
 
     const daneDoWyslania = {
       kosztorys_id: dane.kosztorys_id === '' ? null : Number(dane.kosztorys_id),
+      klient_id: dane.klient_id,
       dostawca_id: dane.dostawca_id === '' ? null : Number(dane.dostawca_id),
       status: dane.status,
       status_zamowienia_dostawcy: dane.status_zamowienia_dostawcy,
@@ -230,6 +243,8 @@ function ZamowienieForm({ zamowienie, wstepnyKosztorysId, onZapisano }) {
     <form className="pelny-formularz" onSubmit={wyslij}>
       <fieldset>
         <legend>Dane zamówienia</legend>
+
+        <KlientPicker klientId={dane.klient_id} onZmiana={zmienKlienta} wymagany={false} />
 
         <div className="siatka-pol">
           <label>
