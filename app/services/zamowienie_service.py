@@ -30,10 +30,12 @@ class ZamowienieService:
         self._klient_repository = klient_repository
 
     def _sprawdz_powiazania(self, dane: ZamowienieCreate) -> None:
-        # kosztorys_id i dostawca_id są opcjonalne (zamówienie "wolne", np. serwis,
+        # kosztorys_id, klient_id i dostawca_id są opcjonalne (zamówienie "wolne", np. serwis,
         # albo dostawca jeszcze nieznany) — sprawdzamy istnienie tylko gdy podano.
         if dane.kosztorys_id is not None and self._kosztorys_repository.znajdz(dane.kosztorys_id) is None:
             raise ValueError(f"Kosztorys o id={dane.kosztorys_id} nie istnieje")
+        if dane.klient_id is not None and self._klient_repository.znajdz(dane.klient_id) is None:
+            raise ValueError(f"Klient o id={dane.klient_id} nie istnieje")
         if dane.dostawca_id is not None and self._dostawca_repository.znajdz(dane.dostawca_id) is None:
             raise ValueError(f"Dostawca o id={dane.dostawca_id} nie istnieje")
 
@@ -80,6 +82,9 @@ class ZamowienieService:
                 klient=KlientPodsumowanie.model_validate(klient),
             )
 
+        klient = (
+            self._klient_repository.znajdz(zamowienie.klient_id) if zamowienie.klient_id is not None else None
+        )
         dostawca = (
             self._dostawca_repository.znajdz(zamowienie.dostawca_id)
             if zamowienie.dostawca_id is not None
@@ -89,6 +94,8 @@ class ZamowienieService:
             id=zamowienie.id,
             kosztorys_id=zamowienie.kosztorys_id,
             kosztorys=kosztorys_podsumowanie,
+            klient_id=zamowienie.klient_id,
+            klient=KlientPodsumowanie.model_validate(klient) if klient is not None else None,
             dostawca_id=zamowienie.dostawca_id,
             dostawca=DostawcaPodsumowanie.model_validate(dostawca) if dostawca is not None else None,
             status=zamowienie.status,

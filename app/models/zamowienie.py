@@ -22,6 +22,11 @@ class ZamowienieDB(Base):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     kosztorys_id: Mapped[int | None] = mapped_column(ForeignKey("kosztorysy.id"), nullable=True)
+    # Niezależne od kosztorysu — kosztorys bywa opcjonalny ("wolne" zamówienie, np. serwis),
+    # a klienta trzeba znać zawsze. Przy wyborze kosztorysu podpowiadany z niego automatycznie
+    # (patrz frontend/src/components/ZamowienieForm.jsx::zmienKosztorys), ale też ustawialny
+    # ręcznie — dlatego to osobne pole, nie tylko wnioskowane z kosztorys.klient_id.
+    klient_id: Mapped[int | None] = mapped_column(ForeignKey("klienci.id"), nullable=True)
     # Dostawca bywa nieznany w chwili akceptacji kosztorysu — uzupełniany później, stąd nullable.
     dostawca_id: Mapped[int | None] = mapped_column(ForeignKey("dostawcy.id"), nullable=True)
 

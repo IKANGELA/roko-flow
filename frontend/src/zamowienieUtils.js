@@ -18,6 +18,7 @@ export const STATUSY_ZAMOWIENIA = [
 export function zamowienieDoPayloadu(zamowienie, nadpisania = {}) {
   return {
     kosztorys_id: zamowienie.kosztorys_id,
+    klient_id: zamowienie.klient_id,
     dostawca_id: zamowienie.dostawca_id,
     status: zamowienie.status,
     status_zamowienia_dostawcy: zamowienie.status_zamowienia_dostawcy,
