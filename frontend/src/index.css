@@ -113,6 +113,45 @@ legend {
   letter-spacing: 0.05em;
 }
 
+/* Siatka pól (np. dane inwestycji) — rozkłada pola na kilka kolumn zamiast jednej
+   wąskiej kolumny na pełną szerokość, każde pole z podpisem nad nim. */
+.siatka-pol {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4px 16px;
+  margin-bottom: 12px;
+}
+
+.siatka-pol label {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.siatka-pol input,
+.siatka-pol select,
+.siatka-pol textarea {
+  font-size: 14px;
+  font-weight: normal;
+  color: var(--ink);
+  width: 100%;
+  min-width: 0;
+}
+
+.siatka-pol .pole-szerokie {
+  grid-column: span 2;
+}
+
+.siatka-pol .pole-checkbox {
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+}
+
 label {
   display: inline-flex;
   align-items: center;
