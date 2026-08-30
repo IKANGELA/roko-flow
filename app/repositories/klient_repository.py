@@ -25,6 +25,16 @@ class KlientRepository:
     def znajdz(self, klient_id: int) -> Optional[KlientDB]:
         return self._db.query(KlientDB).filter(KlientDB.id == klient_id).first()
 
+    def aktualizuj(self, klient_id: int, dane: KlientCreate) -> Optional[KlientDB]:
+        klient = self.znajdz(klient_id)
+        if klient is None:
+            return None
+        for pole, wartosc in dane.model_dump().items():
+            setattr(klient, pole, wartosc)
+        self._db.commit()
+        self._db.refresh(klient)
+        return klient
+
     def usun(self, klient_id: int) -> bool:
         klient = self.znajdz(klient_id)
         if klient is None:

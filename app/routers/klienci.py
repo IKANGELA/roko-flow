@@ -36,6 +36,16 @@ def pobierz_klienta(klient_id: int, service: KlientService = Depends(get_klient_
     return klient
 
 
+@router.put("/{klient_id}", response_model=Klient)
+def aktualizuj_klienta(
+    klient_id: int, dane: KlientCreate, service: KlientService = Depends(get_klient_service)
+) -> Klient:
+    klient = service.aktualizuj_klienta(klient_id, dane)
+    if klient is None:
+        raise HTTPException(status_code=404, detail="Klient nie znaleziony")
+    return klient
+
+
 @router.delete("/{klient_id}", status_code=204)
 def usun_klienta(klient_id: int, service: KlientService = Depends(get_klient_service)) -> None:
     try:

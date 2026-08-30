@@ -17,6 +17,18 @@ export async function utworzKlienta(dane) {
   return odpowiedz.json()
 }
 
+export async function aktualizujKlienta(id, dane) {
+  const odpowiedz = await fetch(`${API_URL}/klienci/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(dane),
+  })
+  if (!odpowiedz.ok) {
+    throw new Error('Nie udało się zaktualizować klienta')
+  }
+  return odpowiedz.json()
+}
+
 export async function pobierzKosztorysy() {
   const odpowiedz = await fetch(`${API_URL}/kosztorysy/`)
   return odpowiedz.json()

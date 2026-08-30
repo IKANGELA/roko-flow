@@ -22,6 +22,9 @@ class KlientService:
     def pobierz_klienta(self, klient_id: int) -> Optional[KlientDB]:
         return self._repository.znajdz(klient_id)
 
+    def aktualizuj_klienta(self, klient_id: int, dane: KlientCreate) -> Optional[KlientDB]:
+        return self._repository.aktualizuj(klient_id, dane)
+
     def usun_klienta(self, klient_id: int) -> bool:
         if self._kosztorys_repository.istnieje_dla_klienta(klient_id):
             raise ValueError("Nie można usunąć klienta — istnieją dla niego kosztorysy")
