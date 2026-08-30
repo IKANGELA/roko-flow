@@ -12,7 +12,7 @@ function KlientPicker({ klientId, onZmiana, wymagany = true }) {
 
   function klientUtworzony(nowyKlient) {
     setKlienci((poprzedni) => [...poprzedni, nowyKlient])
-    onZmiana(nowyKlient.id)
+    onZmiana(nowyKlient)
     setTryb('wybierz')
   }
 
@@ -34,7 +34,10 @@ function KlientPicker({ klientId, onZmiana, wymagany = true }) {
       {tryb === 'wybierz' && (
         <select
           value={klientId ?? ''}
-          onChange={(event) => onZmiana(event.target.value === '' ? null : Number(event.target.value))}
+          onChange={(event) => {
+            const wybrany = klienci.find((klient) => String(klient.id) === event.target.value)
+            onZmiana(wybrany ?? null)
+          }}
           required={wymagany}
         >
           <option value="" disabled={wymagany}>

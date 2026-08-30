@@ -89,8 +89,14 @@ function KosztorysForm({ kosztorys, onZapisano }) {
     setDane((poprzednie) => ({ ...poprzednie, [name]: value }))
   }
 
-  function zmienKlienta(klientId) {
-    setDane((poprzednie) => ({ ...poprzednie, klient_id: klientId }))
+  // Wybór klienta podpowiada jego adres jako adres nabywcy (do faktury) — zwykle taki sam,
+  // a nadal można go ręcznie zmienić, jeśli akurat różni się od adresu klienta.
+  function zmienKlienta(klient) {
+    setDane((poprzednie) => ({
+      ...poprzednie,
+      klient_id: klient.id,
+      adres_nabywcy: klient.adres || '',
+    }))
   }
 
   function zbudujPayload() {
