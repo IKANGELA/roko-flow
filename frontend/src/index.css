@@ -197,6 +197,40 @@ form button[type='submit']:hover {
   border-color: var(--gold);
 }
 
+/* Skompresowane przyciski akcji w wierszu (np. tabela pozycji kosztorysu) —
+   ułożone w kolumnie, wyrównane do prawej, tej samej szerokości, żeby zajmowały
+   jak najmniej miejsca i zostawiały więcej na pola treści. */
+.przyciski-akcji {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 4px;
+}
+
+.przyciski-akcji button {
+  padding: 4px 8px;
+  font-size: 12px;
+  white-space: nowrap;
+  text-align: center;
+}
+
+/* Tabela pozycji kosztorysu — osobne "kafelki" pól z drobnym odstępem między sobą,
+   zamiast pól stykających się krawędziami. */
+.tabela-pozycji {
+  border-collapse: separate;
+  border-spacing: 6px 6px;
+}
+
+.tabela-pozycji th,
+.tabela-pozycji td {
+  border-bottom: none;
+  padding: 2px;
+}
+
+.tabela-pozycji thead th {
+  padding: 8px 10px;
+}
+
 /* Tabele */
 
 table {
