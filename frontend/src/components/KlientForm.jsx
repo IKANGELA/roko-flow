@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { utworzKlienta } from '../api'
+import { aktualizujKlienta, utworzKlienta } from '../api'
 
 const PUSTY_FORMULARZ = {
   imie_i_nazwisko: '',
@@ -10,8 +10,24 @@ const PUSTY_FORMULARZ = {
   uwagi: '',
 }
 
-function KlientForm({ onUtworzono }) {
-  const [dane, setDane] = useState(PUSTY_FORMULARZ)
+function danePoczatkowe(klient) {
+  if (!klient) {
+    return PUSTY_FORMULARZ
+  }
+  return {
+    imie_i_nazwisko: klient.imie_i_nazwisko,
+    telefon: klient.telefon,
+    email: klient.email || '',
+    adres: klient.adres || '',
+    nip: klient.nip || '',
+    uwagi: klient.uwagi || '',
+  }
+}
+
+function KlientForm({ klient, onZapisano }) {
+  const jestEdycja = Boolean(klient)
+
+  const [dane, setDane] = useState(() => danePoczatkowe(klient))
   const [zapisywanie, setZapisywanie] = useState(false)
   const [blad, setBlad] = useState(null)
 
@@ -34,9 +50,13 @@ function KlientForm({ onUtworzono }) {
     }
 
     try {
-      const nowyKlient = await utworzKlienta(oczyszczoneDane)
-      onUtworzono(nowyKlient)
-      setDane(PUSTY_FORMULARZ)
+      const zapisany = jestEdycja
+        ? await aktualizujKlienta(klient.id, oczyszczoneDane)
+        : await utworzKlienta(oczyszczoneDane)
+      onZapisano(zapisany)
+      if (!jestEdycja) {
+        setDane(PUSTY_FORMULARZ)
+      }
     } catch (e) {
       setBlad('Nie udało się zapisać klienta. Spróbuj ponownie.')
     } finally {
@@ -50,23 +70,37 @@ function KlientForm({ onUtworzono }) {
   // formularz zamiast tego, zamiast utworzyć klienta.
   return (
     <div className="karta-formularza">
-      <h2>Dodaj klienta</h2>
+      <h2>{jestEdycja ? 'Edytuj klienta' : 'Dodaj klienta'}</h2>
 
-      <input
-        name="imie_i_nazwisko"
-        placeholder="Imię i nazwisko"
-        value={dane.imie_i_nazwisko}
-        onChange={zmienPole}
-        required
-      />
-      <input name="telefon" placeholder="Telefon" value={dane.telefon} onChange={zmienPole} required />
-      <input name="email" placeholder="E-mail" value={dane.email} onChange={zmienPole} />
-      <input name="adres" placeholder="Adres" value={dane.adres} onChange={zmienPole} />
-      <input name="nip" placeholder="NIP" value={dane.nip} onChange={zmienPole} />
-      <input name="uwagi" placeholder="Uwagi" value={dane.uwagi} onChange={zmienPole} />
+      <div className="siatka-pol">
+        <label>
+          Imię i nazwisko
+          <input name="imie_i_nazwisko" value={dane.imie_i_nazwisko} onChange={zmienPole} required />
+        </label>
+        <label>
+          Telefon
+          <input name="telefon" value={dane.telefon} onChange={zmienPole} required />
+        </label>
+        <label>
+          E-mail
+          <input name="email" value={dane.email} onChange={zmienPole} />
+        </label>
+        <label>
+          Adres
+          <input name="adres" value={dane.adres} onChange={zmienPole} />
+        </label>
+        <label>
+          NIP
+          <input name="nip" value={dane.nip} onChange={zmienPole} />
+        </label>
+        <label>
+          Uwagi
+          <input name="uwagi" value={dane.uwagi} onChange={zmienPole} />
+        </label>
+      </div>
 
       <button type="button" onClick={wyslij} disabled={zapisywanie}>
-        {zapisywanie ? 'Zapisywanie...' : 'Utwórz klienta'}
+        {zapisywanie ? 'Zapisywanie...' : jestEdycja ? 'Zapisz zmiany' : 'Utwórz klienta'}
       </button>
 
       {blad && <p style={{ color: 'red' }}>{blad}</p>}

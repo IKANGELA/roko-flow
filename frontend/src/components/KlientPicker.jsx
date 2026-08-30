@@ -40,7 +40,7 @@ function KlientPicker({ klientId, onZmiana }) {
         </select>
       )}
 
-      {tryb === 'utworz' && <KlientForm onUtworzono={klientUtworzony} />}
+      {tryb === 'utworz' && <KlientForm onZapisano={klientUtworzony} />}
     </div>
   )
 }
