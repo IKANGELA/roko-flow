@@ -242,6 +242,37 @@ form button[type='submit']:hover {
   border-color: var(--gold);
 }
 
+/* Zakładki przełączające tryb w panelu (np. "Wybierz z listy" / "Utwórz klienta"
+   w wyborze klienta) — wyraźny kontrast aktywnej zakładki, żeby było widać, że to zakładki. */
+.zakladki {
+  display: flex;
+  gap: 4px;
+  border-bottom: 2px solid var(--border);
+  margin-bottom: 14px;
+}
+
+.zakladki button {
+  border: none;
+  border-radius: 6px 6px 0 0;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  background: transparent;
+  color: var(--muted);
+}
+
+.zakladki button:hover {
+  background: var(--gold-light);
+  color: var(--ink);
+}
+
+.zakladki button.aktywna,
+.zakladki button.aktywna:hover {
+  background: var(--gold-light);
+  color: var(--gold-dark);
+  border-bottom-color: var(--gold-dark);
+  cursor: default;
+}
+
 /* Skompresowane przyciski akcji w wierszu (np. tabela pozycji kosztorysu) —
    ułożone w kolumnie, wyrównane do prawej, tej samej szerokości, żeby zajmowały
    jak najmniej miejsca i zostawiały więcej na pola treści. */
