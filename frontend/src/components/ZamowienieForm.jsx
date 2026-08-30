@@ -95,6 +95,7 @@ function ZamowienieForm({ zamowienie, wstepnyKosztorysId, onZapisano }) {
     setPozycje(
       wybrany.pozycje.map((pozycja) => ({
         nazwa: pozycja.nazwa,
+        dostawca_id: pozycja.dostawca_id ?? '',
         opis: pozycja.opis || '',
         kolor: pozycja.kolor || '',
         oscieznica_rodzaj: pozycja.oscieznica_rodzaj || '',
@@ -287,7 +288,12 @@ function ZamowienieForm({ zamowienie, wstepnyKosztorysId, onZapisano }) {
                 kosztorysu — kliknij „Zapisz” przy pozycji.
               </em>
             </p>
-            <PozycjeEditor pozycje={pozycje} onZmiana={setPozycje} onZapiszKosztorys={zapiszPozycjeKosztorysu} />
+            <PozycjeEditor
+              pozycje={pozycje}
+              onZmiana={setPozycje}
+              onZapiszKosztorys={zapiszPozycjeKosztorysu}
+              dostawcy={dostawcy}
+            />
           </>
         )}
       </fieldset>

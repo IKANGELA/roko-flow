@@ -18,6 +18,7 @@ class KosztorysRepository:
         return [
             PozycjaKosztorysuDB(
                 nazwa=pozycja.nazwa,
+                dostawca_id=pozycja.dostawca_id,
                 opis=pozycja.opis,
                 kolor=pozycja.kolor,
                 oscieznica_rodzaj=pozycja.oscieznica_rodzaj,

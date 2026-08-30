@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
+from app.repositories.dostawca_repository import DostawcaRepository
 from app.repositories.klient_repository import KlientRepository
 from app.repositories.kosztorys_repository import KosztorysRepository
 from app.repositories.montaz_repository import MontazRepository
@@ -14,7 +15,11 @@ router = APIRouter(prefix="/kosztorysy", tags=["Kosztorysy"])
 
 def get_kosztorys_service(db: Session = Depends(get_db)) -> KosztorysService:
     return KosztorysService(
-        KosztorysRepository(db), KlientRepository(db), ZamowienieRepository(db), MontazRepository(db)
+        KosztorysRepository(db),
+        KlientRepository(db),
+        ZamowienieRepository(db),
+        MontazRepository(db),
+        DostawcaRepository(db),
     )
 
 

@@ -33,6 +33,7 @@ export function kosztorysDoPayloadu(kosztorys, nadpisania = {}) {
 export function pozycjeDoPayloadu(pozycje) {
   return pozycje.map((pozycja) => ({
     nazwa: pozycja.nazwa,
+    dostawca_id: pozycja.dostawca_id === '' || pozycja.dostawca_id == null ? null : Number(pozycja.dostawca_id),
     opis: pozycja.opis || null,
     kolor: pozycja.kolor || null,
     oscieznica_rodzaj: pozycja.oscieznica_rodzaj || null,

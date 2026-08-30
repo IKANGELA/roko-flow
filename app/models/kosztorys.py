@@ -43,6 +43,9 @@ class PozycjaKosztorysuDB(Base):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     kosztorys_id: Mapped[int] = mapped_column(ForeignKey("kosztorysy.id"), nullable=False)
+    # Producent/marka, od którego pochodzi ta konkretna pozycja (np. drzwi od Erkado,
+    # klamki od VDS) — różne pozycje w jednym kosztorysie mogą mieć różnych dostawców.
+    dostawca_id: Mapped[int | None] = mapped_column(ForeignKey("dostawcy.id"), nullable=True)
 
     nazwa: Mapped[str] = mapped_column(String, nullable=False)
     opis: Mapped[str | None] = mapped_column(String, nullable=True)
