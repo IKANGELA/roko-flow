@@ -2,10 +2,12 @@ from typing import List, Optional
 
 from app.models.zamowienie import ZamowienieDB
 from app.repositories.dostawca_repository import DostawcaRepository
+from app.repositories.klient_repository import KlientRepository
 from app.repositories.kosztorys_repository import KosztorysRepository
 from app.repositories.zamowienie_repository import ZamowienieRepository
 from app.schemas.zamowienie import (
     DostawcaPodsumowanie,
+    KlientPodsumowanie,
     KosztorysPodsumowanie,
     Zamowienie,
     ZamowienieCreate,
@@ -20,10 +22,12 @@ class ZamowienieService:
         repository: ZamowienieRepository,
         kosztorys_repository: KosztorysRepository,
         dostawca_repository: DostawcaRepository,
+        klient_repository: KlientRepository,
     ) -> None:
         self._repository = repository
         self._kosztorys_repository = kosztorys_repository
         self._dostawca_repository = dostawca_repository
+        self._klient_repository = klient_repository
 
     def _sprawdz_powiazania(self, dane: ZamowienieCreate) -> None:
         # kosztorys_id i dostawca_id są opcjonalne (zamówienie "wolne", np. serwis,
@@ -65,11 +69,17 @@ class ZamowienieService:
             wartosc_brutto = round(zamowienie.wartosc_netto * (1 + zamowienie.vat_procent / 100), 2)
             do_doplaty = round(wartosc_brutto - zamowienie.zaliczka_klienta, 2)
 
-        kosztorys = (
-            self._kosztorys_repository.znajdz(zamowienie.kosztorys_id)
-            if zamowienie.kosztorys_id is not None
-            else None
-        )
+        kosztorys_podsumowanie = None
+        if zamowienie.kosztorys_id is not None:
+            kosztorys = self._kosztorys_repository.znajdz(zamowienie.kosztorys_id)
+            klient = self._klient_repository.znajdz(kosztorys.klient_id)
+            kosztorys_podsumowanie = KosztorysPodsumowanie(
+                id=kosztorys.id,
+                numer=kosztorys.numer,
+                nazwa_inwestycji=kosztorys.nazwa_inwestycji,
+                klient=KlientPodsumowanie.model_validate(klient),
+            )
+
         dostawca = (
             self._dostawca_repository.znajdz(zamowienie.dostawca_id)
             if zamowienie.dostawca_id is not None
@@ -78,7 +88,7 @@ class ZamowienieService:
         return Zamowienie(
             id=zamowienie.id,
             kosztorys_id=zamowienie.kosztorys_id,
-            kosztorys=KosztorysPodsumowanie.model_validate(kosztorys) if kosztorys is not None else None,
+            kosztorys=kosztorys_podsumowanie,
             dostawca_id=zamowienie.dostawca_id,
             dostawca=DostawcaPodsumowanie.model_validate(dostawca) if dostawca is not None else None,
             status=zamowienie.status,

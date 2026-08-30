@@ -9,6 +9,7 @@ function ZamowieniaList({ zamowienia, onWybierz, zaznaczone, onPrzelacz }) {
         <tr>
           <th></th>
           <th>Numer</th>
+          <th>Klient</th>
           <th>Kosztorys</th>
           <th>Dostawca</th>
           <th>Status</th>
@@ -29,6 +30,7 @@ function ZamowieniaList({ zamowienia, onWybierz, zaznaczone, onPrzelacz }) {
               />
             </td>
             <td>{zamowienie.numer_zamowienia || '—'}</td>
+            <td>{zamowienie.kosztorys ? zamowienie.kosztorys.klient.imie_i_nazwisko : '—'}</td>
             <td>
               {zamowienie.kosztorys
                 ? `${zamowienie.kosztorys.numer}${zamowienie.kosztorys.nazwa_inwestycji ? ` (${zamowienie.kosztorys.nazwa_inwestycji})` : ''}`
