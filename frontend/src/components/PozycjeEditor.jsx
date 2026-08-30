@@ -64,7 +64,8 @@ function PozycjeEditor({ pozycje, onZmiana, onZapiszKosztorys, dostawcy = [] }) 
     <div>
       <table className="tabela-pozycji" style={{ tableLayout: 'fixed' }}>
         <colgroup>
-          <col style={{ width: '12%' }} />
+          <col style={{ width: '4%' }} />
+          <col style={{ width: '11%' }} />
           <col style={{ width: '9%' }} />
           <col style={{ width: '10%' }} />
           <col style={{ width: '8%' }} />
@@ -72,12 +73,13 @@ function PozycjeEditor({ pozycje, onZmiana, onZapiszKosztorys, dostawcy = [] }) 
           <col style={{ width: '10%' }} />
           <col style={{ width: '7%' }} />
           <col style={{ width: '7%' }} />
-          <col style={{ width: '10%' }} />
+          <col style={{ width: '9%' }} />
           <col style={{ width: '8%' }} />
           <col style={{ width: '10%' }} />
         </colgroup>
         <thead>
           <tr>
+            <th>Lp.</th>
             <th>Nazwa</th>
             <th>Producent/Marka</th>
             <th>Opis</th>
@@ -94,13 +96,14 @@ function PozycjeEditor({ pozycje, onZmiana, onZapiszKosztorys, dostawcy = [] }) 
         <tbody>
           {pozycje.length === 0 && (
             <tr>
-              <td colSpan={11}>Brak pozycji — dodaj pierwszą przyciskiem poniżej.</td>
+              <td colSpan={12}>Brak pozycji — dodaj pierwszą przyciskiem poniżej.</td>
             </tr>
           )}
 
           {pozycje.map((pozycja, indeksPozycji) => (
             <Fragment key={indeksPozycji}>
               <tr>
+                <td>{indeksPozycji + 1}</td>
                 <td>
                   <input
                     value={pozycja.nazwa}
@@ -186,7 +189,7 @@ function PozycjeEditor({ pozycje, onZmiana, onZapiszKosztorys, dostawcy = [] }) 
 
               {rozwinieta === indeksPozycji && (
                 <tr>
-                  <td colSpan={11} style={{ background: 'var(--bg)' }}>
+                  <td colSpan={12} style={{ background: 'var(--bg)' }}>
                     <table>
                       <thead>
                         <tr>
