@@ -1,3 +1,5 @@
+import { Fragment, useState } from 'react'
+
 const PUSTA_POZYCJA = () => ({
   nazwa: '',
   opis: '',
@@ -16,13 +18,19 @@ export function sumaNettoPozycji(pozycja) {
   return pozycja.skladniki.reduce((suma, skladnik) => suma + (Number(skladnik.kwota) || 0), 0)
 }
 
-function PozycjeEditor({ pozycje, onZmiana }) {
+function PozycjeEditor({ pozycje, onZmiana, onZapiszKosztorys }) {
+  const [rozwinieta, setRozwinieta] = useState(null)
+
   function dodajPozycje() {
     onZmiana([...pozycje, PUSTA_POZYCJA()])
+    setRozwinieta(pozycje.length)
   }
 
   function usunPozycje(indeksPozycji) {
     onZmiana(pozycje.filter((_, i) => i !== indeksPozycji))
+    if (rozwinieta === indeksPozycji) {
+      setRozwinieta(null)
+    }
   }
 
   function zmienPozycje(indeksPozycji, pole, wartosc) {
@@ -53,111 +61,162 @@ function PozycjeEditor({ pozycje, onZmiana }) {
 
   return (
     <div>
-      <h3>Pozycje</h3>
-      {pozycje.length === 0 && <p>Brak pozycji — dodaj pierwszą przyciskiem poniżej.</p>}
+      <table>
+        <thead>
+          <tr>
+            <th>Nazwa</th>
+            <th>Opis</th>
+            <th>Kolor</th>
+            <th>Ościeżnica rodzaj</th>
+            <th>Informacje dodatkowe</th>
+            <th>Szkło</th>
+            <th>Wentylacja</th>
+            <th>Uwagi</th>
+            <th>Suma Netto</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {pozycje.length === 0 && (
+            <tr>
+              <td colSpan={10}>Brak pozycji — dodaj pierwszą przyciskiem poniżej.</td>
+            </tr>
+          )}
 
-      {pozycje.map((pozycja, indeksPozycji) => (
-        <div key={indeksPozycji} style={{ border: '1px solid #ccc', padding: 12, marginBottom: 12 }}>
-          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 8 }}>
-            <input
-              placeholder="Nazwa (np. Drzwi do salonu)"
-              value={pozycja.nazwa}
-              onChange={(event) => zmienPozycje(indeksPozycji, 'nazwa', event.target.value)}
-              required
-            />
-            <input
-              placeholder="Opis"
-              value={pozycja.opis}
-              onChange={(event) => zmienPozycje(indeksPozycji, 'opis', event.target.value)}
-            />
-            <input
-              placeholder="Kolor"
-              value={pozycja.kolor}
-              onChange={(event) => zmienPozycje(indeksPozycji, 'kolor', event.target.value)}
-            />
-            <input
-              placeholder="Ościeżnica rodzaj"
-              value={pozycja.oscieznica_rodzaj}
-              onChange={(event) => zmienPozycje(indeksPozycji, 'oscieznica_rodzaj', event.target.value)}
-            />
-            <input
-              placeholder="Informacje dodatkowe"
-              value={pozycja.informacje_dodatkowe}
-              onChange={(event) => zmienPozycje(indeksPozycji, 'informacje_dodatkowe', event.target.value)}
-            />
-            <input
-              placeholder="Szkło"
-              value={pozycja.szklo}
-              onChange={(event) => zmienPozycje(indeksPozycji, 'szklo', event.target.value)}
-            />
-            <input
-              placeholder="Wentylacja"
-              value={pozycja.wentylacja}
-              onChange={(event) => zmienPozycje(indeksPozycji, 'wentylacja', event.target.value)}
-            />
-            <input
-              placeholder="Uwagi"
-              value={pozycja.uwagi}
-              onChange={(event) => zmienPozycje(indeksPozycji, 'uwagi', event.target.value)}
-            />
-            <button type="button" onClick={() => usunPozycje(indeksPozycji)}>
-              Usuń pozycję
-            </button>
-          </div>
-
-          <table style={{ width: '100%' }}>
-            <thead>
+          {pozycje.map((pozycja, indeksPozycji) => (
+            <Fragment key={indeksPozycji}>
               <tr>
-                <th style={{ textAlign: 'left' }}>Składnik kosztu</th>
-                <th style={{ textAlign: 'left' }}>Kwota</th>
-                <th></th>
+                <td>
+                  <input
+                    value={pozycja.nazwa}
+                    onChange={(event) => zmienPozycje(indeksPozycji, 'nazwa', event.target.value)}
+                    required
+                  />
+                </td>
+                <td>
+                  <input
+                    value={pozycja.opis}
+                    onChange={(event) => zmienPozycje(indeksPozycji, 'opis', event.target.value)}
+                  />
+                </td>
+                <td>
+                  <input
+                    value={pozycja.kolor}
+                    onChange={(event) => zmienPozycje(indeksPozycji, 'kolor', event.target.value)}
+                  />
+                </td>
+                <td>
+                  <input
+                    value={pozycja.oscieznica_rodzaj}
+                    onChange={(event) => zmienPozycje(indeksPozycji, 'oscieznica_rodzaj', event.target.value)}
+                  />
+                </td>
+                <td>
+                  <input
+                    value={pozycja.informacje_dodatkowe}
+                    onChange={(event) => zmienPozycje(indeksPozycji, 'informacje_dodatkowe', event.target.value)}
+                  />
+                </td>
+                <td>
+                  <input
+                    value={pozycja.szklo}
+                    onChange={(event) => zmienPozycje(indeksPozycji, 'szklo', event.target.value)}
+                  />
+                </td>
+                <td>
+                  <input
+                    value={pozycja.wentylacja}
+                    onChange={(event) => zmienPozycje(indeksPozycji, 'wentylacja', event.target.value)}
+                  />
+                </td>
+                <td>
+                  <input
+                    value={pozycja.uwagi}
+                    onChange={(event) => zmienPozycje(indeksPozycji, 'uwagi', event.target.value)}
+                  />
+                </td>
+                <td>
+                  <strong>{sumaNettoPozycji(pozycja).toFixed(2)} zł</strong>
+                </td>
+                <td style={{ whiteSpace: 'nowrap' }}>
+                  <button
+                    type="button"
+                    onClick={() => setRozwinieta(rozwinieta === indeksPozycji ? null : indeksPozycji)}
+                  >
+                    Składniki ({pozycja.skladniki.length})
+                  </button>{' '}
+                  <button type="button" onClick={() => usunPozycje(indeksPozycji)}>
+                    Usuń
+                  </button>{' '}
+                  <button type="button" onClick={onZapiszKosztorys}>
+                    Zapisz
+                  </button>
+                </td>
               </tr>
-            </thead>
-            <tbody>
-              {pozycja.skladniki.map((skladnik, indeksSkladnika) => (
-                <tr key={indeksSkladnika}>
-                  <td>
-                    <input
-                      placeholder="np. Montaż drzwi, Podfrezowanie, Ościeżnica"
-                      value={skladnik.opis}
-                      onChange={(event) =>
-                        zmienSkladnik(indeksPozycji, indeksSkladnika, 'opis', event.target.value)
-                      }
-                    />
-                  </td>
-                  <td>
-                    <input
-                      type="number"
-                      step="0.01"
-                      value={skladnik.kwota}
-                      onChange={(event) =>
-                        zmienSkladnik(indeksPozycji, indeksSkladnika, 'kwota', event.target.value)
-                      }
-                    />
-                  </td>
-                  <td>
-                    <button type="button" onClick={() => usunSkladnik(indeksPozycji, indeksSkladnika)}>
-                      Usuń
-                    </button>
+
+              {rozwinieta === indeksPozycji && (
+                <tr>
+                  <td colSpan={10} style={{ background: 'var(--bg)' }}>
+                    <table>
+                      <thead>
+                        <tr>
+                          <th>Składnik kosztu</th>
+                          <th>Kwota</th>
+                          <th></th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {pozycja.skladniki.map((skladnik, indeksSkladnika) => (
+                          <tr key={indeksSkladnika}>
+                            <td>
+                              <input
+                                placeholder="np. Montaż drzwi, Podfrezowanie, Ościeżnica"
+                                value={skladnik.opis}
+                                onChange={(event) =>
+                                  zmienSkladnik(indeksPozycji, indeksSkladnika, 'opis', event.target.value)
+                                }
+                              />
+                            </td>
+                            <td>
+                              <input
+                                type="number"
+                                step="0.01"
+                                value={skladnik.kwota}
+                                onChange={(event) =>
+                                  zmienSkladnik(indeksPozycji, indeksSkladnika, 'kwota', event.target.value)
+                                }
+                              />
+                            </td>
+                            <td>
+                              <button
+                                type="button"
+                                onClick={() => usunSkladnik(indeksPozycji, indeksSkladnika)}
+                              >
+                                Usuń
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                    <div style={{ marginTop: 8 }}>
+                      <button type="button" onClick={() => dodajSkladnik(indeksPozycji)}>
+                        + Dodaj składnik kosztu
+                      </button>
+                    </div>
                   </td>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              )}
+            </Fragment>
+          ))}
+        </tbody>
+      </table>
 
-          <button type="button" onClick={() => dodajSkladnik(indeksPozycji)}>
-            + Dodaj składnik kosztu
-          </button>
-
-          <p>
-            <strong>Suma netto pozycji: {sumaNettoPozycji(pozycja).toFixed(2)} zł</strong>
-          </p>
-        </div>
-      ))}
-
-      <button type="button" onClick={dodajPozycje}>
-        + Dodaj pozycję
-      </button>
+      <div style={{ marginTop: 12 }}>
+        <button type="button" onClick={dodajPozycje}>
+          + Dodaj pozycję
+        </button>
+      </div>
     </div>
   )
 }
