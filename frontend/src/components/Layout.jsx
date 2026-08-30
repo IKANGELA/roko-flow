@@ -7,6 +7,7 @@ const POZYCJE_MENU = [
   { sciezka: '/zamowienia', etykieta: 'Zamówienia' },
   { sciezka: '/dostawcy', etykieta: 'Dostawcy' },
   { sciezka: '/montaze', etykieta: 'Montaże' },
+  { sciezka: '/raporty', etykieta: 'Raporty' },
 ]
 
 function Layout() {
