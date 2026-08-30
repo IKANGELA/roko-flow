@@ -3,7 +3,14 @@ import { useLocation } from 'react-router-dom'
 import ZamowieniaList from '../components/ZamowieniaList'
 import ZamowienieForm from '../components/ZamowienieForm'
 import PasekZaznaczenia from '../components/PasekZaznaczenia'
-import { aktualizujZamowienie, pobierzZamowienia, usunZamowienie } from '../api'
+import {
+  aktualizujKosztorys,
+  aktualizujZamowienie,
+  pobierzKosztorysy,
+  pobierzZamowienia,
+  usunZamowienie,
+} from '../api'
+import { kosztorysDoPayloadu } from '../kosztorysUtils'
 import { useZaznaczenie } from '../useZaznaczenie'
 import { usunZaznaczoneElementy } from '../usunZaznaczone'
 import { zamowienieDoPayloadu } from '../zamowienieUtils'
@@ -27,13 +34,24 @@ function ZamowieniaPage() {
     setWybraneZamowienie(null)
   }
 
-  function zapisanoZamowienie(zapisane) {
+  async function zapisanoZamowienie(zapisane) {
     setZamowienia((poprzednie) => {
       const juzIstnieje = poprzednie.some((z) => z.id === zapisane.id)
       return juzIstnieje
         ? poprzednie.map((z) => (z.id === zapisane.id ? zapisane : z))
         : [...poprzednie, zapisane]
     })
+
+    // Dopiero teraz, gdy zamówienie z akceptacji kosztorysu faktycznie zostało zapisane,
+    // oznaczamy kosztorys jako zaakceptowany — patrz KosztorysyPage::zaakceptujKosztorys.
+    if (widok === 'nowy' && kosztorysIdZNawigacji && zapisane.kosztorys_id === kosztorysIdZNawigacji) {
+      const kosztorysy = await pobierzKosztorysy()
+      const kosztorys = kosztorysy.find((k) => k.id === kosztorysIdZNawigacji)
+      if (kosztorys && !kosztorys.wybrany_do_realizacji) {
+        await aktualizujKosztorys(kosztorys.id, kosztorysDoPayloadu(kosztorys, { wybrany_do_realizacji: true }))
+      }
+    }
+
     wrocDoListy()
   }
 

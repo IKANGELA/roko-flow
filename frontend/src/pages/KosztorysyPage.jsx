@@ -39,11 +39,11 @@ function KosztorysyPage() {
     setWidok('edytuj')
   }
 
-  async function zaakceptujKosztorys(kosztorys) {
-    const payload = kosztorysDoPayloadu(kosztorys, { wybrany_do_realizacji: true })
-    await aktualizujKosztorys(kosztorys.id, payload)
-    // Zaakceptowany kosztorys od razu przechodzi do tworzenia zamówienia — z tym kosztorysem
-    // już wybranym, żeby nie trzeba było go szukać ręcznie na liście.
+  function zaakceptujKosztorys(kosztorys) {
+    // Samo kliknięcie "Akceptuj" NIE oznacza jeszcze kosztorysu jako zaakceptowanego —
+    // to robi dopiero faktyczne zapisanie zamówienia (patrz ZamowieniaPage::zapisanoZamowienie).
+    // Inaczej wyjście z formularza zamówienia bez zapisu zostawiało kosztorys w stanie
+    // "zaakceptowany" (przycisk "Cofnij akceptację") mimo braku jakiegokolwiek zamówienia.
     navigate('/zamowienia', { state: { kosztorysId: kosztorys.id } })
   }
 
