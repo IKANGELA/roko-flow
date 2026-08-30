@@ -4,14 +4,23 @@ from typing import Optional
 from pydantic import BaseModel, ConfigDict
 
 
+class KlientPodsumowanie(BaseModel):
+    """Okrojone dane klienta, dołączane do zamówienia (przez kosztorys)."""
+
+    id: int
+    imie_i_nazwisko: str
+    telefon: str
+
+    model_config = ConfigDict(from_attributes=True)
+
+
 class KosztorysPodsumowanie(BaseModel):
-    """Okrojone dane kosztorysu, dołączane do zamówienia, żeby nie trzeba było ich dociągać osobno."""
+    """Okrojone dane kosztorysu (razem z klientem), dołączane do zamówienia."""
 
     id: int
     numer: str
     nazwa_inwestycji: Optional[str] = None
-
-    model_config = ConfigDict(from_attributes=True)
+    klient: KlientPodsumowanie
 
 
 class DostawcaPodsumowanie(BaseModel):

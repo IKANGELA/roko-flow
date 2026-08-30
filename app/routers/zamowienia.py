@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 
 from app.core.database import get_db
 from app.repositories.dostawca_repository import DostawcaRepository
+from app.repositories.klient_repository import KlientRepository
 from app.repositories.kosztorys_repository import KosztorysRepository
 from app.repositories.zamowienie_repository import ZamowienieRepository
 from app.schemas.zamowienie import Zamowienie, ZamowienieCreate
@@ -13,7 +14,7 @@ router = APIRouter(prefix="/zamowienia", tags=["Zamówienia"])
 
 def get_zamowienie_service(db: Session = Depends(get_db)) -> ZamowienieService:
     return ZamowienieService(
-        ZamowienieRepository(db), KosztorysRepository(db), DostawcaRepository(db)
+        ZamowienieRepository(db), KosztorysRepository(db), DostawcaRepository(db), KlientRepository(db)
     )
 
 
