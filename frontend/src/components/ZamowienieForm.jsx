@@ -145,8 +145,14 @@ function ZamowienieForm({ zamowienie, wstepnyKosztorysId, onZapisano }) {
     setDane((poprzednie) => ({ ...poprzednie, [name]: checked }))
   }
 
-  function zmienKlienta(klientId) {
-    setDane((poprzednie) => ({ ...poprzednie, klient_id: klientId }))
+  // Wybór klienta podpowiada jego adres jako adres nabywcy (do faktury) — zwykle taki sam,
+  // a nadal można go ręcznie zmienić, jeśli akurat różni się od adresu klienta.
+  function zmienKlienta(klient) {
+    setDane((poprzednie) => ({
+      ...poprzednie,
+      klient_id: klient ? klient.id : null,
+      adres_nabywcy: klient ? klient.adres || '' : poprzednie.adres_nabywcy,
+    }))
   }
 
   function zmienKosztorys(event) {
