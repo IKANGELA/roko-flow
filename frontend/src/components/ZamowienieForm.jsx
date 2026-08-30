@@ -37,6 +37,19 @@ const PUSTY_FORMULARZ = {
   dodaj_do_montazy: false,
 }
 
+// Pola podpowiadane z kosztorysu przy jego wyborze — jedno miejsce, żeby nie rozjeżdżały
+// się między ręczną zmianą (zmienKosztorys) a wejściem z wstepnyKosztorysId (np. po
+// "Akceptuj" na kosztorysie), gdzie zmienKosztorys nie jest wywoływane.
+function polaZKosztorysu(kosztorys) {
+  return {
+    klient_id: kosztorys.klient_id,
+    vat_procent: kosztorys.vat_procent,
+    adres_nabywcy: kosztorys.adres_nabywcy || '',
+    nip_nabywcy: kosztorys.nip_nabywcy || '',
+    adres_montazu: kosztorys.adres_montazu || '',
+  }
+}
+
 function danePoczatkowe(zamowienie, wstepnyKosztorysId) {
   if (zamowienie) {
     return {
@@ -134,7 +147,9 @@ function ZamowienieForm({ zamowienie, wstepnyKosztorysId, onZapisano }) {
     // Bezpiecznik dla wejścia z wstepnyKosztorysId (np. po "Akceptuj" na kosztorysie) —
     // wtedy kosztorys_id jest ustawiony od razu, zanim lista kosztorysów się wczyta,
     // więc zmienKosztorys() (wywoływane tylko przy ręcznym wyborze) jeszcze nie zadziałało.
-    setDane((poprzednie) => (poprzednie.klient_id ? poprzednie : { ...poprzednie, klient_id: wybrany.klient_id }))
+    // Efekt odpala się raz na kosztorys_id (patrz warunek wyżej), więc bezpiecznie nadpisuje
+    // te same pola, które przy ręcznym wyborze ustawia zmienKosztorys.
+    setDane((poprzednie) => ({ ...poprzednie, ...polaZKosztorysu(wybrany) }))
   }, [dane.kosztorys_id, kosztorysy])
 
   function zmienPole(event) {
@@ -165,11 +180,7 @@ function ZamowienieForm({ zamowienie, wstepnyKosztorysId, onZapisano }) {
     setDane((poprzednie) => ({
       ...poprzednie,
       kosztorys_id: nowyId,
-      klient_id: wybrany ? wybrany.klient_id : poprzednie.klient_id,
-      vat_procent: wybrany ? wybrany.vat_procent : poprzednie.vat_procent,
-      adres_nabywcy: wybrany ? wybrany.adres_nabywcy || '' : poprzednie.adres_nabywcy,
-      nip_nabywcy: wybrany ? wybrany.nip_nabywcy || '' : poprzednie.nip_nabywcy,
-      adres_montazu: wybrany ? wybrany.adres_montazu || '' : poprzednie.adres_montazu,
+      ...(wybrany ? polaZKosztorysu(wybrany) : {}),
     }))
   }
 
