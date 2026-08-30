@@ -11,6 +11,7 @@ function ZamowieniaList({ zamowienia, onWybierz, zaznaczone, onPrzelacz, onZmien
         <tr>
           <th></th>
           <th>Numer</th>
+          <th>Data zamówienia</th>
           <th>Klient</th>
           <th>Kosztorys</th>
           <th>Status</th>
@@ -32,6 +33,7 @@ function ZamowieniaList({ zamowienia, onWybierz, zaznaczone, onPrzelacz, onZmien
               />
             </td>
             <td>{zamowienie.numer_zamowienia || '—'}</td>
+            <td>{zamowienie.data_zamowienia || '—'}</td>
             <td>
               {zamowienie.klient?.imie_i_nazwisko || zamowienie.kosztorys?.klient?.imie_i_nazwisko || '—'}
             </td>
