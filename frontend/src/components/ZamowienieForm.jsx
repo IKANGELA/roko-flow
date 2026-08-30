@@ -79,6 +79,11 @@ function ZamowienieForm({ zamowienie, wstepnyKosztorysId, onZapisano }) {
   const [statusZapisuPozycji, setStatusZapisuPozycji] = useState(null) // null | 'zapisywanie' | 'zapisano' | 'blad'
   const zaladowanyKosztorysId = useRef(null)
 
+  // Migawka ostatnio zapisanych pozycji — porównanie z bieżącym stanem mówi, czy są
+  // niezapisane zmiany (podświetlenie przycisku "Zapisz" przy pozycji, patrz niżej).
+  const zapisanePozycjeRef = useRef('[]')
+  const pozycjeNiezapisane = JSON.stringify(pozycje) !== zapisanePozycjeRef.current
+
   useEffect(() => {
     pobierzKosztorysy().then(setKosztorysy)
     pobierzDostawcow().then(setDostawcy)
@@ -99,27 +104,27 @@ function ZamowienieForm({ zamowienie, wstepnyKosztorysId, onZapisano }) {
     if (!wybrany) {
       return
     }
-    setPozycje(
-      wybrany.pozycje.map((pozycja) => ({
-        nazwa: pozycja.nazwa,
-        dostawca_id: pozycja.dostawca_id ?? '',
-        montaz_kwota: pozycja.montaz_kwota ?? '',
-        opis: pozycja.opis || '',
-        opis_kwota: pozycja.opis_kwota ?? '',
-        kolor: pozycja.kolor || '',
-        kolor_kwota: pozycja.kolor_kwota ?? '',
-        oscieznica_rodzaj: pozycja.oscieznica_rodzaj || '',
-        oscieznica_rodzaj_kwota: pozycja.oscieznica_rodzaj_kwota ?? '',
-        informacje_dodatkowe: pozycja.informacje_dodatkowe || '',
-        informacje_dodatkowe_kwota: pozycja.informacje_dodatkowe_kwota ?? '',
-        szklo: pozycja.szklo || '',
-        szklo_kwota: pozycja.szklo_kwota ?? '',
-        wentylacja: pozycja.wentylacja || '',
-        wentylacja_kwota: pozycja.wentylacja_kwota ?? '',
-        uwagi: pozycja.uwagi || '',
-        uwagi_kwota: pozycja.uwagi_kwota ?? '',
-      })),
-    )
+    const wczytanePozycje = wybrany.pozycje.map((pozycja) => ({
+      nazwa: pozycja.nazwa,
+      dostawca_id: pozycja.dostawca_id ?? '',
+      montaz_kwota: pozycja.montaz_kwota ?? '',
+      opis: pozycja.opis || '',
+      opis_kwota: pozycja.opis_kwota ?? '',
+      kolor: pozycja.kolor || '',
+      kolor_kwota: pozycja.kolor_kwota ?? '',
+      oscieznica_rodzaj: pozycja.oscieznica_rodzaj || '',
+      oscieznica_rodzaj_kwota: pozycja.oscieznica_rodzaj_kwota ?? '',
+      informacje_dodatkowe: pozycja.informacje_dodatkowe || '',
+      informacje_dodatkowe_kwota: pozycja.informacje_dodatkowe_kwota ?? '',
+      szklo: pozycja.szklo || '',
+      szklo_kwota: pozycja.szklo_kwota ?? '',
+      wentylacja: pozycja.wentylacja || '',
+      wentylacja_kwota: pozycja.wentylacja_kwota ?? '',
+      uwagi: pozycja.uwagi || '',
+      uwagi_kwota: pozycja.uwagi_kwota ?? '',
+    }))
+    setPozycje(wczytanePozycje)
+    zapisanePozycjeRef.current = JSON.stringify(wczytanePozycje)
     zaladowanyKosztorysId.current = dane.kosztorys_id
   }, [dane.kosztorys_id, kosztorysy])
 
@@ -167,6 +172,7 @@ function ZamowienieForm({ zamowienie, wstepnyKosztorysId, onZapisano }) {
         poprzednie.map((k) => (k.id === zaktualizowanyKosztorys.id ? zaktualizowanyKosztorys : k)),
       )
       setStatusZapisuPozycji('zapisano')
+      zapisanePozycjeRef.current = JSON.stringify(pozycje)
     } catch (e) {
       setStatusZapisuPozycji('blad')
     }
@@ -323,6 +329,9 @@ function ZamowienieForm({ zamowienie, wstepnyKosztorysId, onZapisano }) {
             {statusZapisuPozycji === 'zapisywanie' && <p>Zapisywanie pozycji...</p>}
             {statusZapisuPozycji === 'zapisano' && <p>Zapisano ✓</p>}
             {statusZapisuPozycji === 'blad' && <p style={{ color: 'red' }}>Nie udało się zapisać pozycji.</p>}
+            {statusZapisuPozycji !== 'zapisywanie' && pozycjeNiezapisane && (
+              <p style={{ color: 'var(--danger)' }}>Masz niezapisane zmiany w pozycjach.</p>
+            )}
             <p>
               <em>
                 Zmiany w pozycjach (np. dobór klamek ustalony już po złożeniu zamówienia) zapisują się do
@@ -334,6 +343,7 @@ function ZamowienieForm({ zamowienie, wstepnyKosztorysId, onZapisano }) {
               onZmiana={setPozycje}
               onZapiszKosztorys={zapiszPozycjeKosztorysu}
               dostawcy={dostawcy}
+              niezapisaneZmiany={pozycjeNiezapisane}
             />
           </>
         )}

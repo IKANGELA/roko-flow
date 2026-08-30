@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import KlientPicker from './KlientPicker'
 import PozycjeEditor from './PozycjeEditor'
 import { aktualizujKosztorys, pobierzDostawcow, utworzKosztorys } from '../api'
@@ -75,6 +75,11 @@ function KosztorysForm({ kosztorys, onZapisano }) {
   const [statusZapisu, setStatusZapisu] = useState(null) // null | 'zapisywanie' | 'zapisano' | 'blad'
   const [dostawcy, setDostawcy] = useState([])
 
+  // Migawka ostatnio zapisanych pozycji — porównanie z bieżącym stanem mówi, czy są
+  // niezapisane zmiany (podświetlenie przycisku "Zapisz" przy pozycji, patrz niżej).
+  const zapisanePozycjeRef = useRef(JSON.stringify(pozycje))
+  const pozycjeNiezapisane = JSON.stringify(pozycje) !== zapisanePozycjeRef.current
+
   useEffect(() => {
     pobierzDostawcow().then(setDostawcy)
   }, [])
@@ -121,6 +126,7 @@ function KosztorysForm({ kosztorys, onZapisano }) {
         : await utworzKosztorys(payload)
       setKosztorysId(zapisany.id)
       setStatusZapisu('zapisano')
+      zapisanePozycjeRef.current = JSON.stringify(pozycje)
     } catch (e) {
       setStatusZapisu('blad')
     }
@@ -141,6 +147,7 @@ function KosztorysForm({ kosztorys, onZapisano }) {
       const zapisany = kosztorysId
         ? await aktualizujKosztorys(kosztorysId, payload)
         : await utworzKosztorys(payload)
+      zapisanePozycjeRef.current = JSON.stringify(pozycje)
       onZapisano(zapisany)
     } catch (e) {
       setBlad('Nie udało się zapisać kosztorysu.')
@@ -197,11 +204,15 @@ function KosztorysForm({ kosztorys, onZapisano }) {
         {statusZapisu === 'zapisywanie' && <p>Zapisywanie kosztorysu...</p>}
         {statusZapisu === 'zapisano' && <p>Zapisano ✓</p>}
         {statusZapisu === 'blad' && <p style={{ color: 'red' }}>Nie udało się zapisać.</p>}
+        {statusZapisu !== 'zapisywanie' && pozycjeNiezapisane && (
+          <p style={{ color: 'var(--danger)' }}>Masz niezapisane zmiany w pozycjach.</p>
+        )}
         <PozycjeEditor
           pozycje={pozycje}
           onZmiana={setPozycje}
           onZapiszKosztorys={zapiszWTle}
           dostawcy={dostawcy}
+          niezapisaneZmiany={pozycjeNiezapisane}
         />
       </fieldset>
 
