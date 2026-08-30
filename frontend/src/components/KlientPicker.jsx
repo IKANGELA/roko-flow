@@ -18,11 +18,15 @@ function KlientPicker({ klientId, onZmiana }) {
 
   return (
     <div>
-      <div>
-        <button type="button" onClick={() => setTryb('wybierz')} disabled={tryb === 'wybierz'}>
+      <div className="zakladki">
+        <button
+          type="button"
+          className={tryb === 'wybierz' ? 'aktywna' : ''}
+          onClick={() => setTryb('wybierz')}
+        >
           Wybierz z listy
-        </button>{' '}
-        <button type="button" onClick={() => setTryb('utworz')} disabled={tryb === 'utworz'}>
+        </button>
+        <button type="button" className={tryb === 'utworz' ? 'aktywna' : ''} onClick={() => setTryb('utworz')}>
           Utwórz klienta
         </button>
       </div>
