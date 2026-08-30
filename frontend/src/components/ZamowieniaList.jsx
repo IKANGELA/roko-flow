@@ -34,7 +34,9 @@ function ZamowieniaList({ zamowienia, onWybierz, zaznaczone, onPrzelacz, onZmien
             <td>
               {zamowienie.klient?.imie_i_nazwisko || zamowienie.kosztorys?.klient?.imie_i_nazwisko || '—'}
             </td>
-            <td>{zamowienie.numer_zamowienia || '—'}</td>
+            {/* Jeden numer na całą sprawę — numer kosztorysu (K_01...), a nie numer_zamowienia
+                (to osobne pole na referencję zamówienia u dostawcy, często długo puste). */}
+            <td>{zamowienie.kosztorys?.numer || zamowienie.numer_zamowienia || '—'}</td>
             <td>{zamowienie.data_zamowienia || '—'}</td>
             <td>{zamowienie.adres_montazu || '—'}</td>
             <td>{zamowienie.wartosc_brutto === null ? '—' : `${zamowienie.wartosc_brutto.toFixed(2)} zł`}</td>
