@@ -52,12 +52,16 @@ function pozycjePoczatkowe(kosztorys) {
 }
 
 function KosztorysForm({ kosztorys, onZapisano }) {
-  const jestEdycja = Boolean(kosztorys)
-
   const [dane, setDane] = useState(() => danePoczatkowe(kosztorys))
   const [pozycje, setPozycje] = useState(() => pozycjePoczatkowe(kosztorys))
   const [zapisywanie, setZapisywanie] = useState(false)
   const [blad, setBlad] = useState(null)
+
+  // Id kosztorysu w bazie — na starcie taki, jaki dostałyśmy (edycja), albo brak (nowy).
+  // Gdy pierwszy raz zapiszemy "w tle" (np. przy dodaniu pozycji), dostajemy nowe id
+  // i od tej pory kolejne zapisy (także ten końcowy, przyciskiem na dole) są już edycją.
+  const [kosztorysId, setKosztorysId] = useState(kosztorys?.id ?? null)
+  const [statusZapisu, setStatusZapisu] = useState(null) // null | 'zapisywanie' | 'zapisano' | 'blad'
 
   function zmienPole(event) {
     const { name, value } = event.target
@@ -68,17 +72,8 @@ function KosztorysForm({ kosztorys, onZapisano }) {
     setDane((poprzednie) => ({ ...poprzednie, klient_id: klientId }))
   }
 
-  async function wyslij(event) {
-    event.preventDefault()
-    if (!dane.klient_id) {
-      setBlad('Wybierz lub utwórz klienta.')
-      return
-    }
-
-    setZapisywanie(true)
-    setBlad(null)
-
-    const daneDoWyslania = {
+  function zbudujPayload() {
+    return {
       klient_id: dane.klient_id,
       nazwa_inwestycji: dane.nazwa_inwestycji || null,
       adres_montazu: dane.adres_montazu || null,
@@ -104,110 +99,155 @@ function KosztorysForm({ kosztorys, onZapisano }) {
         })),
       })),
     }
+  }
+
+  // Zapisuje cały kosztorys "w tle" (bez zamykania formularza) — wywoływane z przycisku
+  // "Zapisz" przy pozycji, żeby nic nie zginęło przy wypełnianiu długiej listy pozycji.
+  async function zapiszWTle() {
+    if (!dane.klient_id) {
+      setBlad('Wybierz lub utwórz klienta, zanim zapiszesz pozycję.')
+      return
+    }
+    setBlad(null)
+    setStatusZapisu('zapisywanie')
+    try {
+      const payload = zbudujPayload()
+      const zapisany = kosztorysId
+        ? await aktualizujKosztorys(kosztorysId, payload)
+        : await utworzKosztorys(payload)
+      setKosztorysId(zapisany.id)
+      setStatusZapisu('zapisano')
+    } catch (e) {
+      setStatusZapisu('blad')
+    }
+  }
+
+  async function wyslij(event) {
+    event.preventDefault()
+    if (!dane.klient_id) {
+      setBlad('Wybierz lub utwórz klienta.')
+      return
+    }
+
+    setZapisywanie(true)
+    setBlad(null)
 
     try {
-      const zapisany = jestEdycja
-        ? await aktualizujKosztorys(kosztorys.id, daneDoWyslania)
-        : await utworzKosztorys(daneDoWyslania)
+      const payload = zbudujPayload()
+      const zapisany = kosztorysId
+        ? await aktualizujKosztorys(kosztorysId, payload)
+        : await utworzKosztorys(payload)
       onZapisano(zapisany)
-      if (!jestEdycja) {
-        setDane(PUSTY_FORMULARZ)
-        setPozycje([])
-      }
     } catch (e) {
-      setBlad(jestEdycja ? 'Nie udało się zaktualizować kosztorysu.' : 'Nie udało się zapisać kosztorysu.')
+      setBlad('Nie udało się zapisać kosztorysu.')
     } finally {
       setZapisywanie(false)
     }
   }
 
   return (
-    <form onSubmit={wyslij}>
-      <h3>Dane klienta i inwestycji</h3>
+    <form className="pelny-formularz" onSubmit={wyslij}>
+      <fieldset>
+        <legend>Dane klienta i inwestycji</legend>
 
-      <KlientPicker klientId={dane.klient_id} onZmiana={zmienKlienta} />
+        <KlientPicker klientId={dane.klient_id} onZmiana={zmienKlienta} />
 
-      <div>
-        <input
-          name="nazwa_inwestycji"
-          placeholder="Nazwa inwestycji"
-          value={dane.nazwa_inwestycji}
-          onChange={zmienPole}
-        />
-      </div>
-      <div>
-        <input
-          name="adres_montazu"
-          placeholder="Adres montażu"
-          value={dane.adres_montazu}
-          onChange={zmienPole}
-        />
-      </div>
-      <div>
-        <input name="termin" placeholder="Termin (np. 2 tygodnie)" value={dane.termin} onChange={zmienPole} />
-      </div>
-      <div>
-        <textarea name="uwagi" placeholder="Uwagi" value={dane.uwagi} onChange={zmienPole} rows={2} />
-      </div>
-      <div>
-        <label>
+        <div>
           <input
-            type="checkbox"
-            name="wybrany_do_realizacji"
-            checked={dane.wybrany_do_realizacji}
-            onChange={(event) =>
-              setDane((poprzednie) => ({ ...poprzednie, wybrany_do_realizacji: event.target.checked }))
-            }
-          />{' '}
-          Wybrany do realizacji
-        </label>
-      </div>
-
-      <div>
-        <label>
-          VAT:{' '}
-          <select name="vat_procent" value={dane.vat_procent} onChange={zmienPole}>
-            <option value={8}>8%</option>
-            <option value={23}>23%</option>
-            <option value={0}>0%</option>
-          </select>
-        </label>
-      </div>
-
-      <div>
-        <label>
-          Dodatkowe koszty:{' '}
-          <input name="dodatkowe_koszty" type="number" step="0.01" value={dane.dodatkowe_koszty} onChange={zmienPole} />
-        </label>
-      </div>
-
-      <div>
-        <label>
-          Rabat:{' '}
-          <input name="rabat" type="number" step="0.01" value={dane.rabat} onChange={zmienPole} />
-        </label>
-      </div>
-
-      <div>
-        <label>
-          Ustalona zaliczka (puste = domyślne 40%):{' '}
-          <input
-            name="ustalona_zaliczka"
-            type="number"
-            step="0.01"
-            value={dane.ustalona_zaliczka}
+            name="nazwa_inwestycji"
+            placeholder="Nazwa inwestycji"
+            value={dane.nazwa_inwestycji}
             onChange={zmienPole}
           />
-        </label>
-      </div>
+        </div>
+        <div>
+          <input
+            name="adres_montazu"
+            placeholder="Adres montażu"
+            value={dane.adres_montazu}
+            onChange={zmienPole}
+          />
+        </div>
+        <div>
+          <input name="termin" placeholder="Termin (np. 2 tygodnie)" value={dane.termin} onChange={zmienPole} />
+        </div>
+        <div>
+          <textarea name="uwagi" placeholder="Uwagi" value={dane.uwagi} onChange={zmienPole} rows={2} />
+        </div>
+        <div>
+          <label>
+            <input
+              type="checkbox"
+              name="wybrany_do_realizacji"
+              checked={dane.wybrany_do_realizacji}
+              onChange={(event) =>
+                setDane((poprzednie) => ({ ...poprzednie, wybrany_do_realizacji: event.target.checked }))
+              }
+            />{' '}
+            Wybrany do realizacji
+          </label>
+        </div>
+      </fieldset>
 
-      <hr style={{ margin: '24px 0' }} />
+      <fieldset>
+        <legend>Pozycje</legend>
+        {statusZapisu === 'zapisywanie' && <p>Zapisywanie kosztorysu...</p>}
+        {statusZapisu === 'zapisano' && <p>Zapisano ✓</p>}
+        {statusZapisu === 'blad' && <p style={{ color: 'red' }}>Nie udało się zapisać.</p>}
+        <PozycjeEditor pozycje={pozycje} onZmiana={setPozycje} onZapiszKosztorys={zapiszWTle} />
+      </fieldset>
 
-      <PozycjeEditor pozycje={pozycje} onZmiana={setPozycje} />
+      <fieldset>
+        <legend>Podsumowanie finansowe</legend>
+
+        <div>
+          <label>
+            VAT:{' '}
+            <select name="vat_procent" value={dane.vat_procent} onChange={zmienPole}>
+              <option value={8}>8%</option>
+              <option value={23}>23%</option>
+              <option value={0}>0%</option>
+            </select>
+          </label>
+        </div>
+
+        <div>
+          <label>
+            Dodatkowe koszty:{' '}
+            <input
+              name="dodatkowe_koszty"
+              type="number"
+              step="0.01"
+              value={dane.dodatkowe_koszty}
+              onChange={zmienPole}
+            />
+          </label>
+        </div>
+
+        <div>
+          <label>
+            Rabat:{' '}
+            <input name="rabat" type="number" step="0.01" value={dane.rabat} onChange={zmienPole} />
+          </label>
+        </div>
+
+        <div>
+          <label>
+            Ustalona zaliczka (puste = domyślne 40%):{' '}
+            <input
+              name="ustalona_zaliczka"
+              type="number"
+              step="0.01"
+              value={dane.ustalona_zaliczka}
+              onChange={zmienPole}
+            />
+          </label>
+        </div>
+      </fieldset>
 
       <div style={{ marginTop: 24 }}>
         <button type="submit" disabled={zapisywanie}>
-          {zapisywanie ? 'Zapisywanie...' : jestEdycja ? 'Zapisz zmiany' : 'Utwórz kosztorys'}
+          {zapisywanie ? 'Zapisywanie...' : kosztorysId ? 'Zapisz zmiany' : 'Utwórz kosztorys'}
         </button>
       </div>
 

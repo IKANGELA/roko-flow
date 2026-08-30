@@ -20,8 +20,7 @@ function KlientForm({ onUtworzono }) {
     setDane((poprzednie) => ({ ...poprzednie, [name]: value }))
   }
 
-  async function wyslij(event) {
-    event.preventDefault()
+  async function wyslij() {
     setZapisywanie(true)
     setBlad(null)
 
@@ -45,8 +44,12 @@ function KlientForm({ onUtworzono }) {
     }
   }
 
+  // Uwaga: to celowo <div>, nie <form> — KlientForm bywa osadzany wewnątrz innych
+  // formularzy (np. formularza kosztorysu przez KlientPicker), a zagnieżdżone <form>
+  // w HTML są niepoprawne i powodują, że kliknięcie przycisku wysyła "zewnętrzny"
+  // formularz zamiast tego, zamiast utworzyć klienta.
   return (
-    <form onSubmit={wyslij}>
+    <div className="karta-formularza">
       <h2>Dodaj klienta</h2>
 
       <input
@@ -62,12 +65,12 @@ function KlientForm({ onUtworzono }) {
       <input name="nip" placeholder="NIP" value={dane.nip} onChange={zmienPole} />
       <input name="uwagi" placeholder="Uwagi" value={dane.uwagi} onChange={zmienPole} />
 
-      <button type="submit" disabled={zapisywanie}>
+      <button type="button" onClick={wyslij} disabled={zapisywanie}>
         {zapisywanie ? 'Zapisywanie...' : 'Utwórz klienta'}
       </button>
 
       {blad && <p style={{ color: 'red' }}>{blad}</p>}
-    </form>
+    </div>
   )
 }
 

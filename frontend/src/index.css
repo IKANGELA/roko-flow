@@ -74,7 +74,8 @@ hr {
 
 /* Formularze */
 
-form {
+form,
+.karta-formularza {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 10px;
@@ -82,8 +83,34 @@ form {
   max-width: 640px;
 }
 
-form > div {
+form > div,
+.karta-formularza > input {
   margin-bottom: 12px;
+}
+
+/* Formularz na pełną szerokość, podzielony na sekcje (fieldset) zamiast jednej karty */
+form.pelny-formularz {
+  max-width: none;
+  background: transparent;
+  border: none;
+  padding: 0;
+}
+
+fieldset {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px 20px 20px;
+  margin: 0 0 20px;
+}
+
+legend {
+  padding: 0 6px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--gold-dark);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 label {
@@ -103,6 +130,14 @@ textarea {
   border-radius: 6px;
   padding: 8px 10px;
   min-width: 220px;
+}
+
+/* Wąskie pola wewnątrz komórek tabeli (np. tabela pozycji kosztorysu) */
+td input,
+td select {
+  min-width: 0;
+  width: 100%;
+  padding: 6px 8px;
 }
 
 input[type='checkbox'] {
