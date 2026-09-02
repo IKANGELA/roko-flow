@@ -4,7 +4,9 @@ from app.models.zamowienie import ZamowienieDB
 from app.repositories.dostawca_repository import DostawcaRepository
 from app.repositories.klient_repository import KlientRepository
 from app.repositories.kosztorys_repository import KosztorysRepository
+from app.repositories.montaz_repository import MontazRepository
 from app.repositories.zamowienie_repository import ZamowienieRepository
+from app.schemas.montaz import MontazCreate
 from app.schemas.zamowienie import (
     DostawcaPodsumowanie,
     KlientPodsumowanie,
@@ -23,11 +25,13 @@ class ZamowienieService:
         kosztorys_repository: KosztorysRepository,
         dostawca_repository: DostawcaRepository,
         klient_repository: KlientRepository,
+        montaz_repository: MontazRepository,
     ) -> None:
         self._repository = repository
         self._kosztorys_repository = kosztorys_repository
         self._dostawca_repository = dostawca_repository
         self._klient_repository = klient_repository
+        self._montaz_repository = montaz_repository
 
     def _sprawdz_powiazania(self, dane: ZamowienieCreate) -> None:
         # kosztorys_id, klient_id i dostawca_id są opcjonalne (zamówienie "wolne", np. serwis,
@@ -39,9 +43,21 @@ class ZamowienieService:
         if dane.dostawca_id is not None and self._dostawca_repository.znajdz(dane.dostawca_id) is None:
             raise ValueError(f"Dostawca o id={dane.dostawca_id} nie istnieje")
 
+    def _dodaj_do_montazy_jesli_trzeba(self, dane: ZamowienieCreate) -> None:
+        # Zaznaczenie "Dodaj do Montaży" na zamówieniu ma faktycznie utworzyć termin montażu —
+        # montaż wisi na kosztorysie, nie na zamówieniu (patrz [[montaz_calendar_sync]]), więc bez
+        # kosztorysu nie ma do czego go przypiąć — po cichu pomijamy, to nie błąd zamówienia.
+        # Jeśli montaż dla tego kosztorysu już istnieje, nie tworzymy drugiego.
+        if not dane.dodaj_do_montazy or dane.kosztorys_id is None:
+            return
+        if self._montaz_repository.istnieje_dla_kosztorysu(dane.kosztorys_id):
+            return
+        self._montaz_repository.dodaj(MontazCreate(kosztorys_id=dane.kosztorys_id))
+
     def utworz_zamowienie(self, dane: ZamowienieCreate) -> Zamowienie:
         self._sprawdz_powiazania(dane)
         zamowienie_db = self._repository.dodaj(dane)
+        self._dodaj_do_montazy_jesli_trzeba(dane)
         return self._do_schematu(zamowienie_db)
 
     def aktualizuj_zamowienie(self, zamowienie_id: int, dane: ZamowienieCreate) -> Optional[Zamowienie]:
@@ -49,6 +65,7 @@ class ZamowienieService:
         zamowienie_db = self._repository.aktualizuj(zamowienie_id, dane)
         if zamowienie_db is None:
             return None
+        self._dodaj_do_montazy_jesli_trzeba(dane)
         return self._do_schematu(zamowienie_db)
 
     def lista_zamowien(self) -> List[Zamowienie]:
