@@ -2,9 +2,10 @@ import { useEffect, useState } from 'react'
 import MontazeList from '../components/MontazeList'
 import MontazForm from '../components/MontazForm'
 import PasekZaznaczenia from '../components/PasekZaznaczenia'
-import { pobierzMontaze, usunMontaz } from '../api'
+import { aktualizujMontaz, pobierzMontaze, usunMontaz } from '../api'
 import { useZaznaczenie } from '../useZaznaczenie'
 import { usunZaznaczoneElementy } from '../usunZaznaczone'
+import { montazDoPayloadu } from '../montazUtils'
 
 function MontazePage() {
   const [montaze, setMontaze] = useState([])
@@ -34,6 +35,13 @@ function MontazePage() {
   function otworzDoEdycji(montaz) {
     setWybranyMontaz(montaz)
     setWidok('edytuj')
+  }
+
+  // Szybka zmiana statusu wprost z listy, bez otwierania całego formularza edycji —
+  // PUT robi pełną podmianę, więc bazujemy na już wczytanym obiekcie.
+  async function zmienStatus(montaz, nowyStatus) {
+    const zaktualizowany = await aktualizujMontaz(montaz.id, montazDoPayloadu(montaz, { status_montazu: nowyStatus }))
+    setMontaze((poprzednie) => poprzednie.map((m) => (m.id === zaktualizowany.id ? zaktualizowany : m)))
   }
 
   async function usunZaznaczone() {
@@ -75,7 +83,13 @@ function MontazePage() {
       <p>
         <em>Kliknij wiersz, żeby otworzyć montaż do edycji.</em>
       </p>
-      <MontazeList montaze={montaze} onWybierz={otworzDoEdycji} zaznaczone={zaznaczone} onPrzelacz={przelacz} />
+      <MontazeList
+        montaze={montaze}
+        onWybierz={otworzDoEdycji}
+        zaznaczone={zaznaczone}
+        onPrzelacz={przelacz}
+        onZmienStatus={zmienStatus}
+      />
       <PasekZaznaczenia liczbaZaznaczonych={zaznaczone.size} onUsun={usunZaznaczone} />
     </div>
   )

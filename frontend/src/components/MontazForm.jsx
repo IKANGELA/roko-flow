@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { aktualizujMontaz, pobierzKosztorysy, utworzMontaz } from '../api'
+import { STATUSY_MONTAZU } from '../montazUtils'
 
 const PUSTY_FORMULARZ = {
   kosztorys_id: '',
@@ -143,9 +144,11 @@ function MontazForm({ montaz, wstepnyKosztorysId, onZapisano }) {
         <label>
           Status:{' '}
           <select name="status_montazu" value={dane.status_montazu} onChange={zmienPole}>
-            <option value="Do ustalenia">Do ustalenia</option>
-            <option value="Zaplanowano">Zaplanowano</option>
-            <option value="Zrealizowano">Zrealizowano</option>
+            {STATUSY_MONTAZU.map((wartosc) => (
+              <option key={wartosc} value={wartosc}>
+                {wartosc}
+              </option>
+            ))}
           </select>
         </label>
       </div>
