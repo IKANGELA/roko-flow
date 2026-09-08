@@ -26,3 +26,6 @@ class UstawieniaFirmyDB(Base):
     # Dokładne, prawdziwe sformułowanie do zdania "prowadzącym działalność zarejestrowaną
     # w..., nr wpisu..." w umowie — wpisywane raz przez użytkownika, nigdy zgadywane w kodzie.
     dane_rejestrowe: Mapped[str | None] = mapped_column(String, nullable=True)
+    # Opłata za dzień roboczy ekipy przy niedotrzymaniu wymiarów otworów (karta otworów).
+    # Tekst, nie liczba — żeby dało się wpisać "500 zł netto" itp. dokładnie tak, jak ma brzmieć.
+    stawka_niedotrzymania_wymiarow: Mapped[str | None] = mapped_column(String, nullable=True)

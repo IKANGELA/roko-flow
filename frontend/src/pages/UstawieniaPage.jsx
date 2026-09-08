@@ -11,6 +11,7 @@ const PUSTY_FORMULARZ = {
   email: '',
   www: '',
   dane_rejestrowe: '',
+  stawka_niedotrzymania_wymiarow: '',
 }
 
 function UstawieniaPage() {
@@ -31,6 +32,7 @@ function UstawieniaPage() {
         email: ustawienia.email || '',
         www: ustawienia.www || '',
         dane_rejestrowe: ustawienia.dane_rejestrowe || '',
+        stawka_niedotrzymania_wymiarow: ustawienia.stawka_niedotrzymania_wymiarow || '',
       })
       setWczytywanie(false)
     })
@@ -113,6 +115,15 @@ function UstawieniaPage() {
             <label className="pole-szerokie">
               Dane rejestrowe (do zdania „prowadzącym działalność zarejestrowaną w..." w umowie)
               <input name="dane_rejestrowe" value={dane.dane_rejestrowe} onChange={zmienPole} />
+            </label>
+            <label>
+              Opłata za niedotrzymanie wymiarów (karta otworów)
+              <input
+                name="stawka_niedotrzymania_wymiarow"
+                placeholder="np. 500 zł netto"
+                value={dane.stawka_niedotrzymania_wymiarow}
+                onChange={zmienPole}
+              />
             </label>
           </div>
         </fieldset>
