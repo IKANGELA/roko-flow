@@ -9,6 +9,7 @@ class KlientPodsumowanie(BaseModel):
 
     id: int
     imie_i_nazwisko: str
+    typ_klienta: str
     telefon: str
 
     model_config = ConfigDict(from_attributes=True)

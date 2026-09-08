@@ -133,6 +133,7 @@ class KosztorysService:
             numer=kosztorys.numer,
             wersja=kosztorys.wersja,
             nazwa_inwestycji=kosztorys.nazwa_inwestycji,
+            rodzaj_inwestycji=kosztorys.rodzaj_inwestycji,
             adres_nabywcy=kosztorys.adres_nabywcy,
             nip_nabywcy=kosztorys.nip_nabywcy,
             adres_montazu=kosztorys.adres_montazu,

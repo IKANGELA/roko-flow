@@ -56,6 +56,7 @@ class KosztorysRepository:
             numer=self._kolejny_numer(),
             wersja=dane.wersja,
             nazwa_inwestycji=dane.nazwa_inwestycji,
+            rodzaj_inwestycji=dane.rodzaj_inwestycji,
             adres_nabywcy=dane.adres_nabywcy,
             nip_nabywcy=dane.nip_nabywcy,
             adres_montazu=dane.adres_montazu,
@@ -82,6 +83,7 @@ class KosztorysRepository:
         kosztorys.klient_id = dane.klient_id
         kosztorys.wersja = dane.wersja
         kosztorys.nazwa_inwestycji = dane.nazwa_inwestycji
+        kosztorys.rodzaj_inwestycji = dane.rodzaj_inwestycji
         kosztorys.adres_nabywcy = dane.adres_nabywcy
         kosztorys.nip_nabywcy = dane.nip_nabywcy
         kosztorys.adres_montazu = dane.adres_montazu

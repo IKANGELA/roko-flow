@@ -17,6 +17,9 @@ class KosztorysDB(Base):
     numer: Mapped[str] = mapped_column(String, nullable=False)
     wersja: Mapped[int] = mapped_column(Integer, default=1)
     nazwa_inwestycji: Mapped[str | None] = mapped_column(String, nullable=True)
+    # Mieszkaniowa/Niemieszkaniowa — razem z klient.typ_klienta wpływa na podpowiadaną
+    # stawkę VAT (patrz app/schemas/kosztorys.py::RODZAJE_INWESTYCJI).
+    rodzaj_inwestycji: Mapped[str | None] = mapped_column(String, nullable=True)
     # Adres i NIP nabywcy do faktury — bywają inne niż dane samego klienta (np. faktura na
     # firmę), dlatego to osobne pola, tylko podpowiadane z karty klienta przy jego wyborze.
     adres_nabywcy: Mapped[str | None] = mapped_column(String, nullable=True)

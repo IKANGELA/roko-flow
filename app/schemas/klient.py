@@ -2,11 +2,16 @@ from typing import Optional
 
 from pydantic import BaseModel, ConfigDict
 
+# Wpływa na domyślną stawkę VAT podpowiadaną w kosztorysie — patrz
+# app/schemas/kosztorys.py::RODZAJE_INWESTYCJI i podpowiedz_vat.
+TYPY_KLIENTA = ["Prywatny", "Firma"]
+
 
 class KlientCreate(BaseModel):
     """Dane potrzebne do utworzenia nowego klienta (bez id — to nadaje baza danych)."""
 
     imie_i_nazwisko: str
+    typ_klienta: str = "Prywatny"
     telefon: str
     email: Optional[str] = None
     adres: Optional[str] = None
