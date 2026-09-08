@@ -1,4 +1,6 @@
-function MontazeList({ montaze, onWybierz, zaznaczone, onPrzelacz }) {
+import { STATUSY_MONTAZU } from '../montazUtils'
+
+function MontazeList({ montaze, onWybierz, zaznaczone, onPrzelacz, onZmienStatus }) {
   if (montaze.length === 0) {
     return <p>Brak montaży.</p>
   }
@@ -35,7 +37,18 @@ function MontazeList({ montaze, onWybierz, zaznaczone, onPrzelacz }) {
             <td>{montaz.godzina_montazu || '—'}</td>
             <td>{montaz.co_do_montazu || '—'}</td>
             <td>{montaz.nazwa_montazysty || '—'}</td>
-            <td>{montaz.status_montazu}</td>
+            <td onClick={(event) => event.stopPropagation()}>
+              <select
+                value={montaz.status_montazu}
+                onChange={(event) => onZmienStatus(montaz, event.target.value)}
+              >
+                {STATUSY_MONTAZU.map((wartosc) => (
+                  <option key={wartosc} value={wartosc}>
+                    {wartosc}
+                  </option>
+                ))}
+              </select>
+            </td>
           </tr>
         ))}
       </tbody>
