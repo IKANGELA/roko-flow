@@ -129,10 +129,11 @@ def zbuduj_pdf_karty_otworow(kosztorys: Kosztorys, ustawienia: UstawieniaFirmy) 
         wiersze,
         colWidths=[1 * cm, 4.2 * cm] + [3.5 * cm] * 6,
         repeatRows=1,
-        # Wiersz nagłówka: None = wysokość dopasowana automatycznie do zawiniętego tekstu —
-        # ze sztywną wysokością (jak było wcześniej) długie etykiety kolumn się nie mieściły
-        # i nachodziły na wiersz poniżej.
-        rowHeights=[None] + [0.9 * cm] * liczba_wierszy,
+        # Bez rowHeights w ogóle — każdy wiersz (nie tylko nagłówek) dopasowuje wysokość
+        # do tego, co faktycznie w nim jest. Sztywna wysokość zawsze ryzykuje obcięcie
+        # treści, która się nie zmieści (dokładnie to zgłosiła użytkowniczka). Miejsce do
+        # ręcznego wpisania w pustych komórkach zapewnia PADDING niżej — on tylko dokłada
+        # przestrzeń, nigdy jej nie ogranicza.
     )
     tabela.setStyle(
         TableStyle(
@@ -141,6 +142,8 @@ def zbuduj_pdf_karty_otworow(kosztorys: Kosztorys, ustawienia: UstawieniaFirmy) 
                 ("GRID", (0, 0), (-1, -1), 0.5, OBRAMOWANIE),
                 ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
                 ("ALIGN", (0, 0), (0, -1), "CENTER"),
+                ("TOPPADDING", (0, 1), (-1, -1), 0.3 * cm),
+                ("BOTTOMPADDING", (0, 1), (-1, -1), 0.3 * cm),
             ]
         )
     )
