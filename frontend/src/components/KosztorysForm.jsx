@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import KlientPicker from './KlientPicker'
 import PozycjeEditor from './PozycjeEditor'
 import { aktualizujKosztorys, pobierzDostawcow, utworzKosztorys } from '../api'
-import { podpowiedzVat, pozycjeDoPayloadu, RODZAJE_INWESTYCJI } from '../kosztorysUtils'
+import { podpowiedzVat, pozycjeDoPayloadu, pozycjeMajaMontaz, RODZAJE_INWESTYCJI } from '../kosztorysUtils'
 
 const PUSTY_FORMULARZ = {
   klient_id: null,
@@ -79,10 +79,6 @@ function KosztorysForm({ kosztorys, onZapisano }) {
   const [statusZapisu, setStatusZapisu] = useState(null) // null | 'zapisywanie' | 'zapisano' | 'blad'
   const [dostawcy, setDostawcy] = useState([])
 
-  // Typ ostatnio wybranego klienta (Firma/Prywatny) — do podpowiedzi VAT przy zmianie
-  // rodzaju inwestycji. Przy edycji istniejącego kosztorysu bierzemy go z dołączonego klienta.
-  const [typKlientaWybranego, setTypKlientaWybranego] = useState(kosztorys?.klient?.typ_klienta ?? null)
-
   // Migawka ostatnio zapisanych pozycji — porównanie z bieżącym stanem mówi, czy są
   // niezapisane zmiany (podświetlenie przycisku "Zapisz" przy pozycji, patrz niżej).
   const zapisanePozycjeRef = useRef(JSON.stringify(pozycje))
@@ -98,28 +94,26 @@ function KosztorysForm({ kosztorys, onZapisano }) {
   }
 
   // Wybór klienta podpowiada jego adres jako adres nabywcy (do faktury) — zwykle taki sam,
-  // a nadal można go ręcznie zmienić, jeśli akurat różni się od adresu klienta. Podpowiada też
-  // stawkę VAT na podstawie typu klienta i już wybranego rodzaju inwestycji.
+  // a nadal można go ręcznie zmienić, jeśli akurat różni się od adresu klienta. Typ klienta
+  // (Firma/Prywatny) NIE wpływa na VAT — patrz zmienRodzajInwestycji.
   function zmienKlienta(klient) {
-    setTypKlientaWybranego(klient.typ_klienta)
     setDane((poprzednie) => ({
       ...poprzednie,
       klient_id: klient.id,
       adres_nabywcy: klient.adres || '',
       nip_nabywcy: klient.nip || '',
-      vat_procent: podpowiedzVat(klient.typ_klienta, poprzednie.rodzaj_inwestycji),
     }))
   }
 
-  // Podpowiedź VAT działa w obie strony — zmiana rodzaju inwestycji też ją przelicza.
+  // O stawce VAT decyduje wyłącznie to, czy montaż jest wliczony w tę fakturę (patrz pozycje)
+  // i czy inwestycja jest mieszkaniowa — nie typ klienta. Przeliczamy przy zmianie rodzaju
+  // inwestycji, bazując na aktualnym stanie pozycji.
   function zmienRodzajInwestycji(event) {
     const nowyRodzaj = event.target.value
     setDane((poprzednie) => ({
       ...poprzednie,
       rodzaj_inwestycji: nowyRodzaj,
-      vat_procent: typKlientaWybranego
-        ? podpowiedzVat(typKlientaWybranego, nowyRodzaj)
-        : poprzednie.vat_procent,
+      vat_procent: podpowiedzVat(pozycjeMajaMontaz(pozycje), nowyRodzaj),
     }))
   }
 
