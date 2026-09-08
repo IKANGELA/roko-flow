@@ -1,5 +1,7 @@
 # ROKO Flow
 
+🔗 **[Zobacz działające demo](https://ikangela.github.io/roko-flow/)** — wersja pokazowa z przykładowymi, fikcyjnymi danymi (bez logowania). Backend hostowany na darmowym planie, może "obudzić się" nawet minutę po dłuższej przerwie.
+
 Aplikacja do zarządzania procesem sprzedaży i montażu stolarki budowlanej (drzwi, okna, klamki, rolety, bramy garażowe): od kosztorysu, przez zamówienie u dostawcy, aż po montaż u klienta.
 
 Firma ROKO prowadzi ten proces w Arkuszach Google, wspomaganych skryptami, które automatyzują sporo pracy. Działa to sprawnie, ale ma dwie słabe strony: nie wygląda zbyt atrakcyjnie i każda nowa oferta wymaga skopiowania całego skoroszytu od nowa. ROKO Flow zastępuje to pełną aplikacją webową z bazą danych.
