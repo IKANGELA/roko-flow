@@ -66,9 +66,6 @@ class ZamowienieCreate(BaseModel):
     magazyn: Optional[str] = None
     braki_w_dostawie: Optional[str] = None
 
-    zaliczka_producent: float = 0
-    doplata_producent: float = 0
-
     wartosc_netto: Optional[float] = None
     vat_procent: float = 8
 

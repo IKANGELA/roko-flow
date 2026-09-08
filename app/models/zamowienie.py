@@ -51,9 +51,6 @@ class ZamowienieDB(Base):
     magazyn: Mapped[str | None] = mapped_column(String, nullable=True)
     braki_w_dostawie: Mapped[str | None] = mapped_column(String, nullable=True)
 
-    zaliczka_producent: Mapped[float] = mapped_column(Float, default=0)
-    doplata_producent: Mapped[float] = mapped_column(Float, default=0)
-
     # Wartość netto bywa nieznana do czasu wyceny u dostawcy — również nullable.
     wartosc_netto: Mapped[float | None] = mapped_column(Float, nullable=True)
     vat_procent: Mapped[float] = mapped_column(Float, default=8)
