@@ -122,11 +122,17 @@ def zbuduj_pdf_karty_otworow(kosztorys: Kosztorys, ustawienia: UstawieniaFirmy) 
             ]
         )
 
+    # Strona A4 pozioma ma 29.7 cm, minus marginesy (1.2 cm z każdej strony) = 27.3 cm
+    # dostępnej szerokości — kolumny muszą się w tym zmieścić, inaczej ostatnie kolumny
+    # "wychodzą" poza kartkę (dokładnie ten błąd, który zgłosiła użytkowniczka).
     tabela = Table(
         wiersze,
-        colWidths=[1 * cm, 4.5 * cm] + [3.7 * cm] * 6,
+        colWidths=[1 * cm, 4.2 * cm] + [3.5 * cm] * 6,
         repeatRows=1,
-        rowHeights=[1.1 * cm] + [0.9 * cm] * liczba_wierszy,
+        # Wiersz nagłówka: None = wysokość dopasowana automatycznie do zawiniętego tekstu —
+        # ze sztywną wysokością (jak było wcześniej) długie etykiety kolumn się nie mieściły
+        # i nachodziły na wiersz poniżej.
+        rowHeights=[None] + [0.9 * cm] * liczba_wierszy,
     )
     tabela.setStyle(
         TableStyle(
