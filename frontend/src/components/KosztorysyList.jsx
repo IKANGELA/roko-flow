@@ -1,4 +1,4 @@
-import { linkPdfKosztorysu, linkPdfUmowy } from '../api'
+import { linkPdfKartyOtworow, linkPdfKosztorysu, linkPdfUmowy } from '../api'
 
 function KosztorysyList({ kosztorysy, onWybierz, onAkceptuj, onWycofajAkceptacje, zaznaczone, onPrzelacz }) {
   if (kosztorysy.length === 0) {
@@ -77,6 +77,14 @@ function KosztorysyList({ kosztorysy, onWybierz, onAkceptuj, onWycofajAkceptacje
                   onClick={(event) => event.stopPropagation()}
                 >
                   <button type="button">Umowa</button>
+                </a>
+                <a
+                  href={linkPdfKartyOtworow(kosztorys.id)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={(event) => event.stopPropagation()}
+                >
+                  <button type="button">Karta otworów</button>
                 </a>
               </div>
             </td>

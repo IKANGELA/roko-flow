@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, Response
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
+from app.pdf.karta_otworow_pdf import zbuduj_pdf_karty_otworow
 from app.pdf.kosztorys_pdf import zbuduj_pdf_kosztorysu
 from app.pdf.umowa_pdf import zbuduj_pdf_umowy
 from app.repositories.dostawca_repository import DostawcaRepository
@@ -100,6 +101,24 @@ def pobierz_pdf_umowy(
         content=pdf,
         media_type="application/pdf",
         headers={"Content-Disposition": f'attachment; filename="Umowa_{kosztorys.numer}.pdf"'},
+    )
+
+
+@router.get("/{kosztorys_id}/karta-otworow-pdf")
+def pobierz_pdf_karty_otworow(
+    kosztorys_id: int,
+    service: KosztorysService = Depends(get_kosztorys_service),
+    db: Session = Depends(get_db),
+) -> Response:
+    kosztorys = service.pobierz_kosztorys(kosztorys_id)
+    if kosztorys is None:
+        raise HTTPException(status_code=404, detail="Kosztorys nie znaleziony")
+    ustawienia = UstawieniaService(UstawieniaRepository(db)).pobierz()
+    pdf = zbuduj_pdf_karty_otworow(kosztorys, ustawienia)
+    return Response(
+        content=pdf,
+        media_type="application/pdf",
+        headers={"Content-Disposition": f'attachment; filename="Karta_otworow_{kosztorys.numer}.pdf"'},
     )
 
 

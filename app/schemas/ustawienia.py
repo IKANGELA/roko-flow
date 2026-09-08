@@ -15,5 +15,6 @@ class UstawieniaFirmy(BaseModel):
     email: Optional[str] = None
     www: Optional[str] = None
     dane_rejestrowe: Optional[str] = None
+    stawka_niedotrzymania_wymiarow: Optional[str] = None
 
     model_config = ConfigDict(from_attributes=True)
