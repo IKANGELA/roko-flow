@@ -1,14 +1,17 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Response
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
+from app.pdf.kosztorys_pdf import zbuduj_pdf_kosztorysu
 from app.repositories.dostawca_repository import DostawcaRepository
 from app.repositories.klient_repository import KlientRepository
 from app.repositories.kosztorys_repository import KosztorysRepository
 from app.repositories.montaz_repository import MontazRepository
+from app.repositories.ustawienia_repository import UstawieniaRepository
 from app.repositories.zamowienie_repository import ZamowienieRepository
 from app.schemas.kosztorys import Kosztorys, KosztorysCreate
 from app.services.kosztorys_service import KosztorysService
+from app.services.ustawienia_service import UstawieniaService
 
 router = APIRouter(prefix="/kosztorysy", tags=["Kosztorysy"])
 
@@ -61,6 +64,24 @@ def pobierz_kosztorys(
     if kosztorys is None:
         raise HTTPException(status_code=404, detail="Kosztorys nie znaleziony")
     return kosztorys
+
+
+@router.get("/{kosztorys_id}/pdf")
+def pobierz_pdf_kosztorysu(
+    kosztorys_id: int,
+    service: KosztorysService = Depends(get_kosztorys_service),
+    db: Session = Depends(get_db),
+) -> Response:
+    kosztorys = service.pobierz_kosztorys(kosztorys_id)
+    if kosztorys is None:
+        raise HTTPException(status_code=404, detail="Kosztorys nie znaleziony")
+    ustawienia = UstawieniaService(UstawieniaRepository(db)).pobierz()
+    pdf = zbuduj_pdf_kosztorysu(kosztorys, ustawienia)
+    return Response(
+        content=pdf,
+        media_type="application/pdf",
+        headers={"Content-Disposition": f'attachment; filename="Kosztorys_{kosztorys.numer}.pdf"'},
+    )
 
 
 @router.delete("/{kosztorys_id}", status_code=204)

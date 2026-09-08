@@ -6,6 +6,7 @@ import ZamowieniaPage from './pages/ZamowieniaPage'
 import DostawcyPage from './pages/DostawcyPage'
 import MontazePage from './pages/MontazePage'
 import RaportyPage from './pages/RaportyPage'
+import UstawieniaPage from './pages/UstawieniaPage'
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
         <Route path="/dostawcy" element={<DostawcyPage />} />
         <Route path="/montaze" element={<MontazePage />} />
         <Route path="/raporty" element={<RaportyPage />} />
+        <Route path="/ustawienia" element={<UstawieniaPage />} />
       </Route>
     </Routes>
   )

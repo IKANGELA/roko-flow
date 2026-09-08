@@ -145,6 +145,29 @@ export async function aktualizujMontaz(id, dane) {
   return odpowiedz.json()
 }
 
+export async function pobierzUstawieniaFirmy() {
+  const odpowiedz = await fetch(`${API_URL}/ustawienia/firma`)
+  return odpowiedz.json()
+}
+
+export async function aktualizujUstawieniaFirmy(dane) {
+  const odpowiedz = await fetch(`${API_URL}/ustawienia/firma`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(dane),
+  })
+  if (!odpowiedz.ok) {
+    throw new Error('Nie udało się zapisać ustawień firmy')
+  }
+  return odpowiedz.json()
+}
+
+// Link do pobrania PDF-a kosztorysu — otwierany wprost jako <a href>, przeglądarka sama
+// obsłuży pobieranie na podstawie nagłówka Content-Disposition zwracanego przez backend.
+export function linkPdfKosztorysu(kosztorysId) {
+  return `${API_URL}/kosztorysy/${kosztorysId}/pdf`
+}
+
 // Wspólna obsługa usuwania — jeśli backend odrzuci usunięcie (np. bo istnieją powiązane
 // rekordy), pokazujemy dokładnie ten komunikat, który zwrócił, zamiast ogólnego "błąd".
 async function usunPodAdresem(url) {

@@ -1,3 +1,5 @@
+import { linkPdfKosztorysu } from '../api'
+
 function KosztorysyList({ kosztorysy, onWybierz, onAkceptuj, onWycofajAkceptacje, zaznaczone, onPrzelacz }) {
   if (kosztorysy.length === 0) {
     return <p>Brak kosztorysów.</p>
@@ -38,27 +40,37 @@ function KosztorysyList({ kosztorysy, onWybierz, onAkceptuj, onWycofajAkceptacje
             <td>{kosztorys.wybrany_do_realizacji ? 'Zaakceptowany' : 'Oczekuje'}</td>
             <td>{kosztorys.uwagi || '—'}</td>
             <td style={{ textAlign: 'right' }}>
-              {!kosztorys.wybrany_do_realizacji ? (
-                <button
-                  type="button"
-                  onClick={(event) => {
-                    event.stopPropagation()
-                    onAkceptuj(kosztorys)
-                  }}
+              <div className="przyciski-akcji">
+                {!kosztorys.wybrany_do_realizacji ? (
+                  <button
+                    type="button"
+                    onClick={(event) => {
+                      event.stopPropagation()
+                      onAkceptuj(kosztorys)
+                    }}
+                  >
+                    Akceptuj
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={(event) => {
+                      event.stopPropagation()
+                      onWycofajAkceptacje(kosztorys)
+                    }}
+                  >
+                    Cofnij akceptację
+                  </button>
+                )}
+                <a
+                  href={linkPdfKosztorysu(kosztorys.id)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={(event) => event.stopPropagation()}
                 >
-                  Akceptuj
-                </button>
-              ) : (
-                <button
-                  type="button"
-                  onClick={(event) => {
-                    event.stopPropagation()
-                    onWycofajAkceptacje(kosztorys)
-                  }}
-                >
-                  Cofnij akceptację
-                </button>
-              )}
+                  <button type="button">PDF</button>
+                </a>
+              </div>
             </td>
           </tr>
         ))}
