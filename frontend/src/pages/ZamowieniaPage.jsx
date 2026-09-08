@@ -47,8 +47,8 @@ function ZamowieniaPage() {
     if (widok === 'nowy' && kosztorysIdZNawigacji && zapisane.kosztorys_id === kosztorysIdZNawigacji) {
       const kosztorysy = await pobierzKosztorysy()
       const kosztorys = kosztorysy.find((k) => k.id === kosztorysIdZNawigacji)
-      if (kosztorys && !kosztorys.wybrany_do_realizacji) {
-        await aktualizujKosztorys(kosztorys.id, kosztorysDoPayloadu(kosztorys, { wybrany_do_realizacji: true }))
+      if (kosztorys && kosztorys.status !== 'Zaakceptowany') {
+        await aktualizujKosztorys(kosztorys.id, kosztorysDoPayloadu(kosztorys, { status: 'Zaakceptowany' }))
       }
     }
 

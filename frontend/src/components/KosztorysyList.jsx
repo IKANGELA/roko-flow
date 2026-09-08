@@ -1,6 +1,15 @@
 import { linkPdfKartyOtworow, linkPdfKosztorysu, linkPdfUmowy } from '../api'
+import { STATUSY_KOSZTORYSU } from '../kosztorysUtils'
 
-function KosztorysyList({ kosztorysy, onWybierz, onAkceptuj, onWycofajAkceptacje, zaznaczone, onPrzelacz }) {
+function KosztorysyList({
+  kosztorysy,
+  onWybierz,
+  onAkceptuj,
+  onWycofajAkceptacje,
+  onZmienStatus,
+  zaznaczone,
+  onPrzelacz,
+}) {
   if (kosztorysy.length === 0) {
     return <p>Brak kosztorysów.</p>
   }
@@ -37,11 +46,19 @@ function KosztorysyList({ kosztorysy, onWybierz, onAkceptuj, onWycofajAkceptacje
             <td>{kosztorys.adres_montazu || '—'}</td>
             <td>{kosztorys.data}</td>
             <td>{kosztorys.suma_brutto.toFixed(2)} zł</td>
-            <td>{kosztorys.wybrany_do_realizacji ? 'Zaakceptowany' : 'Oczekuje'}</td>
+            <td onClick={(event) => event.stopPropagation()}>
+              <select value={kosztorys.status} onChange={(event) => onZmienStatus(kosztorys, event.target.value)}>
+                {STATUSY_KOSZTORYSU.map((wartosc) => (
+                  <option key={wartosc} value={wartosc}>
+                    {wartosc}
+                  </option>
+                ))}
+              </select>
+            </td>
             <td>{kosztorys.uwagi || '—'}</td>
             <td style={{ textAlign: 'right' }}>
               <div className="przyciski-akcji">
-                {!kosztorys.wybrany_do_realizacji ? (
+                {kosztorys.status !== 'Zaakceptowany' ? (
                   <button
                     type="button"
                     onClick={(event) => {

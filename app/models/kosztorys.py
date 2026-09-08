@@ -1,6 +1,6 @@
 from datetime import date, datetime
 
-from sqlalchemy import Boolean, Date, DateTime, Float, ForeignKey, Integer, String
+from sqlalchemy import Date, DateTime, Float, ForeignKey, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core.database import Base
@@ -28,7 +28,11 @@ class KosztorysDB(Base):
     termin: Mapped[str | None] = mapped_column(String, nullable=True)
     data: Mapped[date] = mapped_column(Date, default=date.today)
     uwagi: Mapped[str | None] = mapped_column(String, nullable=True)
-    wybrany_do_realizacji: Mapped[bool] = mapped_column(Boolean, default=False)
+    # Stała lista (patrz app/schemas/kosztorys.py::STATUSY_KOSZTORYSU) — zmieniana ręcznie
+    # bezpośrednio z listy kosztorysów, ALBO automatycznie na "Zaakceptowany" w momencie
+    # faktycznego zapisania zamówienia po kliknięciu "Akceptuj" (patrz
+    # frontend/src/pages/ZamowieniaPage.jsx::zapisanoZamowienie) — oba sposoby są równorzędne.
+    status: Mapped[str] = mapped_column(String, default="Oczekuje")
     ostatnia_aktualizacja: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
     vat_procent: Mapped[float] = mapped_column(Float, default=8)

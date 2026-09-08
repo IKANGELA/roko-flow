@@ -140,7 +140,7 @@ class KosztorysService:
             termin=kosztorys.termin,
             data=kosztorys.data,
             uwagi=kosztorys.uwagi,
-            wybrany_do_realizacji=kosztorys.wybrany_do_realizacji,
+            status=kosztorys.status,
             ostatnia_aktualizacja=kosztorys.ostatnia_aktualizacja,
             vat_procent=kosztorys.vat_procent,
             dodatkowe_koszty=kosztorys.dodatkowe_koszty,

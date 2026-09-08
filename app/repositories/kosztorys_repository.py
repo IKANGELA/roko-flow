@@ -62,7 +62,7 @@ class KosztorysRepository:
             adres_montazu=dane.adres_montazu,
             termin=dane.termin,
             uwagi=dane.uwagi,
-            wybrany_do_realizacji=dane.wybrany_do_realizacji,
+            status=dane.status,
             vat_procent=dane.vat_procent,
             dodatkowe_koszty=dane.dodatkowe_koszty,
             rabat=dane.rabat,
@@ -89,7 +89,7 @@ class KosztorysRepository:
         kosztorys.adres_montazu = dane.adres_montazu
         kosztorys.termin = dane.termin
         kosztorys.uwagi = dane.uwagi
-        kosztorys.wybrany_do_realizacji = dane.wybrany_do_realizacji
+        kosztorys.status = dane.status
         kosztorys.vat_procent = dane.vat_procent
         kosztorys.dodatkowe_koszty = dane.dodatkowe_koszty
         kosztorys.rabat = dane.rabat
