@@ -13,7 +13,7 @@ from reportlab.lib.pagesizes import A4
 from reportlab.lib.units import cm
 from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
 
-from app.pdf._fonts import STYL_NAGLOWEK, STYL_TEKST, STYL_TEKST_UZASADNIONY
+from app.pdf._fonts import STYL_NAGLOWEK, STYL_PARAGRAF, STYL_TEKST, STYL_TEKST_UZASADNIONY
 from app.schemas.kosztorys import Kosztorys
 from app.schemas.ustawienia import UstawieniaFirmy
 
@@ -168,8 +168,11 @@ def _paragrafy_umowy(kosztorys: Kosztorys, ustawienia: UstawieniaFirmy) -> list:
 
     elementy = []
     for numer, tresc in enumerate(tresci, start=1):
-        elementy.append(Paragraph(f"<b>§ {numer}</b> {tresc}", STYL_TEKST_UZASADNIONY))
-        elementy.append(Spacer(1, 0.25 * cm))
+        # Numer paragrafu na osobnej, wytłuszczonej linii — nie wtopiony w tekst — żeby
+        # każdy paragraf wyraźnie oddzielał się od poprzedniego, a nie tworzył jedną
+        # ciągłą "ścianę tekstu".
+        elementy.append(Paragraph(f"§ {numer}", STYL_PARAGRAF))
+        elementy.append(Paragraph(tresc, STYL_TEKST_UZASADNIONY))
     return elementy
 
 
