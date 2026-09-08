@@ -2,11 +2,12 @@ import { useEffect, useRef, useState } from 'react'
 import KlientPicker from './KlientPicker'
 import PozycjeEditor from './PozycjeEditor'
 import { aktualizujKosztorys, pobierzDostawcow, utworzKosztorys } from '../api'
-import { pozycjeDoPayloadu } from '../kosztorysUtils'
+import { podpowiedzVat, pozycjeDoPayloadu, RODZAJE_INWESTYCJI } from '../kosztorysUtils'
 
 const PUSTY_FORMULARZ = {
   klient_id: null,
   nazwa_inwestycji: '',
+  rodzaj_inwestycji: '',
   adres_nabywcy: '',
   nip_nabywcy: '',
   adres_montazu: '',
@@ -26,6 +27,7 @@ function danePoczatkowe(kosztorys) {
   return {
     klient_id: kosztorys.klient_id,
     nazwa_inwestycji: kosztorys.nazwa_inwestycji || '',
+    rodzaj_inwestycji: kosztorys.rodzaj_inwestycji || '',
     adres_nabywcy: kosztorys.adres_nabywcy || '',
     nip_nabywcy: kosztorys.nip_nabywcy || '',
     adres_montazu: kosztorys.adres_montazu || '',
@@ -77,6 +79,10 @@ function KosztorysForm({ kosztorys, onZapisano }) {
   const [statusZapisu, setStatusZapisu] = useState(null) // null | 'zapisywanie' | 'zapisano' | 'blad'
   const [dostawcy, setDostawcy] = useState([])
 
+  // Typ ostatnio wybranego klienta (Firma/Prywatny) — do podpowiedzi VAT przy zmianie
+  // rodzaju inwestycji. Przy edycji istniejącego kosztorysu bierzemy go z dołączonego klienta.
+  const [typKlientaWybranego, setTypKlientaWybranego] = useState(kosztorys?.klient?.typ_klienta ?? null)
+
   // Migawka ostatnio zapisanych pozycji — porównanie z bieżącym stanem mówi, czy są
   // niezapisane zmiany (podświetlenie przycisku "Zapisz" przy pozycji, patrz niżej).
   const zapisanePozycjeRef = useRef(JSON.stringify(pozycje))
@@ -92,13 +98,28 @@ function KosztorysForm({ kosztorys, onZapisano }) {
   }
 
   // Wybór klienta podpowiada jego adres jako adres nabywcy (do faktury) — zwykle taki sam,
-  // a nadal można go ręcznie zmienić, jeśli akurat różni się od adresu klienta.
+  // a nadal można go ręcznie zmienić, jeśli akurat różni się od adresu klienta. Podpowiada też
+  // stawkę VAT na podstawie typu klienta i już wybranego rodzaju inwestycji.
   function zmienKlienta(klient) {
+    setTypKlientaWybranego(klient.typ_klienta)
     setDane((poprzednie) => ({
       ...poprzednie,
       klient_id: klient.id,
       adres_nabywcy: klient.adres || '',
       nip_nabywcy: klient.nip || '',
+      vat_procent: podpowiedzVat(klient.typ_klienta, poprzednie.rodzaj_inwestycji),
+    }))
+  }
+
+  // Podpowiedź VAT działa w obie strony — zmiana rodzaju inwestycji też ją przelicza.
+  function zmienRodzajInwestycji(event) {
+    const nowyRodzaj = event.target.value
+    setDane((poprzednie) => ({
+      ...poprzednie,
+      rodzaj_inwestycji: nowyRodzaj,
+      vat_procent: typKlientaWybranego
+        ? podpowiedzVat(typKlientaWybranego, nowyRodzaj)
+        : poprzednie.vat_procent,
     }))
   }
 
@@ -106,6 +127,7 @@ function KosztorysForm({ kosztorys, onZapisano }) {
     return {
       klient_id: dane.klient_id,
       nazwa_inwestycji: dane.nazwa_inwestycji || null,
+      rodzaj_inwestycji: dane.rodzaj_inwestycji || null,
       adres_nabywcy: dane.adres_nabywcy || null,
       nip_nabywcy: dane.nip_nabywcy || null,
       adres_montazu: dane.adres_montazu || null,
@@ -177,6 +199,17 @@ function KosztorysForm({ kosztorys, onZapisano }) {
           <label>
             Nazwa inwestycji
             <input name="nazwa_inwestycji" value={dane.nazwa_inwestycji} onChange={zmienPole} />
+          </label>
+          <label>
+            Rodzaj inwestycji
+            <select name="rodzaj_inwestycji" value={dane.rodzaj_inwestycji} onChange={zmienRodzajInwestycji}>
+              <option value="">-- nie ustalono --</option>
+              {RODZAJE_INWESTYCJI.map((rodzaj) => (
+                <option key={rodzaj} value={rodzaj}>
+                  {rodzaj}
+                </option>
+              ))}
+            </select>
           </label>
           <label>
             Adres nabywcy (do faktury)

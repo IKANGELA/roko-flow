@@ -1,8 +1,11 @@
 import { useState } from 'react'
 import { aktualizujKlienta, utworzKlienta } from '../api'
 
+export const TYPY_KLIENTA = ['Prywatny', 'Firma']
+
 const PUSTY_FORMULARZ = {
   imie_i_nazwisko: '',
+  typ_klienta: 'Prywatny',
   telefon: '',
   email: '',
   adres: '',
@@ -16,6 +19,7 @@ function danePoczatkowe(klient) {
   }
   return {
     imie_i_nazwisko: klient.imie_i_nazwisko,
+    typ_klienta: klient.typ_klienta || 'Prywatny',
     telefon: klient.telefon,
     email: klient.email || '',
     adres: klient.adres || '',
@@ -76,6 +80,16 @@ function KlientForm({ klient, onZapisano }) {
         <label>
           Imię i nazwisko
           <input name="imie_i_nazwisko" value={dane.imie_i_nazwisko} onChange={zmienPole} required />
+        </label>
+        <label>
+          Typ klienta
+          <select name="typ_klienta" value={dane.typ_klienta} onChange={zmienPole}>
+            {TYPY_KLIENTA.map((typ) => (
+              <option key={typ} value={typ}>
+                {typ}
+              </option>
+            ))}
+          </select>
         </label>
         <label>
           Telefon

@@ -2,12 +2,14 @@ import { useEffect, useState } from 'react'
 import KlienciList from '../components/KlienciList'
 import KlientForm from '../components/KlientForm'
 import PasekZaznaczenia from '../components/PasekZaznaczenia'
-import { pobierzKlientow, usunKlienta } from '../api'
+import { pobierzKlientow, pobierzKosztorysy, pobierzZamowienia, usunKlienta } from '../api'
 import { useZaznaczenie } from '../useZaznaczenie'
 import { usunZaznaczoneElementy } from '../usunZaznaczone'
 
 function KlienciPage() {
   const [klienci, setKlienci] = useState([])
+  const [kosztorysy, setKosztorysy] = useState([])
+  const [zamowienia, setZamowienia] = useState([])
   const [szukaj, setSzukaj] = useState('')
   const [widok, setWidok] = useState('lista') // 'lista' | 'nowy' | 'edytuj'
   const [wybranyKlient, setWybranyKlient] = useState(null)
@@ -15,7 +17,19 @@ function KlienciPage() {
 
   useEffect(() => {
     pobierzKlientow().then(setKlienci)
+    pobierzKosztorysy().then(setKosztorysy)
+    pobierzZamowienia().then(setZamowienia)
   }, [])
+
+  // Ile kosztorysów/zamówień ma dany klient — liczone po stronie frontendu z już wczytanych
+  // list, żeby nie potrzebować osobnego endpointu. Zamówienia liczone po klient_id, z fallbackiem
+  // na kosztorys.klient.id dla starszych wpisów (patrz zamowienie_status_and_identity).
+  function liczbyDlaKlienta(klientId) {
+    return {
+      kosztorysy: kosztorysy.filter((k) => k.klient_id === klientId).length,
+      zamowienia: zamowienia.filter((z) => (z.klient_id ?? z.kosztorys?.klient?.id) === klientId).length,
+    }
+  }
 
   const wyszukiwaneKlienci = klienci.filter((klient) =>
     klient.imie_i_nazwisko.toLowerCase().includes(szukaj.trim().toLowerCase()),
@@ -90,6 +104,7 @@ function KlienciPage() {
         onWybierz={otworzDoEdycji}
         zaznaczone={zaznaczone}
         onPrzelacz={przelacz}
+        liczbyDlaKlienta={liczbyDlaKlienta}
       />
       <PasekZaznaczenia liczbaZaznaczonych={zaznaczone.size} onUsun={usunZaznaczonych} />
     </div>

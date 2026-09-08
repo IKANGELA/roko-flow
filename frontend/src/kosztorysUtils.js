@@ -1,3 +1,16 @@
+// Mieszkaniowa/Niemieszkaniowa — musi być zgodne z RODZAJE_INWESTYCJI w app/schemas/kosztorys.py.
+export const RODZAJE_INWESTYCJI = ['Mieszkaniowa', 'Niemieszkaniowa']
+
+// Podpowiedź stawki VAT na podstawie typu klienta i rodzaju inwestycji — tylko podpowiedź,
+// zawsze można ją ręcznie nadpisać (np. przy podzielonej fakturze u klienta prywatnego
+// z dużą kubaturą — VAT wtedy dzieli się na fakturze poza systemem, patrz dane_nabywcy_fields).
+export function podpowiedzVat(typKlienta, rodzajInwestycji) {
+  if (typKlienta === 'Firma') {
+    return rodzajInwestycji === 'Mieszkaniowa' ? 8 : 23
+  }
+  return 8
+}
+
 // Buduje payload dla PUT /kosztorysy/{id} na podstawie już istniejącego, w pełni wypełnionego
 // kosztorysu (np. pobranego z listy) — używane, gdy zmieniamy jedno pole (np. przy akceptacji),
 // bez przechodzenia przez cały formularz edycji.
@@ -5,6 +18,7 @@ export function kosztorysDoPayloadu(kosztorys, nadpisania = {}) {
   return {
     klient_id: kosztorys.klient_id,
     nazwa_inwestycji: kosztorys.nazwa_inwestycji,
+    rodzaj_inwestycji: kosztorys.rodzaj_inwestycji,
     adres_nabywcy: kosztorys.adres_nabywcy,
     nip_nabywcy: kosztorys.nip_nabywcy,
     adres_montazu: kosztorys.adres_montazu,

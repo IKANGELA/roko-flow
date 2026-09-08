@@ -9,9 +9,19 @@ class KlientPodsumowanie(BaseModel):
 
     id: int
     imie_i_nazwisko: str
+    typ_klienta: str
     telefon: str
 
     model_config = ConfigDict(from_attributes=True)
+
+
+# Wpływa razem z KlientDB.typ_klienta na domyślną stawkę VAT podpowiadaną w formularzu
+# kosztorysu (frontend/src/kosztorysUtils.js::podpowiedzVat) — tylko podpowiedź, zawsze
+# można ją ręcznie nadpisać (np. przy podzielonej fakturze u klienta prywatnego z dużą
+# kubaturą). Rozróżnienie ma sens głównie dla klientów firmowych (Firma+Mieszkaniowa -> 8%,
+# Firma+Niemieszkaniowa -> 23%); dla klientów prywatnych realna stawka zależy od kubatury,
+# której system nie śledzi.
+RODZAJE_INWESTYCJI = ["Mieszkaniowa", "Niemieszkaniowa"]
 
 
 class DostawcaPodsumowanie(BaseModel):
@@ -98,6 +108,7 @@ class KosztorysCreate(BaseModel):
     klient_id: int
     wersja: int = 1
     nazwa_inwestycji: Optional[str] = None
+    rodzaj_inwestycji: Optional[str] = None
     adres_nabywcy: Optional[str] = None
     nip_nabywcy: Optional[str] = None
     adres_montazu: Optional[str] = None
@@ -118,6 +129,7 @@ class Kosztorys(BaseModel):
     numer: str
     wersja: int
     nazwa_inwestycji: Optional[str] = None
+    rodzaj_inwestycji: Optional[str] = None
     adres_nabywcy: Optional[str] = None
     nip_nabywcy: Optional[str] = None
     adres_montazu: Optional[str] = None
