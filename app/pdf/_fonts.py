@@ -32,6 +32,9 @@ STYL_TEKST_WYSRODKOWANY = ParagraphStyle("TekstWysrodkowany", parent=STYL_TEKST,
 STYL_TEKST_UZASADNIONY = ParagraphStyle("TekstUzasadniony", parent=STYL_TEKST, alignment=4)  # 4 = TA_JUSTIFY
 STYL_KOMORKA = ParagraphStyle("Komorka", parent=_STYLE["Normal"], fontName="DejaVu", fontSize=8, leading=10)
 STYL_NAGLOWEK_TABELI = ParagraphStyle("NaglowekTabeli", parent=STYL_KOMORKA, fontName="DejaVu-Bold", textColor=colors.white)
+# Numer paragrafu (§ N) jako osobny, wytłuszczony wiersz nad treścią — nie wtopiony w tekst
+# akapitu — żeby każdy paragraf był wizualnie wyraźnie oddzielony od poprzedniego (np. w umowie).
+STYL_PARAGRAF = ParagraphStyle("Paragraf", parent=_STYLE["Normal"], fontName="DejaVu-Bold", fontSize=10, spaceBefore=10, spaceAfter=4)
 
 ZLOTY = colors.HexColor("#b8934a")
 TLO_NAPRZEMIENNE = colors.HexColor("#faf8f4")
