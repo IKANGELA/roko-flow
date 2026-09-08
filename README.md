@@ -1,5 +1,13 @@
 # ROKO Flow
 
+![Python](https://img.shields.io/badge/Python-3.11-3776AB?logo=python&logoColor=white)
+![FastAPI](https://img.shields.io/badge/FastAPI-009688?logo=fastapi&logoColor=white)
+![SQLAlchemy](https://img.shields.io/badge/SQLAlchemy-ORM-D71F00)
+![Pydantic](https://img.shields.io/badge/Pydantic-validation-E92063?logo=pydantic&logoColor=white)
+![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black)
+![Vite](https://img.shields.io/badge/Vite-8-646CFF?logo=vite&logoColor=white)
+![SQLite](https://img.shields.io/badge/SQLite-database-003B57?logo=sqlite&logoColor=white)
+
 🔗 **[Zobacz działające demo](https://ikangela.github.io/roko-flow/)** — wersja pokazowa z przykładowymi, fikcyjnymi danymi (bez logowania). Backend hostowany na darmowym planie, może "obudzić się" nawet minutę po dłuższej przerwie.
 
 Aplikacja do zarządzania procesem sprzedaży i montażu stolarki budowlanej (drzwi, okna, klamki, rolety, bramy garażowe): od kosztorysu, przez zamówienie u dostawcy, aż po montaż u klienta.
