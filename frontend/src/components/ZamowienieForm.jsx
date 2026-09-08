@@ -83,6 +83,13 @@ function danePoczatkowe(zamowienie, wstepnyKosztorysId) {
 function ZamowienieForm({ zamowienie, wstepnyKosztorysId, onZapisano }) {
   const jestEdycja = Boolean(zamowienie)
 
+  // Zaliczka klienta domyślnie liczy się jako 40% wartości brutto (tak jak w kosztorysie) —
+  // ale to tylko podpowiedź. Wpisanie własnej kwoty (np. zaokrąglonej) "blokuje" automatykę,
+  // żeby dalsze przeliczanie brutto (np. przez zmianę pozycji) jej nie nadpisało. Przy edycji
+  // istniejącego zamówienia zaczynamy od trybu ręcznego — nie chcemy cicho zmieniać już
+  // zapisanej kwoty tylko dlatego, że ktoś otworzył formularz.
+  const [zaliczkaReczna, setZaliczkaReczna] = useState(jestEdycja)
+
   const [kosztorysy, setKosztorysy] = useState([])
   const [dostawcy, setDostawcy] = useState([])
   const [dane, setDane] = useState(() => danePoczatkowe(zamowienie, wstepnyKosztorysId))
@@ -219,6 +226,24 @@ function ZamowienieForm({ zamowienie, wstepnyKosztorysId, onZapisano }) {
 
   const wartoscBrutto = wartoscNetto === null ? 0 : wartoscNetto * (1 + Number(dane.vat_procent) / 100)
   const doDoplaty = wartoscNetto === null ? null : wartoscBrutto - (Number(dane.zaliczka_klienta) || 0)
+
+  // Dopóki zaliczka nie jest "ręczna", trzyma się 40% wartości brutto — przelicza się,
+  // gdy brutto się zmieni (np. przez edycję pozycji albo VAT).
+  useEffect(() => {
+    if (zaliczkaReczna) {
+      return
+    }
+    setDane((poprzednie) => ({ ...poprzednie, zaliczka_klienta: Math.round(wartoscBrutto * 0.4 * 100) / 100 }))
+  }, [wartoscBrutto, zaliczkaReczna])
+
+  function zmienZaliczkeKlienta(event) {
+    setZaliczkaReczna(true)
+    setDane((poprzednie) => ({ ...poprzednie, zaliczka_klienta: event.target.value }))
+  }
+
+  function wyliczZaliczke40Procent() {
+    setZaliczkaReczna(false)
+  }
 
   async function wyslij(event) {
     event.preventDefault()
@@ -420,14 +445,22 @@ function ZamowienieForm({ zamowienie, wstepnyKosztorysId, onZapisano }) {
           </label>
 
           <label>
-            Zaliczka klienta
-            <input
-              type="number"
-              step="0.01"
-              name="zaliczka_klienta"
-              value={dane.zaliczka_klienta}
-              onChange={zmienPole}
-            />
+            Zaliczka klienta {!zaliczkaReczna && <span style={{ fontWeight: 'normal', color: 'var(--muted)' }}>(40% automatycznie)</span>}
+            <div style={{ display: 'flex', gap: 6 }}>
+              <input
+                type="number"
+                step="0.01"
+                name="zaliczka_klienta"
+                value={dane.zaliczka_klienta}
+                onChange={zmienZaliczkeKlienta}
+                style={{ flex: 1, minWidth: 0 }}
+              />
+              {zaliczkaReczna && (
+                <button type="button" onClick={wyliczZaliczke40Procent}>
+                  40%
+                </button>
+              )}
+            </div>
           </label>
           <label>
             Data zaliczki
