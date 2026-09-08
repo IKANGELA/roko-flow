@@ -1,6 +1,11 @@
 // Mieszkaniowa/Niemieszkaniowa — musi być zgodne z RODZAJE_INWESTYCJI w app/schemas/kosztorys.py.
 export const RODZAJE_INWESTYCJI = ['Mieszkaniowa', 'Niemieszkaniowa']
 
+// Zmieniany ręcznie bezpośrednio z listy kosztorysów, albo automatycznie na "Zaakceptowany"
+// w momencie faktycznego zapisania zamówienia po kliknięciu "Akceptuj" — oba sposoby są
+// równorzędne. Musi być zgodne z STATUSY_KOSZTORYSU w app/schemas/kosztorys.py.
+export const STATUSY_KOSZTORYSU = ['Oczekuje', 'Zaakceptowany', 'Odrzucony']
+
 // Realna zasada VAT (nie typ klienta!) — 8% wymaga ŁĄCZNIE: (1) montaż wliczony w tę samą
 // fakturę co towar (usługa modernizacji/remontu), (2) budynek mieszkalny w limicie powierzchni
 // (150 m² mieszkanie / 300 m² dom — limitu nie śledzimy, to nadal wymaga ręcznej weryfikacji
@@ -30,7 +35,7 @@ export function kosztorysDoPayloadu(kosztorys, nadpisania = {}) {
     adres_montazu: kosztorys.adres_montazu,
     termin: kosztorys.termin,
     uwagi: kosztorys.uwagi,
-    wybrany_do_realizacji: kosztorys.wybrany_do_realizacji,
+    status: kosztorys.status,
     vat_procent: kosztorys.vat_procent,
     dodatkowe_koszty: kosztorys.dodatkowe_koszty,
     rabat: kosztorys.rabat,

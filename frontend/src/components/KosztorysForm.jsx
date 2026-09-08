@@ -2,7 +2,13 @@ import { useEffect, useRef, useState } from 'react'
 import KlientPicker from './KlientPicker'
 import PozycjeEditor from './PozycjeEditor'
 import { aktualizujKosztorys, pobierzDostawcow, utworzKosztorys } from '../api'
-import { podpowiedzVat, pozycjeDoPayloadu, pozycjeMajaMontaz, RODZAJE_INWESTYCJI } from '../kosztorysUtils'
+import {
+  podpowiedzVat,
+  pozycjeDoPayloadu,
+  pozycjeMajaMontaz,
+  RODZAJE_INWESTYCJI,
+  STATUSY_KOSZTORYSU,
+} from '../kosztorysUtils'
 
 const PUSTY_FORMULARZ = {
   klient_id: null,
@@ -13,7 +19,7 @@ const PUSTY_FORMULARZ = {
   adres_montazu: '',
   termin: '',
   uwagi: '',
-  wybrany_do_realizacji: false,
+  status: 'Oczekuje',
   vat_procent: 8,
   dodatkowe_koszty: 0,
   rabat: 0,
@@ -33,7 +39,7 @@ function danePoczatkowe(kosztorys) {
     adres_montazu: kosztorys.adres_montazu || '',
     termin: kosztorys.termin || '',
     uwagi: kosztorys.uwagi || '',
-    wybrany_do_realizacji: kosztorys.wybrany_do_realizacji,
+    status: kosztorys.status,
     vat_procent: kosztorys.vat_procent,
     dodatkowe_koszty: kosztorys.dodatkowe_koszty,
     rabat: kosztorys.rabat,
@@ -127,7 +133,7 @@ function KosztorysForm({ kosztorys, onZapisano }) {
       adres_montazu: dane.adres_montazu || null,
       termin: dane.termin || null,
       uwagi: dane.uwagi || null,
-      wybrany_do_realizacji: dane.wybrany_do_realizacji,
+      status: dane.status,
       vat_procent: Number(dane.vat_procent),
       dodatkowe_koszty: Number(dane.dodatkowe_koszty) || 0,
       rabat: Number(dane.rabat) || 0,
@@ -226,16 +232,15 @@ function KosztorysForm({ kosztorys, onZapisano }) {
             Uwagi
             <textarea name="uwagi" value={dane.uwagi} onChange={zmienPole} rows={2} />
           </label>
-          <label className="pole-checkbox">
-            <input
-              type="checkbox"
-              name="wybrany_do_realizacji"
-              checked={dane.wybrany_do_realizacji}
-              onChange={(event) =>
-                setDane((poprzednie) => ({ ...poprzednie, wybrany_do_realizacji: event.target.checked }))
-              }
-            />
-            Wybrany do realizacji
+          <label>
+            Status
+            <select name="status" value={dane.status} onChange={zmienPole}>
+              {STATUSY_KOSZTORYSU.map((wartosc) => (
+                <option key={wartosc} value={wartosc}>
+                  {wartosc}
+                </option>
+              ))}
+            </select>
           </label>
         </div>
       </fieldset>

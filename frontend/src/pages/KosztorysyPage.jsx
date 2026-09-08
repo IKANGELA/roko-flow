@@ -64,7 +64,16 @@ function KosztorysyPage() {
       await usunZamowienie(zamowienie.id)
     }
 
-    const payload = kosztorysDoPayloadu(kosztorys, { wybrany_do_realizacji: false })
+    const payload = kosztorysDoPayloadu(kosztorys, { status: 'Oczekuje' })
+    const zaktualizowany = await aktualizujKosztorys(kosztorys.id, payload)
+    setKosztorysy((poprzednie) => poprzednie.map((k) => (k.id === zaktualizowany.id ? zaktualizowany : k)))
+  }
+
+  // Prosta zmiana statusu wprost z listy (Oczekuje / Zaakceptowany / Odrzucony) — bez
+  // dodatkowych efektów ubocznych. Jeśli chcesz cofnąć akceptację i przy okazji usunąć
+  // powiązane zamówienia, użyj przycisku "Cofnij akceptację" zamiast tej listy.
+  async function zmienStatusKosztorysu(kosztorys, nowyStatus) {
+    const payload = kosztorysDoPayloadu(kosztorys, { status: nowyStatus })
     const zaktualizowany = await aktualizujKosztorys(kosztorys.id, payload)
     setKosztorysy((poprzednie) => poprzednie.map((k) => (k.id === zaktualizowany.id ? zaktualizowany : k)))
   }
@@ -111,6 +120,7 @@ function KosztorysyPage() {
         onWybierz={otworzDoEdycji}
         onAkceptuj={zaakceptujKosztorys}
         onWycofajAkceptacje={wycofajAkceptacjeKosztorysu}
+        onZmienStatus={zmienStatusKosztorysu}
         zaznaczone={zaznaczone}
         onPrzelacz={przelacz}
       />

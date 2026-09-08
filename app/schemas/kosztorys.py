@@ -23,6 +23,11 @@ class KlientPodsumowanie(BaseModel):
 # pozycjeMajaMontaz + tego pola) — zawsze można ją ręcznie nadpisać.
 RODZAJE_INWESTYCJI = ["Mieszkaniowa", "Niemieszkaniowa"]
 
+# Zmieniany ręcznie bezpośrednio z listy kosztorysów, albo automatycznie na "Zaakceptowany"
+# w momencie faktycznego zapisania zamówienia po kliknięciu "Akceptuj" — oba sposoby są
+# równorzędne, patrz komentarz przy KosztorysDB.status.
+STATUSY_KOSZTORYSU = ["Oczekuje", "Zaakceptowany", "Odrzucony"]
+
 
 class DostawcaPodsumowanie(BaseModel):
     """Okrojone dane dostawcy, dołączane do pozycji kosztorysu."""
@@ -114,7 +119,7 @@ class KosztorysCreate(BaseModel):
     adres_montazu: Optional[str] = None
     termin: Optional[str] = None
     uwagi: Optional[str] = None
-    wybrany_do_realizacji: bool = False
+    status: str = "Oczekuje"
     vat_procent: float = 8
     dodatkowe_koszty: float = 0
     rabat: float = 0
@@ -136,7 +141,7 @@ class Kosztorys(BaseModel):
     termin: Optional[str] = None
     data: date
     uwagi: Optional[str] = None
-    wybrany_do_realizacji: bool
+    status: str
     ostatnia_aktualizacja: datetime
     vat_procent: float
     dodatkowe_koszty: float
