@@ -1,14 +1,20 @@
 // Mieszkaniowa/Niemieszkaniowa — musi być zgodne z RODZAJE_INWESTYCJI w app/schemas/kosztorys.py.
 export const RODZAJE_INWESTYCJI = ['Mieszkaniowa', 'Niemieszkaniowa']
 
-// Podpowiedź stawki VAT na podstawie typu klienta i rodzaju inwestycji — tylko podpowiedź,
-// zawsze można ją ręcznie nadpisać (np. przy podzielonej fakturze u klienta prywatnego
-// z dużą kubaturą — VAT wtedy dzieli się na fakturze poza systemem, patrz dane_nabywcy_fields).
-export function podpowiedzVat(typKlienta, rodzajInwestycji) {
-  if (typKlienta === 'Firma') {
-    return rodzajInwestycji === 'Mieszkaniowa' ? 8 : 23
-  }
-  return 8
+// Realna zasada VAT (nie typ klienta!) — 8% wymaga ŁĄCZNIE: (1) montaż wliczony w tę samą
+// fakturę co towar (usługa modernizacji/remontu), (2) budynek mieszkalny w limicie powierzchni
+// (150 m² mieszkanie / 300 m² dom — limitu nie śledzimy, to nadal wymaga ręcznej weryfikacji
+// przy dużych inwestycjach). Sam zakup towaru bez montażu, albo montaż spoza tego zlecenia,
+// to zawsze 23%, niezależnie od typu klienta.
+export function pozycjeMajaMontaz(pozycje) {
+  return pozycje.some((pozycja) => Number(pozycja.montaz_kwota) > 0)
+}
+
+// Podpowiedź stawki VAT — tylko podpowiedź, zawsze można ją ręcznie nadpisać (np. przy
+// podzielonej fakturze dla dużej kubatury — VAT wtedy dzieli się na fakturze poza systemem,
+// patrz dane_nabywcy_fields / vat_typ_klienta_rules).
+export function podpowiedzVat(zMontazem, rodzajInwestycji) {
+  return zMontazem && rodzajInwestycji === 'Mieszkaniowa' ? 8 : 23
 }
 
 // Buduje payload dla PUT /kosztorysy/{id} na podstawie już istniejącego, w pełni wypełnionego

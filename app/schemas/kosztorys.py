@@ -15,12 +15,12 @@ class KlientPodsumowanie(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
-# Wpływa razem z KlientDB.typ_klienta na domyślną stawkę VAT podpowiadaną w formularzu
-# kosztorysu (frontend/src/kosztorysUtils.js::podpowiedzVat) — tylko podpowiedź, zawsze
-# można ją ręcznie nadpisać (np. przy podzielonej fakturze u klienta prywatnego z dużą
-# kubaturą). Rozróżnienie ma sens głównie dla klientów firmowych (Firma+Mieszkaniowa -> 8%,
-# Firma+Niemieszkaniowa -> 23%); dla klientów prywatnych realna stawka zależy od kubatury,
-# której system nie śledzi.
+# Realna zasada VAT (potwierdzona przez użytkownika, nie typ klienta!): 8% wymaga ŁĄCZNIE
+# montażu wliczonego w tę samą fakturę co towar ORAZ budynku mieszkalnego w limicie powierzchni
+# (150 m² mieszkanie / 300 m² dom — limitu system nie śledzi, wymaga ręcznej weryfikacji przy
+# dużych inwestycjach). Sam towar bez montażu, albo montaż spoza tego zlecenia, to zawsze 23%.
+# Podpowiedź liczona we frontendzie (frontend/src/kosztorysUtils.js::podpowiedzVat na podstawie
+# pozycjeMajaMontaz + tego pola) — zawsze można ją ręcznie nadpisać.
 RODZAJE_INWESTYCJI = ["Mieszkaniowa", "Niemieszkaniowa"]
 
 
