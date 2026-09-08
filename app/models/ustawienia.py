@@ -16,8 +16,13 @@ class UstawieniaFirmyDB(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     nazwa: Mapped[str | None] = mapped_column(String, nullable=True)
     adres: Mapped[str | None] = mapped_column(String, nullable=True)
+    # Do "Miejscowość, dnia ..." w nagłówku druków (umowa, zlecenie serwisowe, protokół odbioru).
+    miejscowosc: Mapped[str | None] = mapped_column(String, nullable=True)
     nip: Mapped[str | None] = mapped_column(String, nullable=True)
     konto_bankowe: Mapped[str | None] = mapped_column(String, nullable=True)
     telefon: Mapped[str | None] = mapped_column(String, nullable=True)
     email: Mapped[str | None] = mapped_column(String, nullable=True)
     www: Mapped[str | None] = mapped_column(String, nullable=True)
+    # Dokładne, prawdziwe sformułowanie do zdania "prowadzącym działalność zarejestrowaną
+    # w..., nr wpisu..." w umowie — wpisywane raz przez użytkownika, nigdy zgadywane w kodzie.
+    dane_rejestrowe: Mapped[str | None] = mapped_column(String, nullable=True)

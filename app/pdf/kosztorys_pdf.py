@@ -4,45 +4,24 @@ patrz app/services/kosztorys_service.py) i danych firmy z Ustawień. Nie liczy n
 samodzielnie — tylko układa to, co już policzył KosztorysService, w dokument do druku.
 """
 
-import os
 from io import BytesIO
 
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import A4
-from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
 from reportlab.lib.units import cm
-from reportlab.pdfbase import pdfmetrics
-from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
 
+from app.pdf._fonts import (
+    OBRAMOWANIE as _OBRAMOWANIE,
+    STYL_KOMORKA as _STYL_KOMORKA,
+    STYL_NAGLOWEK as _STYL_NAGLOWEK,
+    STYL_NAGLOWEK_TABELI as _STYL_NAGLOWEK_TABELI,
+    STYL_TEKST as _STYL_TEKST,
+    TLO_NAPRZEMIENNE as _TLO_NAPRZEMIENNE,
+    ZLOTY as _ZLOTY,
+)
 from app.schemas.kosztorys import Kosztorys, Pozycja
 from app.schemas.ustawienia import UstawieniaFirmy
-
-# Domyślne czcionki reportlab (Helvetica itp.) nie mają polskich znaków (ą, ć, ę, ł, ń, ó,
-# ś, ź, ż) — wychodzą jako czarne kwadraty. Czcionka Vera dołączona do samego reportlab też
-# nie ma (to oryginalny, niepolski Bitstream Vera Sans) — dopiero jego rozszerzony fork,
-# DejaVu Sans, ma pełne pokrycie Latin Extended-A. Pliki czcionki są zapakowane w repo
-# (app/pdf/fonts/), licencja DejaVu pozwala na redystrybucję — patrz fonts/LICENSE.txt.
-_KATALOG_CZCIONEK = os.path.join(os.path.dirname(__file__), "fonts")
-pdfmetrics.registerFont(TTFont("DejaVu", os.path.join(_KATALOG_CZCIONEK, "DejaVuSans.ttf")))
-pdfmetrics.registerFont(TTFont("DejaVu-Bold", os.path.join(_KATALOG_CZCIONEK, "DejaVuSans-Bold.ttf")))
-# Bez tego znaczniki <b>...</b> wewnątrz Paragraph z fontName="DejaVu" i tak przełączałyby się
-# na domyślną (bezpolską) Helvetica-Bold zamiast na DejaVu-Bold.
-pdfmetrics.registerFontFamily("DejaVu", normal="DejaVu", bold="DejaVu-Bold", italic="DejaVu", boldItalic="DejaVu-Bold")
-
-_STYLE = getSampleStyleSheet()
-_STYL_NAGLOWEK = ParagraphStyle(
-    "Naglowek", parent=_STYLE["Heading1"], fontName="DejaVu-Bold", fontSize=16, spaceAfter=4
-)
-_STYL_TEKST = ParagraphStyle("Tekst", parent=_STYLE["Normal"], fontName="DejaVu", fontSize=9, leading=12)
-_STYL_KOMORKA = ParagraphStyle("Komorka", parent=_STYLE["Normal"], fontName="DejaVu", fontSize=8, leading=10)
-_STYL_NAGLOWEK_TABELI = ParagraphStyle(
-    "NaglowekTabeli", parent=_STYL_KOMORKA, fontName="DejaVu-Bold", textColor=colors.white
-)
-
-_ZLOTY = colors.HexColor("#b8934a")
-_TLO_NAPRZEMIENNE = colors.HexColor("#faf8f4")
-_OBRAMOWANIE = colors.HexColor("#e4dfd5")
 
 # Kolejność i etykiety kolumn pozycji z własną kwotą — zgodna z PozycjeEditor.jsx (frontend).
 _KOLUMNY_Z_CENA = [
