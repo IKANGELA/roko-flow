@@ -27,8 +27,6 @@ const PUSTY_FORMULARZ = {
   data_dostawy: '',
   magazyn: '',
   braki_w_dostawie: '',
-  zaliczka_producent: 0,
-  doplata_producent: 0,
   wartosc_netto: '',
   vat_procent: 8,
   zaliczka_klienta: 0,
@@ -68,8 +66,6 @@ function danePoczatkowe(zamowienie, wstepnyKosztorysId) {
       data_dostawy: zamowienie.data_dostawy || '',
       magazyn: zamowienie.magazyn || '',
       braki_w_dostawie: zamowienie.braki_w_dostawie || '',
-      zaliczka_producent: zamowienie.zaliczka_producent,
-      doplata_producent: zamowienie.doplata_producent,
       wartosc_netto: zamowienie.wartosc_netto ?? '',
       vat_procent: zamowienie.vat_procent,
       zaliczka_klienta: zamowienie.zaliczka_klienta,
@@ -236,8 +232,6 @@ function ZamowienieForm({ zamowienie, wstepnyKosztorysId, onZapisano }) {
       data_dostawy: dane.data_dostawy || null,
       magazyn: dane.magazyn || null,
       braki_w_dostawie: dane.braki_w_dostawie || null,
-      zaliczka_producent: Number(dane.zaliczka_producent) || 0,
-      doplata_producent: Number(dane.doplata_producent) || 0,
       wartosc_netto: dane.wartosc_netto === '' ? null : Number(dane.wartosc_netto),
       vat_procent: Number(dane.vat_procent),
       zaliczka_klienta: Number(dane.zaliczka_klienta) || 0,
@@ -430,26 +424,6 @@ function ZamowienieForm({ zamowienie, wstepnyKosztorysId, onZapisano }) {
             <input value={doDoplaty === null ? '—' : `${doDoplaty.toFixed(2)} zł`} disabled />
           </label>
 
-          <label>
-            Zaliczka producenta
-            <input
-              type="number"
-              step="0.01"
-              name="zaliczka_producent"
-              value={dane.zaliczka_producent}
-              onChange={zmienPole}
-            />
-          </label>
-          <label>
-            Dopłata producenta
-            <input
-              type="number"
-              step="0.01"
-              name="doplata_producent"
-              value={dane.doplata_producent}
-              onChange={zmienPole}
-            />
-          </label>
           <label className="pole-checkbox">
             <input type="checkbox" name="doplacono" checked={dane.doplacono} onChange={zmienCheckbox} />
             Dopłacono

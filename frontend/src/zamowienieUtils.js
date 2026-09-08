@@ -32,8 +32,6 @@ export function zamowienieDoPayloadu(zamowienie, nadpisania = {}) {
     data_dostawy: zamowienie.data_dostawy,
     magazyn: zamowienie.magazyn,
     braki_w_dostawie: zamowienie.braki_w_dostawie,
-    zaliczka_producent: zamowienie.zaliczka_producent,
-    doplata_producent: zamowienie.doplata_producent,
     wartosc_netto: zamowienie.wartosc_netto,
     vat_procent: zamowienie.vat_procent,
     zaliczka_klienta: zamowienie.zaliczka_klienta,
