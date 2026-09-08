@@ -66,4 +66,26 @@ Frontend: http://localhost:5173 · API i interaktywna dokumentacja: http://local
 
 ## Zrzuty ekranu
 
-_(do uzupełnienia)_
+**Lista kosztorysów** — status do zmiany bezpośrednio z listy, przyciski do pobrania kosztorysu, umowy i karty otworów jako PDF.
+
+![Lista kosztorysów](docs/screenshots/01-kosztorysy-lista.png)
+
+**Edycja kosztorysu** — dane klienta i inwestycji, pozycje z cenami przypisanymi do każdej kolumny (model, kolor, ościeżnica, szkło itd.).
+
+![Edycja kosztorysu — dane i pozycje](docs/screenshots/03-kosztorys-edycja-dane.png)
+
+**Edycja kosztorysu** — dalszy ciąg: pozycje i automatycznie wyliczane podsumowanie finansowe (VAT, rabat, zaliczka, do dopłaty).
+
+![Edycja kosztorysu — pozycje i podsumowanie](docs/screenshots/04-kosztorys-edycja-pozycje.png)
+
+**Lista zamówień** — wartości i status liczone/zmieniane wprost z listy.
+
+![Lista zamówień](docs/screenshots/02-zamowienia-lista.png)
+
+**Raporty operacyjne** — podsumowanie finansowe firmy i zestawienie, którzy klienci czekają na zamówienie u danego dostawcy.
+
+![Raporty operacyjne](docs/screenshots/05-raporty.png)
+
+**Wygenerowany PDF kosztorysu** — dokument do pobrania bezpośrednio z listy, z danymi firmy uzupełnianymi w Ustawieniach.
+
+![Wygenerowany PDF kosztorysu](docs/screenshots/06-pdf-kosztorysu.png)
