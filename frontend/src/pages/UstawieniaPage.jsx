@@ -4,11 +4,13 @@ import { aktualizujUstawieniaFirmy, pobierzUstawieniaFirmy } from '../api'
 const PUSTY_FORMULARZ = {
   nazwa: '',
   adres: '',
+  miejscowosc: '',
   nip: '',
   konto_bankowe: '',
   telefon: '',
   email: '',
   www: '',
+  dane_rejestrowe: '',
 }
 
 function UstawieniaPage() {
@@ -22,11 +24,13 @@ function UstawieniaPage() {
       setDane({
         nazwa: ustawienia.nazwa || '',
         adres: ustawienia.adres || '',
+        miejscowosc: ustawienia.miejscowosc || '',
         nip: ustawienia.nip || '',
         konto_bankowe: ustawienia.konto_bankowe || '',
         telefon: ustawienia.telefon || '',
         email: ustawienia.email || '',
         www: ustawienia.www || '',
+        dane_rejestrowe: ustawienia.dane_rejestrowe || '',
       })
       setWczytywanie(false)
     })
@@ -87,6 +91,10 @@ function UstawieniaPage() {
               <input name="adres" value={dane.adres} onChange={zmienPole} />
             </label>
             <label>
+              Miejscowość (do "Miejscowość, dnia..." na drukach)
+              <input name="miejscowosc" value={dane.miejscowosc} onChange={zmienPole} />
+            </label>
+            <label>
               Telefon
               <input name="telefon" value={dane.telefon} onChange={zmienPole} />
             </label>
@@ -101,6 +109,10 @@ function UstawieniaPage() {
             <label>
               Konto bankowe
               <input name="konto_bankowe" value={dane.konto_bankowe} onChange={zmienPole} />
+            </label>
+            <label className="pole-szerokie">
+              Dane rejestrowe (do zdania „prowadzącym działalność zarejestrowaną w..." w umowie)
+              <input name="dane_rejestrowe" value={dane.dane_rejestrowe} onChange={zmienPole} />
             </label>
           </div>
         </fieldset>

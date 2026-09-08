@@ -8,10 +8,12 @@ class UstawieniaFirmy(BaseModel):
 
     nazwa: Optional[str] = None
     adres: Optional[str] = None
+    miejscowosc: Optional[str] = None
     nip: Optional[str] = None
     konto_bankowe: Optional[str] = None
     telefon: Optional[str] = None
     email: Optional[str] = None
     www: Optional[str] = None
+    dane_rejestrowe: Optional[str] = None
 
     model_config = ConfigDict(from_attributes=True)

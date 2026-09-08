@@ -168,6 +168,10 @@ export function linkPdfKosztorysu(kosztorysId) {
   return `${API_URL}/kosztorysy/${kosztorysId}/pdf`
 }
 
+export function linkPdfUmowy(kosztorysId) {
+  return `${API_URL}/kosztorysy/${kosztorysId}/umowa-pdf`
+}
+
 // Wspólna obsługa usuwania — jeśli backend odrzuci usunięcie (np. bo istnieją powiązane
 // rekordy), pokazujemy dokładnie ten komunikat, który zwrócił, zamiast ogólnego "błąd".
 async function usunPodAdresem(url) {
