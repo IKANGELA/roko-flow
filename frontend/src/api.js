@@ -1,4 +1,7 @@
-const API_URL = 'http://localhost:8000'
+// Lokalnie (npm run dev) domyślnie localhost:8000. Na wersję demo (GitHub Pages) adres
+// backendu (Render) jest wstrzykiwany w czasie budowania przez zmienną VITE_API_URL
+// (patrz .github/workflows/deploy.yml) — nigdy nie zaszywamy tu na sztywno publicznego adresu.
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
 
 export async function pobierzKlientow() {
   const odpowiedz = await fetch(`${API_URL}/klienci/`)
