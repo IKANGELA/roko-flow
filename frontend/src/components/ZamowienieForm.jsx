@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import KlientPicker from './KlientPicker'
-import PozycjeEditor from './PozycjeEditor'
+import PozycjeEditor, { sumaNettoPozycji } from './PozycjeEditor'
 import {
   aktualizujKosztorys,
   aktualizujZamowienie,
@@ -207,8 +207,18 @@ function ZamowienieForm({ zamowienie, wstepnyKosztorysId, onZapisano }) {
     }
   }
 
-  const wartoscBrutto = dane.wartosc_netto === '' ? 0 : Number(dane.wartosc_netto) * (1 + Number(dane.vat_procent) / 100)
-  const doDoplaty = dane.wartosc_netto === '' ? null : wartoscBrutto - (Number(dane.zaliczka_klienta) || 0)
+  // Gdy zamówienie ma kosztorys, wartość netto to podliczenie jego pozycji (dokładnie to samo
+  // co Kosztorys.suma_netto_pozycji) — nie wpisuje się jej ręcznie. Bez kosztorysu ("wolne"
+  // zamówienie) nadal trzeba ją wpisać ręcznie, bo nie ma z czego jej wyliczyć.
+  const sumaNettoZPozycji = pozycje.reduce((suma, pozycja) => suma + sumaNettoPozycji(pozycja), 0)
+  const wartoscNetto = wybranyKosztorys
+    ? sumaNettoZPozycji
+    : dane.wartosc_netto === ''
+      ? null
+      : Number(dane.wartosc_netto)
+
+  const wartoscBrutto = wartoscNetto === null ? 0 : wartoscNetto * (1 + Number(dane.vat_procent) / 100)
+  const doDoplaty = wartoscNetto === null ? null : wartoscBrutto - (Number(dane.zaliczka_klienta) || 0)
 
   async function wyslij(event) {
     event.preventDefault()
@@ -232,7 +242,7 @@ function ZamowienieForm({ zamowienie, wstepnyKosztorysId, onZapisano }) {
       data_dostawy: dane.data_dostawy || null,
       magazyn: dane.magazyn || null,
       braki_w_dostawie: dane.braki_w_dostawie || null,
-      wartosc_netto: dane.wartosc_netto === '' ? null : Number(dane.wartosc_netto),
+      wartosc_netto: wartoscNetto,
       vat_procent: Number(dane.vat_procent),
       zaliczka_klienta: Number(dane.zaliczka_klienta) || 0,
       data_zaliczki: dane.data_zaliczki || null,
@@ -389,8 +399,12 @@ function ZamowienieForm({ zamowienie, wstepnyKosztorysId, onZapisano }) {
 
         <div className="siatka-pol">
           <label>
-            Wartość netto (można uzupełnić później)
-            <input type="number" step="0.01" name="wartosc_netto" value={dane.wartosc_netto} onChange={zmienPole} />
+            {wybranyKosztorys ? 'Wartość netto (suma pozycji kosztorysu)' : 'Wartość netto (można uzupełnić później)'}
+            {wybranyKosztorys ? (
+              <input value={`${sumaNettoZPozycji.toFixed(2)} zł`} disabled />
+            ) : (
+              <input type="number" step="0.01" name="wartosc_netto" value={dane.wartosc_netto} onChange={zmienPole} />
+            )}
           </label>
           <label>
             VAT
@@ -402,7 +416,7 @@ function ZamowienieForm({ zamowienie, wstepnyKosztorysId, onZapisano }) {
           </label>
           <label>
             Wartość brutto (wyliczana)
-            <input value={dane.wartosc_netto === '' ? '—' : `${wartoscBrutto.toFixed(2)} zł`} disabled />
+            <input value={wartoscNetto === null ? '—' : `${wartoscBrutto.toFixed(2)} zł`} disabled />
           </label>
 
           <label>
